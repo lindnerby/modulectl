@@ -1,26 +1,12 @@
-> **NOTE:** This is a general template that you can use for a project README.md. Except for the mandatory sections, use only those sections that suit your use case but keep the proposed section order.
->
-> Mandatory sections: 
-> - `Overview`
-> - `Prerequisites`, if there are any requirements regarding hard- or software
-> - `Installation`
-> - `Contributing` - do not change this!
-> - `Code of Conduct` - do not change this!
-> - `Licensing` - do not change this!
 
-# {Project Title}
-<!--- mandatory --->
-> Modify the title and insert the name of your project. Use Heading 1 (H1).
+# modulectl
 
 ## Overview
-<!--- mandatory section --->
-
-> Provide a description of the project's functionality.
->
-> If it is an example README.md, describe what the example illustrates.
+`modulectl` is a command line tool which supports Kyma Module developers. It provides a set of commands and flags you can use to:
+- Create an emtpy scaffold for a new module
+- Build a module and push it to a remote repository
 
 ## Prerequisites
-
 > List the requirements to run the project or example.
 
 ## Installation
