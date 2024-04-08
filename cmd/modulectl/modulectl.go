@@ -3,12 +3,10 @@ package modulectl
 import (
 	"fmt"
 	"github.com/kyma-project/modulectl/cmd/modulectl/create"
-	"github.com/kyma-project/modulectl/cmd/modulectl/version"
-	"github.com/kyma-project/modulectl/utils"
 	"github.com/spf13/cobra"
 )
 
-func NewCmd(o *utils.Options) *cobra.Command {
+func NewCmd() *cobra.Command {
 	rootCommand := &cobra.Command{
 		Use:   "modulectl",
 		Short: "This is the Kyma Module Controller CLI",
@@ -18,8 +16,7 @@ func NewCmd(o *utils.Options) *cobra.Command {
 		},
 	}
 
-	rootCommand.AddCommand(create.NewCmd(o))
-	rootCommand.AddCommand(version.NewCmd(version.NewOptions(o)))
+	rootCommand.AddCommand(create.NewCmd())
 
 	return rootCommand
 }

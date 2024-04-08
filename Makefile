@@ -19,7 +19,10 @@ lint:
 	GOBIN=$(LOCALBIN) go install github.com/golangci/golangci-lint/cmd/golangci-lint@$(GOLANG_CI_LINT_VERSION)
 	$(LOCALBIN)/golangci-lint run -v
 
-FLAGS = -ldflags '-s -w -X github.com/kyma-project/modulectl/cmd/modulectl/version.Version=$(VERSION)'
+# TODO: adjust this at the end
+#FLAGS = -ldflags '-s -w -X github.com/kyma-project/modulectl/cmd/modulectl/version.Version=$(VERSION)'
+
+FLAGS = -ldflags '-s -w'
 
 .PHONY: build
 build: build-windows build-linux build-darwin build-windows-arm build-linux-arm build-darwin-arm
