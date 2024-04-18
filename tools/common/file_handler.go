@@ -43,7 +43,7 @@ func FileExists(path string) (bool, error) {
 }
 
 func GenerateYamlFileFromObject(obj interface{}, filePath string) error {
-	yamlVal := generateYaml(obj)
+	yamlVal := GenerateYaml(obj)
 
 	err := os.WriteFile(filePath, []byte(yamlVal), 0600)
 	if err != nil {
@@ -53,7 +53,7 @@ func GenerateYamlFileFromObject(obj interface{}, filePath string) error {
 	return nil
 }
 
-func generateYaml(obj interface{}) string {
+func GenerateYaml(obj interface{}) string {
 	reflectValue := reflect.ValueOf(obj)
 	var yamlBuilder strings.Builder
 	generateYamlWithComments(&yamlBuilder, reflectValue, 0, "")

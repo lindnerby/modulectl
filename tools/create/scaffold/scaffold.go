@@ -5,10 +5,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// FIXME: might as well create a util function which takes in the name of the file and the content as parameters
-// and generates that file, return error
-// -> Have the contents of the file stored as a long string or something
-
 func RunE(cmd *cobra.Command, args []string) error {
 	fmt.Fprintln(cmd.OutOrStdout(), "Validating")
 
