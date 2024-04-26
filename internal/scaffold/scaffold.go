@@ -1,14 +1,14 @@
 package scaffold
 
-import (
-	"github.com/kyma-project/modulectl/internal/scaffold/moduleconfig"
-)
-
-type ScaffoldService struct {
-	moduleConfigService *moduleconfig.ModuleConfigService
+type ModuleConfigService interface {
+	PreventOverwrite(directory, moduleConfigFileName string, overwrite bool) error
 }
 
-func NewScaffoldService(moduleConfigService *moduleconfig.ModuleConfigService) *ScaffoldService {
+type ScaffoldService struct {
+	moduleConfigService ModuleConfigService
+}
+
+func NewScaffoldService(moduleConfigService ModuleConfigService) *ScaffoldService {
 	return &ScaffoldService{
 		moduleConfigService: moduleConfigService,
 	}
