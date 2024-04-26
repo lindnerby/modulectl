@@ -50,13 +50,13 @@ You can specify the required fields of the module config using the following CLI
 Also, edit the sec-scanners-config.yaml to be able to use it.
 `,
 		Example: `Generate a minimal scaffold for a module - only a blank manifest file and module config file is generated using defaults
-                kyma alpha create scaffold
+                modulectl create scaffold
 Generate a scaffold providing required values explicitly
-                kyma alpha create scaffold --module-name="kyma-project.io/module/testmodule" --module-version="0.1.1" --module-channel=fast
+				modulectl create scaffold --module-name="kyma-project.io/module/testmodule" --module-version="0.1.1" --module-channel=fast
 Generate a scaffold with a manifest file, default CR and security-scanners config for a module
-                kyma alpha create scaffold --gen-default-cr --gen-security-config
+				modulectl create scaffold --gen-default-cr --gen-security-config
 Generate a scaffold with a manifest file, default CR and security-scanners config for a module, overriding default values
-                kyma alpha create scaffold --gen-manifest="my-manifest.yaml" --gen-default-cr="my-cr.yaml" --gen-security-config="my-seccfg.yaml"
+				modulectl create scaffold --gen-manifest="my-manifest.yaml" --gen-default-cr="my-cr.yaml" --gen-security-config="my-seccfg.yaml"
 
 `,
 		Args: cobra.ExactArgs(0),
