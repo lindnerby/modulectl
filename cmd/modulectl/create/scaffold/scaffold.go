@@ -1,11 +1,15 @@
 package scaffold
 
 import (
-	"github.com/kyma-project/modulectl/tools/create/scaffold"
 	"github.com/spf13/cobra"
+
+	"github.com/kyma-project/modulectl/internal/cmd/scaffold"
+	"github.com/kyma-project/modulectl/tools/io"
 )
 
 func NewCmd() *cobra.Command {
+	opts := scaffold.Options{}
+
 	cmd := &cobra.Command{
 		Use:   "scaffold [--module-name MODULE_NAME --module-version MODULE_VERSION --module-channel CHANNEL] [--directory MODULE_DIRECTORY] [flags]",
 		Short: "Generates necessary files required for module creation",
@@ -60,36 +64,40 @@ Generate a scaffold with a manifest file, default CR and security-scanners confi
 
 `,
 		Args: cobra.ExactArgs(0),
-		RunE: scaffold.RunE,
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return scaffold.RunScaffold(opts)
+		},
 	}
 
-	cmd.Flags().StringVar(&scaffold.ModuleName, "module-name", "kyma-project.io/module/mymodule",
-		"Specifies the module name in the generated config file")
-	cmd.Flags().StringVar(&scaffold.ModuleVersion, "module-version", "0.0.1",
-		"Specifies the module version in the generated module config file")
-	cmd.Flags().StringVar(&scaffold.ModuleChannel, "module-channel", "regular",
-		"Specifies the module channel in the generated module config file")
+	opts.Out = io.NewDefaultOut(cmd.OutOrStdout())
 
-	cmd.Flags().StringVar(&scaffold.ModuleConfigFile, scaffold.ModuleConfigFileFlagName, scaffold.ModuleConfigFileFlagDefault,
-		"Specifies the name for the generated module configuration file")
-	cmd.Flags().Lookup(scaffold.ModuleConfigFileFlagName).NoOptDefVal = scaffold.ModuleConfigFileFlagDefault
+	// cmd.Flags().StringVar(&scaffold.ModuleName, "module-name", "kyma-project.io/module/mymodule",
+	// 	"Specifies the module name in the generated config file")
+	// cmd.Flags().StringVar(&scaffold.ModuleVersion, "module-version", "0.0.1",
+	// 	"Specifies the module version in the generated module config file")
+	// cmd.Flags().StringVar(&scaffold.ModuleChannel, "module-channel", "regular",
+	// 	"Specifies the module channel in the generated module config file")
 
-	cmd.Flags().StringVar(&scaffold.ManifestFile, scaffold.ManifestFileFlagName, scaffold.ManifestFileFlagDefault,
-		"Specifies the manifest in the generated module config. A blank manifest file is generated if it doesn't exist")
-	cmd.Flags().Lookup(scaffold.ManifestFileFlagName).NoOptDefVal = scaffold.ManifestFileFlagDefault
+	// cmd.Flags().StringVar(&scaffold.ModuleConfigFile, scaffold.ModuleConfigFileFlagName, scaffold.ModuleConfigFileFlagDefault,
+	// 	"Specifies the name for the generated module configuration file")
+	// cmd.Flags().Lookup(scaffold.ModuleConfigFileFlagName).NoOptDefVal = scaffold.ModuleConfigFileFlagDefault
 
-	cmd.Flags().StringVar(&scaffold.SecurityConfigFile, scaffold.SecurityConfigFlagName, "",
-		"Specifies the security file in the generated module config. A scaffold security config file is generated if it doesn't exist")
-	cmd.Flags().Lookup(scaffold.SecurityConfigFlagName).NoOptDefVal = scaffold.SecurityConfigFlagDefault
+	// cmd.Flags().StringVar(&scaffold.ManifestFile, scaffold.ManifestFileFlagName, scaffold.ManifestFileFlagDefault,
+	// 	"Specifies the manifest in the generated module config. A blank manifest file is generated if it doesn't exist")
+	// cmd.Flags().Lookup(scaffold.ManifestFileFlagName).NoOptDefVal = scaffold.ManifestFileFlagDefault
 
-	cmd.Flags().StringVar(&scaffold.DefaultCRFile, scaffold.DefaultCRFlagName, "",
-		"Specifies the defaultCR in the generated module config. A blank defaultCR file is generated if it doesn't exist")
-	cmd.Flags().Lookup(scaffold.DefaultCRFlagName).NoOptDefVal = scaffold.DefaultCRFlagDefault
+	// cmd.Flags().StringVar(&scaffold.SecurityConfigFile, scaffold.SecurityConfigFlagName, "",
+	// 	"Specifies the security file in the generated module config. A scaffold security config file is generated if it doesn't exist")
+	// cmd.Flags().Lookup(scaffold.SecurityConfigFlagName).NoOptDefVal = scaffold.SecurityConfigFlagDefault
 
-	cmd.Flags().StringVarP(&scaffold.Directory, "directory", "d", "./",
-		"Specifies the directory where the scaffolding shall be generated")
-	cmd.Flags().BoolVarP(&scaffold.Overwrite, "overwrite", "o", false,
-		"Specifies if the command overwrites an existing module configuration file")
+	// cmd.Flags().StringVar(&scaffold.DefaultCRFile, scaffold.DefaultCRFlagName, "",
+	// 	"Specifies the defaultCR in the generated module config. A blank defaultCR file is generated if it doesn't exist")
+	// cmd.Flags().Lookup(scaffold.DefaultCRFlagName).NoOptDefVal = scaffold.DefaultCRFlagDefault
+
+	// cmd.Flags().StringVarP(&scaffold.Directory, "directory", "d", "./",
+	// 	"Specifies the directory where the scaffolding shall be generated")
+	// cmd.Flags().BoolVarP(&scaffold.Overwrite, "overwrite", "o", false,
+	// 	"Specifies if the command overwrites an existing module configuration file")
 
 	return cmd
 }
