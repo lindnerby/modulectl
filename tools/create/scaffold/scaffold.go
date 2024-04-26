@@ -2,34 +2,35 @@ package scaffold
 
 import (
 	"fmt"
+
 	"github.com/spf13/cobra"
 )
 
 func RunE(cmd *cobra.Command, args []string) error {
-	fmt.Fprintln(cmd.OutOrStdout(), "Validating")
+	// fmt.Fprintln(cmd.OutOrStdout(), "Validating")
 
-	if err := ValidateFlags(); err != nil {
-		return fmt.Errorf("%w\n", err)
-	}
+	// if err := ValidateFlags(); err != nil {
+	// 	return fmt.Errorf("%w\n", err)
+	// }
 
-	if moduleConfigExists, err := ModuleConfigFileExists(); err != nil {
-		return fmt.Errorf("%w\n", err)
-	} else if moduleConfigExists && !Overwrite {
-		return fmt.Errorf("%w\n", errModuleConfigExists)
-	}
+	// if moduleConfigExists, err := ModuleConfigFileExists(); err != nil {
+	// 	return fmt.Errorf("%w\n", err)
+	// } else if moduleConfigExists && !Overwrite {
+	// 	return fmt.Errorf("%w\n", errModuleConfigExists)
+	// }
 
-	if manifestExists, err := ManifestFileExists(); err != nil {
-		return fmt.Errorf("%w\n", err)
-	} else if manifestExists {
-		fmt.Fprintf(cmd.OutOrStdout(), "The Manifest file already exists, reusing: %s\n", ManifestFilePath())
-	} else {
-		fmt.Fprintln(cmd.OutOrStdout(), "Generating Manifest file")
-		if err := GenerateManifest(); err != nil {
-			return fmt.Errorf("%w: %s\n", errManifestCreation, ManifestFilePath())
-		}
+	// if manifestExists, err := ManifestFileExists(); err != nil {
+	// 	return fmt.Errorf("%w\n", err)
+	// } else if manifestExists {
+	// 	fmt.Fprintf(cmd.OutOrStdout(), "The Manifest file already exists, reusing: %s\n", ManifestFilePath())
+	// } else {
+	// 	fmt.Fprintln(cmd.OutOrStdout(), "Generating Manifest file")
+	// 	if err := GenerateManifest(); err != nil {
+	// 		return fmt.Errorf("%w: %s\n", errManifestCreation, ManifestFilePath())
+	// 	}
 
-		fmt.Fprintf(cmd.OutOrStdout(), "Generated a blank Manifest file: %s\n", ManifestFilePath())
-	}
+	// 	fmt.Fprintf(cmd.OutOrStdout(), "Generated a blank Manifest file: %s\n", ManifestFilePath())
+	// }
 
 	if defaultCRFileConfigured() {
 		defaultCRFileExists, err := DefaultCRFileExists()

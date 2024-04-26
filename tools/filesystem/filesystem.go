@@ -18,3 +18,11 @@ func (u *FileSystemUtil) FileExists(path string) (bool, error) {
 		return false, err
 	}
 }
+
+func (u *FileSystemUtil) WriteFile(path, content string) error {
+	if err := os.WriteFile(path, []byte(content), 0600); err != nil {
+		return err
+	}
+
+	return nil
+}

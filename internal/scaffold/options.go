@@ -11,6 +11,7 @@ type Options struct {
 	Directory                 string
 	ModuleConfigFileName      string
 	ModuleConfigFileOverwrite bool
+	ManifestFileName          string
 }
 
 func (opts Options) validate() error {
@@ -24,6 +25,10 @@ func (opts Options) validate() error {
 
 	if opts.ModuleConfigFileName == "" {
 		return fmt.Errorf("%w: opts.ModuleConfigFileName must not be empty", ErrInvalidOption)
+	}
+
+	if opts.ManifestFileName == "" {
+		return fmt.Errorf("%w: opts.ManifestFileName must not be empty", ErrInvalidOption)
 	}
 
 	return nil

@@ -4,16 +4,22 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/kyma-project/modulectl/internal/scaffold"
+	"github.com/kyma-project/modulectl/internal/scaffold/manifest"
 	"github.com/kyma-project/modulectl/internal/scaffold/moduleconfig"
 	"github.com/kyma-project/modulectl/tools/filesystem"
 	"github.com/kyma-project/modulectl/tools/io"
 )
 
 func NewCmd() *cobra.Command {
+	fileSystemUtil := &filesystem.FileSystemUtil{}
 	scaffoldService := scaffold.NewScaffoldService(
 		moduleconfig.NewModuleConfigService(
-			&filesystem.FileSystemUtil{},
+			fileSystemUtil,
 		),
+		manifest.NewManifestService(
+			fileSystemUtil,
+		),
+		fileSystemUtil,
 	)
 
 	opts := scaffold.Options{}
@@ -89,8 +95,6 @@ Generate a scaffold with a manifest file, default CR and security-scanners confi
 
 	// cmd.Flags().Lookup(scaffold.ModuleConfigFileFlagName).NoOptDefVal = scaffold.ModuleConfigFileFlagDefault
 
-	// cmd.Flags().StringVar(&scaffold.ManifestFile, scaffold.ManifestFileFlagName, scaffold.ManifestFileFlagDefault,
-	// 	"Specifies the manifest in the generated module config. A blank manifest file is generated if it doesn't exist")
 	// cmd.Flags().Lookup(scaffold.ManifestFileFlagName).NoOptDefVal = scaffold.ManifestFileFlagDefault
 
 	// cmd.Flags().StringVar(&scaffold.SecurityConfigFile, scaffold.SecurityConfigFlagName, "",

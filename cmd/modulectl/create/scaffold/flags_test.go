@@ -18,6 +18,7 @@ func Test_ScaffoldFlagsDefaults(t *testing.T) {
 		{name: scaffold.DirectoryFlagName, value: scaffold.DirectoryFlagDefault, expected: "./"},
 		{name: scaffold.ModuleConfigFileFlagName, value: scaffold.ModuleConfigFileFlagDefault, expected: "scaffold-module-config.yaml"},
 		{name: scaffold.ModuleConfigFileOverwriteFlagName, value: strconv.FormatBool(scaffold.ModuleConfigFileOverwriteFlagDefault), expected: "false"},
+		{name: scaffold.ManifestFileFlagName, value: scaffold.ManifestFileFlagDefault, expected: "manifest.yaml"},
 	}
 
 	for _, testcase := range tests {
