@@ -6,8 +6,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/kyma-project/modulectl/internal/cmd/scaffold"
-	"github.com/kyma-project/modulectl/internal/cmd/scaffold/moduleconfig"
+	"github.com/kyma-project/modulectl/internal/scaffold"
+	"github.com/kyma-project/modulectl/internal/scaffold/moduleconfig"
 	"github.com/kyma-project/modulectl/internal/testutils/builder"
 	"github.com/kyma-project/modulectl/internal/testutils/stub"
 )

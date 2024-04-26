@@ -1,7 +1,7 @@
 package scaffold
 
 import (
-	"github.com/kyma-project/modulectl/internal/cmd/scaffold/moduleconfig"
+	"github.com/kyma-project/modulectl/internal/scaffold/moduleconfig"
 )
 
 type ScaffoldService struct {

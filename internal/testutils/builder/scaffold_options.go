@@ -3,7 +3,7 @@ package builder
 import (
 	"io"
 
-	"github.com/kyma-project/modulectl/internal/cmd/scaffold"
+	"github.com/kyma-project/modulectl/internal/scaffold"
 	iotools "github.com/kyma-project/modulectl/tools/io"
 )
 

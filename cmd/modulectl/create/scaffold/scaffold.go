@@ -3,8 +3,8 @@ package scaffold
 import (
 	"github.com/spf13/cobra"
 
-	"github.com/kyma-project/modulectl/internal/cmd/scaffold"
-	"github.com/kyma-project/modulectl/internal/cmd/scaffold/moduleconfig"
+	"github.com/kyma-project/modulectl/internal/scaffold"
+	"github.com/kyma-project/modulectl/internal/scaffold/moduleconfig"
 	"github.com/kyma-project/modulectl/tools/filesystem"
 	"github.com/kyma-project/modulectl/tools/io"
 )
