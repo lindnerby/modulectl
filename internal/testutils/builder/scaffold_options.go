@@ -16,8 +16,11 @@ func NewScaffoldOptionsBuilder() *ScaffoldOptionsBuilder {
 		options: scaffold.Options{},
 	}
 
-	return builder.WithOut(iotools.NewDefaultOut(io.Discard))
-
+	return builder.
+		WithOut(iotools.NewDefaultOut(io.Discard)).
+		WithDirectory("./").
+		WithModuleConfigFileName("scaffold-module-config.yaml").
+		WithModuleConfigFileOverwrite(false)
 }
 
 func (b *ScaffoldOptionsBuilder) Build() scaffold.Options {
@@ -26,5 +29,20 @@ func (b *ScaffoldOptionsBuilder) Build() scaffold.Options {
 
 func (b *ScaffoldOptionsBuilder) WithOut(out iotools.Out) *ScaffoldOptionsBuilder {
 	b.options.Out = out
+	return b
+}
+
+func (b *ScaffoldOptionsBuilder) WithDirectory(directory string) *ScaffoldOptionsBuilder {
+	b.options.Directory = directory
+	return b
+}
+
+func (b *ScaffoldOptionsBuilder) WithModuleConfigFileName(moduleConfigFileName string) *ScaffoldOptionsBuilder {
+	b.options.ModuleConfigFileName = moduleConfigFileName
+	return b
+}
+
+func (b *ScaffoldOptionsBuilder) WithModuleConfigFileOverwrite(moduleConfigFileOverwrite bool) *ScaffoldOptionsBuilder {
+	b.options.ModuleConfigFileOverwrite = moduleConfigFileOverwrite
 	return b
 }

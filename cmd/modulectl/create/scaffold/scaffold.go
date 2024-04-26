@@ -4,10 +4,18 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/kyma-project/modulectl/internal/cmd/scaffold"
+	"github.com/kyma-project/modulectl/internal/cmd/scaffold/moduleconfig"
+	"github.com/kyma-project/modulectl/tools/filesystem"
 	"github.com/kyma-project/modulectl/tools/io"
 )
 
 func NewCmd() *cobra.Command {
+	scaffoldService := scaffold.NewScaffoldService(
+		moduleconfig.NewModuleConfigService(
+			&filesystem.FileSystemUtil{},
+		),
+	)
+
 	opts := scaffold.Options{}
 
 	cmd := &cobra.Command{
@@ -63,13 +71,14 @@ Generate a scaffold with a manifest file, default CR and security-scanners confi
 				modulectl create scaffold --gen-manifest="my-manifest.yaml" --gen-default-cr="my-cr.yaml" --gen-security-config="my-seccfg.yaml"
 
 `,
-		Args: cobra.ExactArgs(0),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return scaffold.RunScaffold(opts)
+		Args: cobra.NoArgs,
+		RunE: func(_ *cobra.Command, _ []string) error {
+			return scaffoldService.CreateScaffold(opts)
 		},
 	}
 
 	opts.Out = io.NewDefaultOut(cmd.OutOrStdout())
+	parseFlags(cmd.Flags(), &opts)
 
 	// cmd.Flags().StringVar(&scaffold.ModuleName, "module-name", "kyma-project.io/module/mymodule",
 	// 	"Specifies the module name in the generated config file")
@@ -78,8 +87,6 @@ Generate a scaffold with a manifest file, default CR and security-scanners confi
 	// cmd.Flags().StringVar(&scaffold.ModuleChannel, "module-channel", "regular",
 	// 	"Specifies the module channel in the generated module config file")
 
-	// cmd.Flags().StringVar(&scaffold.ModuleConfigFile, scaffold.ModuleConfigFileFlagName, scaffold.ModuleConfigFileFlagDefault,
-	// 	"Specifies the name for the generated module configuration file")
 	// cmd.Flags().Lookup(scaffold.ModuleConfigFileFlagName).NoOptDefVal = scaffold.ModuleConfigFileFlagDefault
 
 	// cmd.Flags().StringVar(&scaffold.ManifestFile, scaffold.ManifestFileFlagName, scaffold.ManifestFileFlagDefault,
@@ -93,11 +100,6 @@ Generate a scaffold with a manifest file, default CR and security-scanners confi
 	// cmd.Flags().StringVar(&scaffold.DefaultCRFile, scaffold.DefaultCRFlagName, "",
 	// 	"Specifies the defaultCR in the generated module config. A blank defaultCR file is generated if it doesn't exist")
 	// cmd.Flags().Lookup(scaffold.DefaultCRFlagName).NoOptDefVal = scaffold.DefaultCRFlagDefault
-
-	// cmd.Flags().StringVarP(&scaffold.Directory, "directory", "d", "./",
-	// 	"Specifies the directory where the scaffolding shall be generated")
-	// cmd.Flags().BoolVarP(&scaffold.Overwrite, "overwrite", "o", false,
-	// 	"Specifies if the command overwrites an existing module configuration file")
 
 	return cmd
 }

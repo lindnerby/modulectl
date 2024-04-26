@@ -7,12 +7,23 @@ import (
 )
 
 type Options struct {
-	Out io.Out
+	Out                       io.Out
+	Directory                 string
+	ModuleConfigFileName      string
+	ModuleConfigFileOverwrite bool
 }
 
 func (opts Options) validate() error {
 	if opts.Out == nil {
 		return fmt.Errorf("%w: opts.Out must not be nil", ErrInvalidOption)
+	}
+
+	if opts.Directory == "" {
+		return fmt.Errorf("%w: opts.Directory must not be empty", ErrInvalidOption)
+	}
+
+	if opts.ModuleConfigFileName == "" {
+		return fmt.Errorf("%w: opts.ModuleConfigFileName must not be empty", ErrInvalidOption)
 	}
 
 	return nil
