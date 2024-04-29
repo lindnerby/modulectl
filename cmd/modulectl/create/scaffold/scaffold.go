@@ -4,6 +4,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/kyma-project/modulectl/internal/scaffold"
+	"github.com/kyma-project/modulectl/internal/scaffold/defaultcr"
 	"github.com/kyma-project/modulectl/internal/scaffold/manifest"
 	"github.com/kyma-project/modulectl/internal/scaffold/moduleconfig"
 	"github.com/kyma-project/modulectl/tools/filesystem"
@@ -17,6 +18,9 @@ func NewCmd() *cobra.Command {
 			fileSystemUtil,
 		),
 		manifest.NewManifestService(
+			fileSystemUtil,
+		),
+		defaultcr.NewDefaultCRService(
 			fileSystemUtil,
 		),
 		fileSystemUtil,

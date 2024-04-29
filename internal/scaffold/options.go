@@ -12,6 +12,7 @@ type Options struct {
 	ModuleConfigFileName      string
 	ModuleConfigFileOverwrite bool
 	ManifestFileName          string
+	DefaultCRFileName         string
 }
 
 func (opts Options) validate() error {
@@ -32,4 +33,8 @@ func (opts Options) validate() error {
 	}
 
 	return nil
+}
+
+func (opts Options) defaultCRFileNameConfigured() bool {
+	return opts.DefaultCRFileName != ""
 }

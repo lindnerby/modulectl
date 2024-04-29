@@ -23,6 +23,10 @@ const (
 	ManifestFileFlagName    = "gen-manifest"
 	ManifestFileFlagDefault = "manifest.yaml"
 	manifestFileFlagUsage   = "Specifies the manifest in the generated module config. A blank manifest file is generated if it doesn't exist"
+
+	DefaultCRFlagName    = "gen-default-cr"
+	DefaultCRFlagDefault = "default-cr.yaml"
+	defaultCRFlagUsage   = "Specifies the default CR in the generated module config. A blank default CR file is generated if it doesn't exist"
 )
 
 func parseFlags(flags *pflag.FlagSet, opts *scaffold.Options) error {
@@ -30,6 +34,7 @@ func parseFlags(flags *pflag.FlagSet, opts *scaffold.Options) error {
 	flags.StringVar(&opts.ModuleConfigFileName, ModuleConfigFileFlagName, ModuleConfigFileFlagDefault, moduleConfigFileFlagUsage)
 	flags.BoolVarP(&opts.ModuleConfigFileOverwrite, ModuleConfigFileOverwriteFlagName, moduleConfigFileOverwriteFlagShort, ModuleConfigFileOverwriteFlagDefault, moduleConfigFileOverwriteFlagUsage)
 	flags.StringVar(&opts.ManifestFileName, ManifestFileFlagName, ManifestFileFlagDefault, manifestFileFlagUsage)
+	flags.StringVar(&opts.DefaultCRFileName, DefaultCRFlagName, DefaultCRFlagDefault, defaultCRFlagUsage)
 
 	return nil
 }
