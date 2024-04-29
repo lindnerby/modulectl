@@ -1,7 +1,6 @@
 package scaffold
 
 import (
-	"fmt"
 	"path"
 
 	"github.com/kyma-project/modulectl/tools/io"
@@ -12,8 +11,7 @@ type ModuleConfigService interface {
 }
 
 type ManifestService interface {
-	GetDefaultManifestContent() string
-	WriteManifestFile(content, path string) error
+	GenerateManifestFile(out io.Out, manifestFilePath string) error
 }
 
 type DefaultCRService interface {
@@ -53,17 +51,8 @@ func (s *ScaffoldService) CreateScaffold(opts Options) error {
 	}
 
 	manifestFilePath := path.Join(opts.Directory, opts.ManifestFileName)
-	manifestFileExists, err := s.filesystem.FileExists(manifestFilePath)
-	if err != nil {
+	if err := s.manifestService.GenerateManifestFile(opts.Out, manifestFilePath); err != nil {
 		return err
-	}
-	if manifestFileExists {
-		opts.Out.Write(fmt.Sprintf("The Manifest file already exists, reusing: %s\n", manifestFilePath))
-	} else {
-		if err := s.manifestService.WriteManifestFile(s.manifestService.GetDefaultManifestContent(), manifestFilePath); err != nil {
-			return err
-		}
-		opts.Out.Write(fmt.Sprintf("Generated a blank Manifest file: %s\n", manifestFilePath))
 	}
 
 	defaultCRFilePath := ""

@@ -82,7 +82,7 @@ func Test_RunScaffold_ReturnsError_WhenModuleConfigServicePreventOverwriteReturn
 	require.ErrorIs(t, result, errOverwriteError)
 }
 
-func Test_RunScaffold_ReturnsError_WhenManifestServiceWriteManifestFileReturnsError(t *testing.T) {
+func Test_RunScaffold_ReturnsError_WhenGeneratingManifestFileFails(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
 		&preventOverwriteStub{},
 		&manifestServiceErrorStub{},
@@ -91,37 +91,19 @@ func Test_RunScaffold_ReturnsError_WhenManifestServiceWriteManifestFileReturnsEr
 
 	result := svc.CreateScaffold(newScaffoldOptionsBuilder().build())
 
-	require.ErrorIs(t, result, manifest.ErrWritingManifestFile)
+	require.ErrorIs(t, result, manifest.ErrGeneratingManifestFile)
 }
 
-func Test_RunScaffold_Succeeds_WhenManifestFileDoesNotExist(t *testing.T) {
+func Test_RunScaffold_Succeeds_WhenGeneratingManifestFile(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
 		&preventOverwriteStub{},
 		&manifestServiceStub{},
 		&defaultCRServiceStub{},
 		&fileDoesNotExistStub{})
 
-	testOut := testOut{sink: []string{}}
-	result := svc.CreateScaffold(newScaffoldOptionsBuilder().withOut(&testOut).build())
+	result := svc.CreateScaffold(newScaffoldOptionsBuilder().build())
 
 	require.NoError(t, result)
-	require.Len(t, testOut.sink, 1)
-	assert.Contains(t, testOut.sink[0], "Generated a blank Manifest file:")
-}
-
-func Test_RunScaffold_Succeeds_WhenManifestFileExists(t *testing.T) {
-	svc := scaffold.NewScaffoldService(
-		&preventOverwriteStub{},
-		&manifestServiceErrorStub{},
-		&defaultCRServiceStub{},
-		&fileExistsStub{})
-
-	testOut := testOut{sink: []string{}}
-	result := svc.CreateScaffold(newScaffoldOptionsBuilder().withOut(&testOut).build())
-
-	require.NoError(t, result)
-	require.Len(t, testOut.sink, 1)
-	assert.Contains(t, testOut.sink[0], "The Manifest file already exists, reusing:")
 }
 
 func Test_RunScaffold_Succeeds_WhenDefaultCRFileIsNotConfigured(t *testing.T) {
@@ -148,7 +130,7 @@ func Test_RunScaffold_ReturnsError_WhenGeneratingDefaultCRFileFails(t *testing.T
 	require.ErrorIs(t, result, defaultcr.ErrGeneratingDefaultCRFile)
 }
 
-func Test_RunScaffold_ReturnsError_WhenGeneratingDefaultCRFile(t *testing.T) {
+func Test_RunScaffold_Succeeds_WhenGeneratingDefaultCRFile(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
 		&preventOverwriteStub{},
 		&manifestServiceStub{},
@@ -178,24 +160,16 @@ func (*preventOverwriteStub) PreventOverwrite(_, _ string, _ bool) error {
 	return nil
 }
 
-type manifestServiceErrorStub struct{}
-
-func (*manifestServiceErrorStub) GetDefaultManifestContent() string {
-	return "test"
-}
-
-func (*manifestServiceErrorStub) WriteManifestFile(_, _ string) error {
-	return manifest.ErrWritingManifestFile
-}
-
 type manifestServiceStub struct{}
 
-func (*manifestServiceStub) GetDefaultManifestContent() string {
-	return "test"
+func (*manifestServiceStub) GenerateManifestFile(_ iotools.Out, _ string) error {
+	return nil
 }
 
-func (*manifestServiceStub) WriteManifestFile(_, _ string) error {
-	return nil
+type manifestServiceErrorStub struct{}
+
+func (*manifestServiceErrorStub) GenerateManifestFile(_ iotools.Out, _ string) error {
+	return manifest.ErrGeneratingManifestFile
 }
 
 type defaultCRServiceStub struct{}

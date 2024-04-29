@@ -4,61 +4,104 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
 	"github.com/kyma-project/modulectl/internal/scaffold/manifest"
 )
 
-const expectedDefaultContent = `# This file holds the Manifest of your module, encompassing all resources installed in the cluster once the module is activated.
-# It should include the Custom Resource Definition for your module's default CustomResource, if it exists.
+func Test_DefaultCRService_GenerateDefaultCRFile_ReturnsError_WhenFileDoesNotExist(t *testing.T) {
+	svc := manifest.NewManifestService(&fileExistsErrorStub{})
 
-`
+	result := svc.GenerateManifestFile(&testOut{}, "some-path")
 
-func Test_GetDefaultManifestContent_ReturnsExpectedContent(t *testing.T) {
-	svc := manifest.NewManifestService(
-		&writeFileErrorStub{},
-	)
-
-	result := svc.GetDefaultManifestContent()
-
-	require.Equal(t, expectedDefaultContent, result)
+	require.ErrorIs(t, result, manifest.ErrGeneratingManifestFile)
+	require.ErrorIs(t, result, errSomeOSError)
 }
 
-func Test_WriteManifestFile_Succeeds(t *testing.T) {
-	svc := manifest.NewManifestService(
-		&writeFileStub{},
-	)
+func Test_DefaultCRService_GenerateDefaultCRFile_Returns_WhenFileDoesAlreadyExist(t *testing.T) {
+	out := &testOut{}
+	svc := manifest.NewManifestService(&fileExistsStub{})
 
-	result := svc.WriteManifestFile("content", "path")
+	result := svc.GenerateManifestFile(out, "some-path")
 
 	require.NoError(t, result)
+	require.Len(t, out.sink, 1)
+	assert.Contains(t, out.sink[0], "The manifest file already exists, reusing:")
 }
 
-func Test_WriteManifestFile_ReturnsError(t *testing.T) {
-	svc := manifest.NewManifestService(
-		&writeFileErrorStub{},
-	)
+func Test_DefaultCRService_GenerateDefaultCRFile_ReturnsError_WhenErrorWritingFile(t *testing.T) {
+	out := &testOut{}
+	svc := manifest.NewManifestService(&fileWriteErrorStub{})
 
-	result := svc.WriteManifestFile("content", "path")
+	result := svc.GenerateManifestFile(out, "some-path")
 
+	require.ErrorIs(t, result, manifest.ErrGeneratingManifestFile)
 	require.ErrorIs(t, result, manifest.ErrWritingManifestFile)
-	require.ErrorIs(t, result, errSomeOSError)
+	require.Len(t, out.sink, 0)
+}
+
+func Test_DefaultCRService_GenerateDefaultCRFile_Returns_WhenFileIsGenerated(t *testing.T) {
+	out := &testOut{}
+	svc := manifest.NewManifestService(&fileDoesNotExistStub{})
+
+	result := svc.GenerateManifestFile(out, "some-path")
+
+	require.NoError(t, result)
+	require.Len(t, out.sink, 1)
+	assert.Contains(t, out.sink[0], "Generated a blank manifest file:")
 }
 
 // ***************
 // Test Stubs
 // ***************
 
-type writeFileErrorStub struct{}
+type testOut struct {
+	sink []string
+}
+
+func (o *testOut) Write(msg string) {
+	o.sink = append(o.sink, msg)
+}
+
+type fileExistsErrorStub struct{}
 
 var errSomeOSError = errors.New("some os error")
 
-func (*writeFileErrorStub) WriteFile(_, _ string) error {
+func (*fileExistsErrorStub) WriteFile(_, _ string) error {
+	return nil
+}
+
+func (*fileExistsErrorStub) FileExists(_ string) (bool, error) {
+	return false, errSomeOSError
+}
+
+type fileWriteErrorStub struct{}
+
+func (*fileWriteErrorStub) WriteFile(_, _ string) error {
 	return errSomeOSError
 }
 
-type writeFileStub struct{}
+func (*fileWriteErrorStub) FileExists(_ string) (bool, error) {
+	return false, nil
+}
 
-func (*writeFileStub) WriteFile(_, _ string) error {
+type fileExistsStub struct{}
+
+func (*fileExistsStub) WriteFile(_, _ string) error {
 	return nil
+}
+
+func (*fileExistsStub) FileExists(_ string) (bool, error) {
+	return true, nil
+}
+
+type fileDoesNotExistStub struct{}
+
+func (*fileDoesNotExistStub) WriteFile(_, _ string) error {
+	return nil
+}
+
+func (*fileDoesNotExistStub) FileExists(_ string) (bool, error) {
+	return false, nil
 }
