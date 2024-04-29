@@ -26,18 +26,15 @@ type ScaffoldService struct {
 	moduleConfigService ModuleConfigService
 	manifestService     ManifestService
 	defaultCRService    DefaultCRService
-	filesystem          FileSystem
 }
 
 func NewScaffoldService(moduleConfigService ModuleConfigService,
 	manifestService ManifestService,
-	defaultCRService DefaultCRService,
-	fileSystem FileSystem) *ScaffoldService {
+	defaultCRService DefaultCRService) *ScaffoldService {
 	return &ScaffoldService{
 		moduleConfigService: moduleConfigService,
 		manifestService:     manifestService,
 		defaultCRService:    defaultCRService,
-		filesystem:          fileSystem,
 	}
 }
 

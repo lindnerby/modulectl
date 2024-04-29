@@ -23,7 +23,6 @@ func NewCmd() *cobra.Command {
 		defaultcr.NewDefaultCRService(
 			fileSystemUtil,
 		),
-		fileSystemUtil,
 	)
 
 	opts := scaffold.Options{}

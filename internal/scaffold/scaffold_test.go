@@ -18,8 +18,7 @@ func Test_RunScaffold_ReturnsError_WhenOutIsNil(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
 		&preventOverwriteErrorStub{},
 		&manifestServiceErrorStub{},
-		&defaultCRServiceErrorStub{},
-		&fileDoesNotExistStub{})
+		&defaultCRServiceErrorStub{})
 	opts := newScaffoldOptionsBuilder().withOut(nil).build()
 
 	result := svc.CreateScaffold(opts)
@@ -32,8 +31,7 @@ func Test_RunScaffold_ReturnsError_WhenDirectoryIsEmpty(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
 		&preventOverwriteErrorStub{},
 		&manifestServiceErrorStub{},
-		&defaultCRServiceErrorStub{},
-		&fileDoesNotExistStub{})
+		&defaultCRServiceErrorStub{})
 	opts := newScaffoldOptionsBuilder().withDirectory("").build()
 
 	result := svc.CreateScaffold(opts)
@@ -46,8 +44,7 @@ func Test_RunScaffold_ReturnsError_WhenModuleConfigFileIsEmpty(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
 		&preventOverwriteErrorStub{},
 		&manifestServiceErrorStub{},
-		&defaultCRServiceErrorStub{},
-		&fileDoesNotExistStub{})
+		&defaultCRServiceErrorStub{})
 	opts := newScaffoldOptionsBuilder().withModuleConfigFileName("").build()
 
 	result := svc.CreateScaffold(opts)
@@ -60,8 +57,7 @@ func Test_RunScaffold_ReturnsError_WhenManifestFileIsEmpty(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
 		&preventOverwriteErrorStub{},
 		&manifestServiceErrorStub{},
-		&defaultCRServiceErrorStub{},
-		&fileDoesNotExistStub{})
+		&defaultCRServiceErrorStub{})
 	opts := newScaffoldOptionsBuilder().withManifestFileName("").build()
 
 	result := svc.CreateScaffold(opts)
@@ -74,8 +70,7 @@ func Test_RunScaffold_ReturnsError_WhenModuleConfigServicePreventOverwriteReturn
 	svc := scaffold.NewScaffoldService(
 		&preventOverwriteErrorStub{},
 		&manifestServiceErrorStub{},
-		&defaultCRServiceErrorStub{},
-		&fileDoesNotExistStub{})
+		&defaultCRServiceErrorStub{})
 
 	result := svc.CreateScaffold(newScaffoldOptionsBuilder().build())
 
@@ -86,8 +81,7 @@ func Test_RunScaffold_ReturnsError_WhenGeneratingManifestFileFails(t *testing.T)
 	svc := scaffold.NewScaffoldService(
 		&preventOverwriteStub{},
 		&manifestServiceErrorStub{},
-		&defaultCRServiceErrorStub{},
-		&fileDoesNotExistStub{})
+		&defaultCRServiceErrorStub{})
 
 	result := svc.CreateScaffold(newScaffoldOptionsBuilder().build())
 
@@ -98,8 +92,7 @@ func Test_RunScaffold_Succeeds_WhenGeneratingManifestFile(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
 		&preventOverwriteStub{},
 		&manifestServiceStub{},
-		&defaultCRServiceStub{},
-		&fileDoesNotExistStub{})
+		&defaultCRServiceStub{})
 
 	result := svc.CreateScaffold(newScaffoldOptionsBuilder().build())
 
@@ -110,8 +103,7 @@ func Test_RunScaffold_Succeeds_WhenDefaultCRFileIsNotConfigured(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
 		&preventOverwriteStub{},
 		&manifestServiceStub{},
-		&defaultCRServiceErrorStub{},
-		&fileDoesNotExistStub{})
+		&defaultCRServiceErrorStub{})
 
 	result := svc.CreateScaffold(newScaffoldOptionsBuilder().withDefaultCRFileName("").build())
 
@@ -122,8 +114,7 @@ func Test_RunScaffold_ReturnsError_WhenGeneratingDefaultCRFileFails(t *testing.T
 	svc := scaffold.NewScaffoldService(
 		&preventOverwriteStub{},
 		&manifestServiceStub{},
-		&defaultCRServiceErrorStub{},
-		&fileDoesNotExistStub{})
+		&defaultCRServiceErrorStub{})
 
 	result := svc.CreateScaffold(newScaffoldOptionsBuilder().build())
 
@@ -134,8 +125,7 @@ func Test_RunScaffold_Succeeds_WhenGeneratingDefaultCRFile(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
 		&preventOverwriteStub{},
 		&manifestServiceStub{},
-		&defaultCRServiceStub{},
-		&fileDoesNotExistStub{})
+		&defaultCRServiceStub{})
 
 	result := svc.CreateScaffold(newScaffoldOptionsBuilder().build())
 
@@ -182,26 +172,6 @@ type defaultCRServiceErrorStub struct{}
 
 func (*defaultCRServiceErrorStub) GenerateDefaultCRFile(out iotools.Out, _ string) error {
 	return defaultcr.ErrGeneratingDefaultCRFile
-}
-
-type fileExistsStub struct{}
-
-func (*fileExistsStub) FileExists(_ string) (bool, error) {
-	return true, nil
-}
-
-type fileDoesNotExistStub struct{}
-
-func (*fileDoesNotExistStub) FileExists(_ string) (bool, error) {
-	return false, nil
-}
-
-type testOut struct {
-	sink []string
-}
-
-func (o *testOut) Write(msg string) {
-	o.sink = append(o.sink, msg)
 }
 
 // ***************
