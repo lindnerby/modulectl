@@ -18,10 +18,6 @@ type DefaultCRService interface {
 	GenerateDefaultCRFile(out io.Out, path string) error
 }
 
-type FileSystem interface {
-	FileExists(path string) (bool, error)
-}
-
 type ScaffoldService struct {
 	moduleConfigService ModuleConfigService
 	manifestService     ManifestService
