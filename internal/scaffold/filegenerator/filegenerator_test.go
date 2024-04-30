@@ -10,29 +10,9 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func Test_FileGeneratorService_GenerateFile_ReturnsError_WhenFileDoesNotExist(t *testing.T) {
-	svc := filegenerator.NewFileGeneratorService("test-kind", &fileExistsErrorStub{}, &contentProviderErrorStub{})
-
-	result := svc.GenerateFile(&testOut{}, "some-path", nil)
-
-	require.ErrorIs(t, result, filegenerator.ErrCheckingFileExistence)
-	require.ErrorIs(t, result, errSomeOSError)
-}
-
-func Test_FileGeneratorService_GenerateFile_Succeeds_WhenFileDoesAlreadyExist(t *testing.T) {
-	out := &testOut{}
-	svc := filegenerator.NewFileGeneratorService("test-kind", &fileExistsStub{}, &contentProviderErrorStub{})
-
-	result := svc.GenerateFile(out, "some-path", nil)
-
-	require.NoError(t, result)
-	require.Len(t, out.sink, 1)
-	assert.Contains(t, out.sink[0], "The test-kind file already exists, reusing:")
-}
-
 func Test_FileGeneratorService_GenerateFile_ReturnsError_WhenErrorGettingDefaultContent(t *testing.T) {
-	out := &testOut{}
-	svc := filegenerator.NewFileGeneratorService("test-kind", &fileWriteErrorStub{}, &contentProviderErrorStub{})
+	out := &fgTestOut{}
+	svc := filegenerator.NewFileGeneratorService("test-kind", &fileWriterErrorStub{}, &contentProviderErrorStub{})
 
 	result := svc.GenerateFile(out, "some-path", nil)
 
@@ -42,8 +22,8 @@ func Test_FileGeneratorService_GenerateFile_ReturnsError_WhenErrorGettingDefault
 }
 
 func Test_FileGeneratorService_GenerateFile_ReturnsError_WhenErrorWritingFile(t *testing.T) {
-	out := &testOut{}
-	svc := filegenerator.NewFileGeneratorService("test-kind", &fileWriteErrorStub{}, &contentProviderStub{})
+	out := &fgTestOut{}
+	svc := filegenerator.NewFileGeneratorService("test-kind", &fileWriterErrorStub{}, &contentProviderStub{})
 
 	result := svc.GenerateFile(out, "some-path", nil)
 
@@ -52,8 +32,8 @@ func Test_FileGeneratorService_GenerateFile_ReturnsError_WhenErrorWritingFile(t 
 }
 
 func Test_FileGeneratorService_GenerateFile_Succeeds_WhenFileIsGenerated(t *testing.T) {
-	out := &testOut{}
-	svc := filegenerator.NewFileGeneratorService("test-kind", &fileDoesNotExistStub{}, &contentProviderStub{})
+	out := &fgTestOut{}
+	svc := filegenerator.NewFileGeneratorService("test-kind", &fileWriterStub{}, &contentProviderStub{})
 
 	result := svc.GenerateFile(out, "some-path", nil)
 
@@ -66,11 +46,11 @@ func Test_FileGeneratorService_GenerateFile_Succeeds_WhenFileIsGenerated(t *test
 // Test Stubs
 // ***************
 
-type testOut struct {
+type fgTestOut struct {
 	sink []string
 }
 
-func (o *testOut) Write(msg string) {
+func (o *fgTestOut) Write(msg string) {
 	o.sink = append(o.sink, msg)
 }
 
@@ -88,44 +68,16 @@ func (*contentProviderErrorStub) GetDefaultContent(args types.KeyValueArgs) (str
 	return "", errSomeContentProviderError
 }
 
-type fileExistsErrorStub struct{}
+type fileWriterErrorStub struct{}
 
-var errSomeOSError = errors.New("some os error")
+var errSomeOSError = errors.New("some error")
 
-func (*fileExistsErrorStub) WriteFile(_, _ string) error {
-	return nil
-}
-
-func (*fileExistsErrorStub) FileExists(_ string) (bool, error) {
-	return false, errSomeOSError
-}
-
-type fileExistsStub struct{}
-
-func (*fileExistsStub) WriteFile(_, _ string) error {
-	return nil
-}
-
-func (*fileExistsStub) FileExists(_ string) (bool, error) {
-	return true, nil
-}
-
-type fileDoesNotExistStub struct{}
-
-func (*fileDoesNotExistStub) WriteFile(_, _ string) error {
-	return nil
-}
-
-func (*fileDoesNotExistStub) FileExists(_ string) (bool, error) {
-	return false, nil
-}
-
-type fileWriteErrorStub struct{}
-
-func (*fileWriteErrorStub) WriteFile(_, _ string) error {
+func (*fileWriterErrorStub) WriteFile(_, _ string) error {
 	return errSomeOSError
 }
 
-func (*fileWriteErrorStub) FileExists(_ string) (bool, error) {
-	return false, nil
+type fileWriterStub struct{}
+
+func (*fileWriterStub) WriteFile(_, _ string) error {
+	return nil
 }

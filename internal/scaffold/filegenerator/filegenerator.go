@@ -8,8 +8,7 @@ import (
 	"github.com/kyma-project/modulectl/tools/io"
 )
 
-type FileSystem interface {
-	FileExists(path string) (bool, error)
+type FileWriter interface {
 	WriteFile(path, content string) error
 }
 
@@ -19,29 +18,19 @@ type DefaultContentProvider interface {
 
 type FileGeneratorService struct {
 	kind                   string
-	fileSystem             FileSystem
+	fileWriter             FileWriter
 	defaultContentProvider DefaultContentProvider
 }
 
-func NewFileGeneratorService(kind string, fileSystem FileSystem, defaultContentProvider DefaultContentProvider) *FileGeneratorService {
+func NewFileGeneratorService(kind string, fileSystem FileWriter, defaultContentProvider DefaultContentProvider) *FileGeneratorService {
 	return &FileGeneratorService{
 		kind:                   kind,
-		fileSystem:             fileSystem,
+		fileWriter:             fileSystem,
 		defaultContentProvider: defaultContentProvider,
 	}
 }
 
 func (s *FileGeneratorService) GenerateFile(out io.Out, path string, args types.KeyValueArgs) error {
-	fileExists, err := s.fileSystem.FileExists(path)
-	if err != nil {
-		return fmt.Errorf("%w %s: %w", ErrCheckingFileExistence, path, err)
-	}
-
-	if fileExists {
-		out.Write(fmt.Sprintf("The %s file already exists, reusing: %s\n", s.kind, path))
-		return nil
-	}
-
 	defaultContent, err := s.defaultContentProvider.GetDefaultContent(args)
 	if err != nil {
 		return errors.Join(ErrGettingDefaultContent, err)
@@ -57,7 +46,7 @@ func (s *FileGeneratorService) GenerateFile(out io.Out, path string, args types.
 }
 
 func (s *FileGeneratorService) writeFile(content, path string) error {
-	if err := s.fileSystem.WriteFile(path, content); err != nil {
+	if err := s.fileWriter.WriteFile(path, content); err != nil {
 		return fmt.Errorf("%w %s: %w", ErrWritingFile, path, err)
 	}
 
