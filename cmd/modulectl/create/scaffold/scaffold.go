@@ -27,10 +27,13 @@ func NewCmd() *cobra.Command {
 		defaultcr.NewDefaultCRService(
 			fileSystemUtil,
 		),
-		filegenerator.NewFileGeneratorService(
+		filegenerator.NewReuseFileGeneratorService(
 			"security-config",
 			fileSystemUtil,
-			contentprovider.NewSecurityConfigContentProvider(yamlConverter)),
+			filegenerator.NewFileGeneratorService(
+				"security-config",
+				fileSystemUtil,
+				contentprovider.NewSecurityConfigContentProvider(yamlConverter))),
 	)
 
 	opts := scaffold.Options{}
