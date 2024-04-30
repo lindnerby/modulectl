@@ -35,6 +35,14 @@ const (
 	ModuleNameFlagName    = "module-name"
 	ModuleNameFlagDefault = "kyma-project.io/module/mymodule"
 	moduleNameFlagUsage   = "Specifies the module name in the generated config file"
+
+	ModuleVersionFlagName    = "module-version"
+	ModuleVersionFlagDefault = "0.0.1"
+	moduleVersionFlagUsage   = "Specifies the module version in the generated module config file"
+
+	ModuleChannelFlagName    = "module-channel"
+	ModuleChannelFlagDefault = "regular"
+	moduleChannelFlagUsage   = "Specifies the module channel in the generated module config file"
 )
 
 func parseFlags(flags *pflag.FlagSet, opts *scaffold.Options) error {
@@ -45,6 +53,8 @@ func parseFlags(flags *pflag.FlagSet, opts *scaffold.Options) error {
 	flags.StringVar(&opts.DefaultCRFileName, DefaultCRFlagName, DefaultCRFlagDefault, defaultCRFlagUsage)
 	flags.StringVar(&opts.SecurityConfigFileName, SecurityConfigFileFlagName, SecurityConfigFileFlagDefault, securityConfigFileFlagUsage)
 	flags.StringVar(&opts.ModuleName, ModuleNameFlagName, ModuleNameFlagDefault, moduleNameFlagUsage)
+	flags.StringVar(&opts.ModuleVersion, ModuleVersionFlagName, ModuleVersionFlagDefault, moduleVersionFlagUsage)
+	flags.StringVar(&opts.ModuleChannel, ModuleChannelFlagName, ModuleChannelFlagDefault, moduleChannelFlagUsage)
 
 	return nil
 }

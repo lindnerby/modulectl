@@ -20,6 +20,11 @@ func NewCmd() *cobra.Command {
 	scaffoldService := scaffold.NewScaffoldService(
 		moduleconfig.NewModuleConfigService(
 			fileSystemUtil,
+			filegenerator.NewFileGeneratorService(
+				"module-config",
+				fileSystemUtil,
+				contentprovider.NewModuleConfigContentProvider(yamlConverter),
+			),
 		),
 		manifest.NewManifestService(
 			fileSystemUtil,

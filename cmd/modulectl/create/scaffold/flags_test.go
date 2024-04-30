@@ -22,6 +22,8 @@ func Test_ScaffoldFlagsDefaults(t *testing.T) {
 		{name: scaffold.DefaultCRFlagName, value: scaffold.DefaultCRFlagDefault, expected: "default-cr.yaml"},
 		{name: scaffold.SecurityConfigFileFlagName, value: scaffold.SecurityConfigFileFlagDefault, expected: "sec-scanners-config.yaml"},
 		{name: scaffold.ModuleNameFlagName, value: scaffold.ModuleNameFlagDefault, expected: "kyma-project.io/module/mymodule"},
+		{name: scaffold.ModuleVersionFlagName, value: scaffold.ModuleVersionFlagDefault, expected: "0.0.1"},
+		{name: scaffold.ModuleChannelFlagName, value: scaffold.ModuleChannelFlagDefault, expected: "regular"},
 	}
 
 	for _, testcase := range tests {

@@ -6,14 +6,6 @@ import (
 	"github.com/kyma-project/modulectl/internal/scaffold/common/types"
 )
 
-const (
-	ArgModuleName = "moduleName"
-)
-
-type ObjectToYAMLConverter interface {
-	ConvertToYaml(obj interface{}) string
-}
-
 type SecurityConfigContentProvider struct {
 	yamlConverter ObjectToYAMLConverter
 }
@@ -25,14 +17,14 @@ func NewSecurityConfigContentProvider(yamlConverter ObjectToYAMLConverter) *Secu
 }
 
 func (s *SecurityConfigContentProvider) GetDefaultContent(args types.KeyValueArgs) (string, error) {
-	if err := validateArgs(args); err != nil {
+	if err := s.validateArgs(args); err != nil {
 		return "", err
 	}
 
-	return s.yamlConverter.ConvertToYaml(getSecurityConfig(args[ArgModuleName])), nil
+	return s.yamlConverter.ConvertToYaml(s.getSecurityConfig(args[ArgModuleName])), nil
 }
 
-func validateArgs(args types.KeyValueArgs) error {
+func (s *SecurityConfigContentProvider) validateArgs(args types.KeyValueArgs) error {
 	if args == nil {
 		return fmt.Errorf("%w: args must not be nil", ErrInvalidArg)
 	}
@@ -49,7 +41,7 @@ func validateArgs(args types.KeyValueArgs) error {
 	return nil
 }
 
-func getSecurityConfig(moduleName string) securityScanCfg {
+func (s *SecurityConfigContentProvider) getSecurityConfig(moduleName string) securityScanCfg {
 	return securityScanCfg{
 		ModuleName: moduleName,
 		Protecode: []string{"europe-docker.pkg.dev/kyma-project/prod/myimage:1.2.3",

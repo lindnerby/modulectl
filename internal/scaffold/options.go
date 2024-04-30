@@ -15,6 +15,8 @@ type Options struct {
 	DefaultCRFileName         string
 	SecurityConfigFileName    string
 	ModuleName                string
+	ModuleVersion             string
+	ModuleChannel             string
 }
 
 func (opts Options) validate() error {
@@ -36,6 +38,14 @@ func (opts Options) validate() error {
 
 	if opts.ModuleName == "" {
 		return fmt.Errorf("%w: opts.ModuleName must not be empty", ErrInvalidOption)
+	}
+
+	if opts.ModuleVersion == "" {
+		return fmt.Errorf("%w: opts.ModuleVersion must not be empty", ErrInvalidOption)
+	}
+
+	if opts.ModuleChannel == "" {
+		return fmt.Errorf("%w: opts.ModuleChannel must not be empty", ErrInvalidOption)
 	}
 
 	return nil

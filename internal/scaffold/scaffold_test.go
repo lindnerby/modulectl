@@ -17,7 +17,7 @@ import (
 
 func Test_RunScaffold_ReturnsError_WhenOutIsNil(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
-		&preventOverwriteErrorStub{},
+		&moduleConfigPreventOverwriteErrorStub{},
 		&manifestServiceErrorStub{},
 		&defaultCRServiceErrorStub{},
 		&fileGeneratorErrorStub{})
@@ -31,7 +31,7 @@ func Test_RunScaffold_ReturnsError_WhenOutIsNil(t *testing.T) {
 
 func Test_RunScaffold_ReturnsError_WhenDirectoryIsEmpty(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
-		&preventOverwriteErrorStub{},
+		&moduleConfigPreventOverwriteErrorStub{},
 		&manifestServiceErrorStub{},
 		&defaultCRServiceErrorStub{},
 		&fileGeneratorErrorStub{})
@@ -45,7 +45,7 @@ func Test_RunScaffold_ReturnsError_WhenDirectoryIsEmpty(t *testing.T) {
 
 func Test_RunScaffold_ReturnsError_WhenModuleConfigFileIsEmpty(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
-		&preventOverwriteErrorStub{},
+		&moduleConfigPreventOverwriteErrorStub{},
 		&manifestServiceErrorStub{},
 		&defaultCRServiceErrorStub{},
 		&fileGeneratorErrorStub{})
@@ -59,7 +59,7 @@ func Test_RunScaffold_ReturnsError_WhenModuleConfigFileIsEmpty(t *testing.T) {
 
 func Test_RunScaffold_ReturnsError_WhenManifestFileIsEmpty(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
-		&preventOverwriteErrorStub{},
+		&moduleConfigPreventOverwriteErrorStub{},
 		&manifestServiceErrorStub{},
 		&defaultCRServiceErrorStub{},
 		&fileGeneratorErrorStub{})
@@ -73,7 +73,7 @@ func Test_RunScaffold_ReturnsError_WhenManifestFileIsEmpty(t *testing.T) {
 
 func Test_RunScaffold_ReturnsError_WhenModuleNameIsEmpty(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
-		&preventOverwriteErrorStub{},
+		&moduleConfigPreventOverwriteErrorStub{},
 		&manifestServiceErrorStub{},
 		&defaultCRServiceErrorStub{},
 		&fileGeneratorErrorStub{})
@@ -85,9 +85,37 @@ func Test_RunScaffold_ReturnsError_WhenModuleNameIsEmpty(t *testing.T) {
 	assert.Contains(t, result.Error(), "opts.ModuleName")
 }
 
+func Test_RunScaffold_ReturnsError_WhenModuleVersionIsEmpty(t *testing.T) {
+	svc := scaffold.NewScaffoldService(
+		&moduleConfigPreventOverwriteErrorStub{},
+		&manifestServiceErrorStub{},
+		&defaultCRServiceErrorStub{},
+		&fileGeneratorErrorStub{})
+	opts := newScaffoldOptionsBuilder().withModuleVersion("").build()
+
+	result := svc.CreateScaffold(opts)
+
+	require.ErrorIs(t, result, scaffold.ErrInvalidOption)
+	assert.Contains(t, result.Error(), "opts.ModuleVersion")
+}
+
+func Test_RunScaffold_ReturnsError_WhenModuleChannelIsEmpty(t *testing.T) {
+	svc := scaffold.NewScaffoldService(
+		&moduleConfigPreventOverwriteErrorStub{},
+		&manifestServiceErrorStub{},
+		&defaultCRServiceErrorStub{},
+		&fileGeneratorErrorStub{})
+	opts := newScaffoldOptionsBuilder().withModuleChannel("").build()
+
+	result := svc.CreateScaffold(opts)
+
+	require.ErrorIs(t, result, scaffold.ErrInvalidOption)
+	assert.Contains(t, result.Error(), "opts.ModuleChannel")
+}
+
 func Test_RunScaffold_ReturnsError_WhenModuleConfigServicePreventOverwriteReturnsError(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
-		&preventOverwriteErrorStub{},
+		&moduleConfigPreventOverwriteErrorStub{},
 		&manifestServiceErrorStub{},
 		&defaultCRServiceErrorStub{},
 		&fileGeneratorErrorStub{})
@@ -99,7 +127,7 @@ func Test_RunScaffold_ReturnsError_WhenModuleConfigServicePreventOverwriteReturn
 
 func Test_RunScaffold_ReturnsError_WhenGeneratingManifestFileFails(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
-		&preventOverwriteStub{},
+		&moduleConfigGenerateFileErrorStub{},
 		&manifestServiceErrorStub{},
 		&defaultCRServiceErrorStub{},
 		&fileGeneratorErrorStub{})
@@ -111,7 +139,7 @@ func Test_RunScaffold_ReturnsError_WhenGeneratingManifestFileFails(t *testing.T)
 
 func Test_RunScaffold_Succeeds_WhenGeneratingManifestFile(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
-		&preventOverwriteStub{},
+		&moduleConfigStub{},
 		&manifestServiceStub{},
 		&defaultCRServiceStub{},
 		&fileGeneratorStub{})
@@ -123,7 +151,7 @@ func Test_RunScaffold_Succeeds_WhenGeneratingManifestFile(t *testing.T) {
 
 func Test_RunScaffold_Succeeds_WhenDefaultCRFileIsNotConfigured(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
-		&preventOverwriteStub{},
+		&moduleConfigStub{},
 		&manifestServiceStub{},
 		&defaultCRServiceErrorStub{},
 		&fileGeneratorStub{})
@@ -135,7 +163,7 @@ func Test_RunScaffold_Succeeds_WhenDefaultCRFileIsNotConfigured(t *testing.T) {
 
 func Test_RunScaffold_ReturnsError_WhenGeneratingDefaultCRFileFails(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
-		&preventOverwriteStub{},
+		&moduleConfigGenerateFileErrorStub{},
 		&manifestServiceStub{},
 		&defaultCRServiceErrorStub{},
 		&fileGeneratorErrorStub{})
@@ -147,7 +175,7 @@ func Test_RunScaffold_ReturnsError_WhenGeneratingDefaultCRFileFails(t *testing.T
 
 func Test_RunScaffold_Succeeds_WhenGeneratingDefaultCRFile(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
-		&preventOverwriteStub{},
+		&moduleConfigStub{},
 		&manifestServiceStub{},
 		&defaultCRServiceStub{},
 		&fileGeneratorStub{})
@@ -159,7 +187,7 @@ func Test_RunScaffold_Succeeds_WhenGeneratingDefaultCRFile(t *testing.T) {
 
 func Test_RunScaffold_Succeeds_WhenSecurityConfigFileIsNotConfigured(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
-		&preventOverwriteStub{},
+		&moduleConfigStub{},
 		&manifestServiceStub{},
 		&defaultCRServiceStub{},
 		&fileGeneratorErrorStub{})
@@ -171,7 +199,7 @@ func Test_RunScaffold_Succeeds_WhenSecurityConfigFileIsNotConfigured(t *testing.
 
 func Test_RunScaffold_ReturnsError_WhenGeneratingSecurityConfigFileFails(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
-		&preventOverwriteStub{},
+		&moduleConfigGenerateFileErrorStub{},
 		&manifestServiceStub{},
 		&defaultCRServiceStub{},
 		&fileGeneratorErrorStub{})
@@ -185,7 +213,33 @@ func Test_RunScaffold_ReturnsError_WhenGeneratingSecurityConfigFileFails(t *test
 
 func Test_RunScaffold_Succeeds_WhenGeneratingSecurityConfigFile(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
-		&preventOverwriteStub{},
+		&moduleConfigStub{},
+		&manifestServiceStub{},
+		&defaultCRServiceStub{},
+		&fileGeneratorStub{})
+
+	result := svc.CreateScaffold(newScaffoldOptionsBuilder().build())
+
+	require.NoError(t, result)
+}
+
+func Test_RunScaffold_ReturnsError_WhenGeneratingModuleConfigReturnsError(t *testing.T) {
+	svc := scaffold.NewScaffoldService(
+		&moduleConfigGenerateFileErrorStub{},
+		&manifestServiceStub{},
+		&defaultCRServiceStub{},
+		&fileGeneratorStub{})
+
+	result := svc.CreateScaffold(newScaffoldOptionsBuilder().build())
+
+	require.ErrorIs(t, result, scaffold.ErrGenertingFile)
+	require.ErrorIs(t, result, errSomeFileGeneratorError)
+	assert.Contains(t, result.Error(), "module-config.yaml")
+}
+
+func Test_RunScaffold_Succeeds(t *testing.T) {
+	svc := scaffold.NewScaffoldService(
+		&moduleConfigStub{},
 		&manifestServiceStub{},
 		&defaultCRServiceStub{},
 		&fileGeneratorStub{})
@@ -198,18 +252,38 @@ func Test_RunScaffold_Succeeds_WhenGeneratingSecurityConfigFile(t *testing.T) {
 // ***************
 // Test Stubs
 // ***************
+var errSomeFileGeneratorError = errors.New("some file generator error")
+var errSomeUnexpectedError = errors.New("if you see this error, something went wrong in the test setup")
 
-type preventOverwriteErrorStub struct{}
+type moduleConfigPreventOverwriteErrorStub struct{}
 
 var errOverwriteError = errors.New("overwrite error")
 
-func (*preventOverwriteErrorStub) PreventOverwrite(_, _ string, _ bool) error {
+func (*moduleConfigPreventOverwriteErrorStub) PreventOverwrite(_, _ string, _ bool) error {
 	return errOverwriteError
 }
 
-type preventOverwriteStub struct{}
+func (*moduleConfigPreventOverwriteErrorStub) GenerateFile(_ iotools.Out, _ string, _ types.KeyValueArgs) error {
+	return errSomeUnexpectedError
+}
 
-func (*preventOverwriteStub) PreventOverwrite(_, _ string, _ bool) error {
+type moduleConfigGenerateFileErrorStub struct{}
+
+func (*moduleConfigGenerateFileErrorStub) PreventOverwrite(_, _ string, _ bool) error {
+	return nil
+}
+
+func (*moduleConfigGenerateFileErrorStub) GenerateFile(_ iotools.Out, _ string, _ types.KeyValueArgs) error {
+	return errSomeFileGeneratorError
+}
+
+type moduleConfigStub struct{}
+
+func (*moduleConfigStub) PreventOverwrite(_, _ string, _ bool) error {
+	return nil
+}
+
+func (*moduleConfigStub) GenerateFile(_ iotools.Out, _ string, _ types.KeyValueArgs) error {
 	return nil
 }
 
@@ -238,8 +312,6 @@ func (*defaultCRServiceErrorStub) GenerateDefaultCRFile(out iotools.Out, _ strin
 }
 
 type fileGeneratorErrorStub struct{}
-
-var errSomeFileGeneratorError = errors.New("some file generator error")
 
 func (*fileGeneratorErrorStub) GenerateFile(_ iotools.Out, _ string, _ types.KeyValueArgs) error {
 	return errSomeFileGeneratorError
@@ -272,7 +344,9 @@ func newScaffoldOptionsBuilder() *scaffoldOptionsBuilder {
 		withDefaultCRFileName("default-cr.yaml").
 		withModuleConfigFileOverwrite(false).
 		withSecurityConfigFileName("security-config.yaml").
-		withModuleName("test-module")
+		withModuleName("test-module").
+		withModuleVersion("0.0.1").
+		withModuleChannel("experimental")
 }
 
 func (b *scaffoldOptionsBuilder) build() scaffold.Options {
@@ -316,5 +390,15 @@ func (b *scaffoldOptionsBuilder) withSecurityConfigFileName(securityConfigFileNa
 
 func (b *scaffoldOptionsBuilder) withModuleName(moduleName string) *scaffoldOptionsBuilder {
 	b.options.ModuleName = moduleName
+	return b
+}
+
+func (b *scaffoldOptionsBuilder) withModuleVersion(moduleVersion string) *scaffoldOptionsBuilder {
+	b.options.ModuleVersion = moduleVersion
+	return b
+}
+
+func (b *scaffoldOptionsBuilder) withModuleChannel(moduleChannel string) *scaffoldOptionsBuilder {
+	b.options.ModuleChannel = moduleChannel
 	return b
 }

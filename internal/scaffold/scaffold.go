@@ -10,6 +10,7 @@ import (
 )
 
 type ModuleConfigService interface {
+	FileGeneratorService
 	PreventOverwrite(directory, moduleConfigFileName string, overwrite bool) error
 }
 
@@ -101,6 +102,21 @@ func (s *ScaffoldService) CreateScaffold(opts Options) error {
 			types.KeyValueArgs{contentprovider.ArgModuleName: opts.ModuleName}); err != nil {
 			return fmt.Errorf("%w %s: %w", ErrGenertingFile, opts.SecurityConfigFileName, err)
 		}
+	}
+
+	moduleConfigFilePath := path.Join(opts.Directory, opts.ModuleConfigFileName)
+	if err := s.moduleConfigService.GenerateFile(
+		opts.Out,
+		moduleConfigFilePath,
+		types.KeyValueArgs{
+			contentprovider.ArgModuleName:         opts.ModuleName,
+			contentprovider.ArgModuleVersion:      opts.ModuleVersion,
+			contentprovider.ArgModuleChannel:      opts.ModuleChannel,
+			contentprovider.ArgManifestFile:       opts.ManifestFileName,
+			contentprovider.ArgDefaultCRFile:      defaultCRFilePath,
+			contentprovider.ArgSecurityConfigFile: securityConfigFilePath,
+		}); err != nil {
+		return fmt.Errorf("%w %s: %w", ErrGenertingFile, opts.ModuleConfigFileName, err)
 	}
 
 	return nil

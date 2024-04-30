@@ -6,7 +6,9 @@ import (
 
 	"github.com/stretchr/testify/require"
 
+	"github.com/kyma-project/modulectl/internal/scaffold/common/types"
 	"github.com/kyma-project/modulectl/internal/scaffold/moduleconfig"
+	"github.com/kyma-project/modulectl/tools/io"
 )
 
 const (
@@ -17,6 +19,7 @@ const (
 func Test_PreventOverwrite_ReturnsError_WhenFilesystemReturnsError(t *testing.T) {
 	svc := moduleconfig.NewModuleConfigService(
 		&errorStub{},
+		&fileGeneratorErrorStub{},
 	)
 
 	result := svc.PreventOverwrite(directory, moduleConfigFile, true)
@@ -27,6 +30,7 @@ func Test_PreventOverwrite_ReturnsError_WhenFilesystemReturnsError(t *testing.T)
 func Test_PreventOverwrite_ReturnsError_WhenFileExistsAndNoOverwrite(t *testing.T) {
 	svc := moduleconfig.NewModuleConfigService(
 		&fileExistsStub{},
+		&fileGeneratorErrorStub{},
 	)
 
 	result := svc.PreventOverwrite(directory, moduleConfigFile, false)
@@ -37,6 +41,7 @@ func Test_PreventOverwrite_ReturnsError_WhenFileExistsAndNoOverwrite(t *testing.
 func Test_PreventOverwrite_ReturnsNil_WhenFileExistsAndOverwrite(t *testing.T) {
 	svc := moduleconfig.NewModuleConfigService(
 		&fileExistsStub{},
+		&fileGeneratorErrorStub{},
 	)
 
 	result := svc.PreventOverwrite(directory, moduleConfigFile, true)
@@ -47,6 +52,7 @@ func Test_PreventOverwrite_ReturnsNil_WhenFileExistsAndOverwrite(t *testing.T) {
 func Test_PreventOverwrite_ReturnsNil_WhenFileDoesNotExist(t *testing.T) {
 	svc := moduleconfig.NewModuleConfigService(
 		&fileDoesNotExistStub{},
+		&fileGeneratorErrorStub{},
 	)
 
 	result := svc.PreventOverwrite(directory, moduleConfigFile, true)
@@ -76,4 +82,12 @@ type errorStub struct{}
 
 func (*errorStub) FileExists(_ string) (bool, error) {
 	return false, errSomeOSError
+}
+
+type fileGeneratorErrorStub struct{}
+
+var errSomeFileGeneratorError = errors.New("some file generator error")
+
+func (*fileGeneratorErrorStub) GenerateFile(out io.Out, path string, args types.KeyValueArgs) error {
+	return errSomeFileGeneratorError
 }

@@ -2,19 +2,28 @@ package moduleconfig
 
 import (
 	"path"
+
+	"github.com/kyma-project/modulectl/internal/scaffold/common/types"
+	"github.com/kyma-project/modulectl/tools/io"
 )
 
 type FileSystem interface {
 	FileExists(path string) (bool, error)
 }
 
-type ModuleConfigService struct {
-	fileSystem FileSystem
+type FileGenerator interface {
+	GenerateFile(out io.Out, path string, args types.KeyValueArgs) error
 }
 
-func NewModuleConfigService(fileSystemUtil FileSystem) *ModuleConfigService {
+type ModuleConfigService struct {
+	fileSystem    FileSystem
+	fileGenerator FileGenerator
+}
+
+func NewModuleConfigService(fileSystemUtil FileSystem, fileGenerator FileGenerator) *ModuleConfigService {
 	return &ModuleConfigService{
-		fileSystem: fileSystemUtil,
+		fileSystem:    fileSystemUtil,
+		fileGenerator: fileGenerator,
 	}
 }
 
@@ -29,4 +38,8 @@ func (s *ModuleConfigService) PreventOverwrite(directory, fileName string, overw
 	}
 
 	return nil
+}
+
+func (s *ModuleConfigService) GenerateFile(out io.Out, path string, args types.KeyValueArgs) error {
+	return s.fileGenerator.GenerateFile(out, path, args)
 }
