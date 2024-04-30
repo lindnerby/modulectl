@@ -10,7 +10,7 @@ import (
 	"github.com/kyma-project/modulectl/internal/scaffold/manifest"
 )
 
-func Test_DefaultCRService_GenerateDefaultCRFile_ReturnsError_WhenFileDoesNotExist(t *testing.T) {
+func Test_ManifestService_GenerateManifestFile_ReturnsError_WhenFileDoesNotExist(t *testing.T) {
 	svc := manifest.NewManifestService(&fileExistsErrorStub{})
 
 	result := svc.GenerateManifestFile(&testOut{}, "some-path")
@@ -19,7 +19,7 @@ func Test_DefaultCRService_GenerateDefaultCRFile_ReturnsError_WhenFileDoesNotExi
 	require.ErrorIs(t, result, errSomeOSError)
 }
 
-func Test_DefaultCRService_GenerateDefaultCRFile_Returns_WhenFileDoesAlreadyExist(t *testing.T) {
+func Test_ManifestService_GenerateManifestFile_Returns_WhenFileDoesAlreadyExist(t *testing.T) {
 	out := &testOut{}
 	svc := manifest.NewManifestService(&fileExistsStub{})
 
@@ -30,7 +30,7 @@ func Test_DefaultCRService_GenerateDefaultCRFile_Returns_WhenFileDoesAlreadyExis
 	assert.Contains(t, out.sink[0], "The manifest file already exists, reusing:")
 }
 
-func Test_DefaultCRService_GenerateDefaultCRFile_ReturnsError_WhenErrorWritingFile(t *testing.T) {
+func Test_ManifestService_GenerateManifestFile_ReturnsError_WhenErrorWritingFile(t *testing.T) {
 	out := &testOut{}
 	svc := manifest.NewManifestService(&fileWriteErrorStub{})
 
@@ -41,7 +41,7 @@ func Test_DefaultCRService_GenerateDefaultCRFile_ReturnsError_WhenErrorWritingFi
 	require.Len(t, out.sink, 0)
 }
 
-func Test_DefaultCRService_GenerateDefaultCRFile_Returns_WhenFileIsGenerated(t *testing.T) {
+func Test_ManifestService_GenerateManifestFile_Returns_WhenFileIsGenerated(t *testing.T) {
 	out := &testOut{}
 	svc := manifest.NewManifestService(&fileDoesNotExistStub{})
 
