@@ -24,13 +24,15 @@ const (
 	ManifestFileFlagDefault = "manifest.yaml"
 	manifestFileFlagUsage   = "Specifies the manifest in the generated module config. A blank manifest file is generated if it doesn't exist"
 
-	DefaultCRFlagName    = "gen-default-cr"
-	DefaultCRFlagDefault = "default-cr.yaml"
-	defaultCRFlagUsage   = "Specifies the default CR in the generated module config. A blank default CR file is generated if it doesn't exist"
+	DefaultCRFlagName         = "gen-default-cr"
+	DefaultCRFlagDefault      = ""
+	DefaultCRFlagNoOptDefault = "default-cr.yaml"
+	defaultCRFlagUsage        = "Specifies the default CR in the generated module config. A blank default CR file is generated if it doesn't exist"
 
-	SecurityConfigFileFlagName    = "gen-security-config"
-	SecurityConfigFileFlagDefault = "sec-scanners-config.yaml"
-	securityConfigFileFlagUsage   = "Specifies the security file in the generated module config. A scaffold security config file is generated if it doesn't exist"
+	SecurityConfigFileFlagName         = "gen-security-config"
+	SecurityConfigFileFlagDefault      = ""
+	SecurityConfigFileFlagNoOptDefault = "sec-scanners-config.yaml"
+	securityConfigFileFlagUsage        = "Specifies the security file in the generated module config. A scaffold security config file is generated if it doesn't exist"
 
 	ModuleNameFlagName    = "module-name"
 	ModuleNameFlagDefault = "kyma-project.io/module/mymodule"
@@ -55,6 +57,9 @@ func parseFlags(flags *pflag.FlagSet, opts *scaffold.Options) error {
 	flags.StringVar(&opts.ModuleName, ModuleNameFlagName, ModuleNameFlagDefault, moduleNameFlagUsage)
 	flags.StringVar(&opts.ModuleVersion, ModuleVersionFlagName, ModuleVersionFlagDefault, moduleVersionFlagUsage)
 	flags.StringVar(&opts.ModuleChannel, ModuleChannelFlagName, ModuleChannelFlagDefault, moduleChannelFlagUsage)
+
+	flags.Lookup(SecurityConfigFileFlagName).NoOptDefVal = SecurityConfigFileFlagNoOptDefault
+	flags.Lookup(DefaultCRFlagName).NoOptDefVal = DefaultCRFlagNoOptDefault
 
 	return nil
 }

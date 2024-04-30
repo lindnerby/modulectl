@@ -105,24 +105,5 @@ Generate a scaffold with a manifest file, default CR and security-scanners confi
 	opts.Out = io.NewDefaultOut(cmd.OutOrStdout())
 	parseFlags(cmd.Flags(), &opts)
 
-	// cmd.Flags().StringVar(&scaffold.ModuleName, "module-name", "kyma-project.io/module/mymodule",
-	// 	"Specifies the module name in the generated config file")
-	// cmd.Flags().StringVar(&scaffold.ModuleVersion, "module-version", "0.0.1",
-	// 	"Specifies the module version in the generated module config file")
-	// cmd.Flags().StringVar(&scaffold.ModuleChannel, "module-channel", "regular",
-	// 	"Specifies the module channel in the generated module config file")
-
-	// cmd.Flags().Lookup(scaffold.ModuleConfigFileFlagName).NoOptDefVal = scaffold.ModuleConfigFileFlagDefault
-
-	// cmd.Flags().Lookup(scaffold.ManifestFileFlagName).NoOptDefVal = scaffold.ManifestFileFlagDefault
-
-	// cmd.Flags().StringVar(&scaffold.SecurityConfigFile, scaffold.SecurityConfigFlagName, "",
-	// 	"Specifies the security file in the generated module config. A scaffold security config file is generated if it doesn't exist")
-	// cmd.Flags().Lookup(scaffold.SecurityConfigFlagName).NoOptDefVal = scaffold.SecurityConfigFlagDefault
-
-	// cmd.Flags().StringVar(&scaffold.DefaultCRFile, scaffold.DefaultCRFlagName, "",
-	// 	"Specifies the defaultCR in the generated module config. A blank defaultCR file is generated if it doesn't exist")
-	// cmd.Flags().Lookup(scaffold.DefaultCRFlagName).NoOptDefVal = scaffold.DefaultCRFlagDefault
-
 	return cmd
 }
