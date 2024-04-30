@@ -27,6 +27,14 @@ const (
 	DefaultCRFlagName    = "gen-default-cr"
 	DefaultCRFlagDefault = "default-cr.yaml"
 	defaultCRFlagUsage   = "Specifies the default CR in the generated module config. A blank default CR file is generated if it doesn't exist"
+
+	SecurityConfigFileFlagName    = "gen-security-config"
+	SecurityConfigFileFlagDefault = "sec-scanners-config.yaml"
+	securityConfigFileFlagUsage   = "Specifies the security file in the generated module config. A scaffold security config file is generated if it doesn't exist"
+
+	ModuleNameFlagName    = "module-name"
+	ModuleNameFlagDefault = "kyma-project.io/module/mymodule"
+	moduleNameFlagUsage   = "Specifies the module name in the generated config file"
 )
 
 func parseFlags(flags *pflag.FlagSet, opts *scaffold.Options) error {
@@ -35,6 +43,8 @@ func parseFlags(flags *pflag.FlagSet, opts *scaffold.Options) error {
 	flags.BoolVarP(&opts.ModuleConfigFileOverwrite, ModuleConfigFileOverwriteFlagName, moduleConfigFileOverwriteFlagShort, ModuleConfigFileOverwriteFlagDefault, moduleConfigFileOverwriteFlagUsage)
 	flags.StringVar(&opts.ManifestFileName, ManifestFileFlagName, ManifestFileFlagDefault, manifestFileFlagUsage)
 	flags.StringVar(&opts.DefaultCRFileName, DefaultCRFlagName, DefaultCRFlagDefault, defaultCRFlagUsage)
+	flags.StringVar(&opts.SecurityConfigFileName, SecurityConfigFileFlagName, SecurityConfigFileFlagDefault, securityConfigFileFlagUsage)
+	flags.StringVar(&opts.ModuleName, ModuleNameFlagName, ModuleNameFlagDefault, moduleNameFlagUsage)
 
 	return nil
 }

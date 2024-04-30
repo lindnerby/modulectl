@@ -4,15 +4,19 @@ import (
 	"github.com/spf13/cobra"
 
 	"github.com/kyma-project/modulectl/internal/scaffold"
+	"github.com/kyma-project/modulectl/internal/scaffold/contentprovider"
 	"github.com/kyma-project/modulectl/internal/scaffold/defaultcr"
+	"github.com/kyma-project/modulectl/internal/scaffold/filegenerator"
 	"github.com/kyma-project/modulectl/internal/scaffold/manifest"
 	"github.com/kyma-project/modulectl/internal/scaffold/moduleconfig"
 	"github.com/kyma-project/modulectl/tools/filesystem"
 	"github.com/kyma-project/modulectl/tools/io"
+	"github.com/kyma-project/modulectl/tools/yaml"
 )
 
 func NewCmd() *cobra.Command {
 	fileSystemUtil := &filesystem.FileSystemUtil{}
+	yamlConverter := &yaml.ObjectToYAMLConverter{}
 	scaffoldService := scaffold.NewScaffoldService(
 		moduleconfig.NewModuleConfigService(
 			fileSystemUtil,
@@ -23,6 +27,10 @@ func NewCmd() *cobra.Command {
 		defaultcr.NewDefaultCRService(
 			fileSystemUtil,
 		),
+		filegenerator.NewFileGeneratorService(
+			"security-config",
+			fileSystemUtil,
+			contentprovider.NewSecurityConfigContentProvider(yamlConverter)),
 	)
 
 	opts := scaffold.Options{}

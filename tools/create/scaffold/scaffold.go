@@ -32,39 +32,39 @@ func RunE(cmd *cobra.Command, args []string) error {
 	// 	fmt.Fprintf(cmd.OutOrStdout(), "Generated a blank Manifest file: %s\n", ManifestFilePath())
 	// }
 
-	if defaultCRFileConfigured() {
-		defaultCRFileExists, err := DefaultCRFileExists()
-		if err != nil {
-			return err
-		}
-		if !defaultCRFileExists {
-			fmt.Fprintln(cmd.OutOrStdout(), "Generating default CR file")
-			if err := GenerateDefaultCRFile(); err != nil {
-				return fmt.Errorf("%w: %s\n", errDefaultCRCreationFailed, err.Error())
-			}
-			fmt.Fprintf(cmd.OutOrStdout(), "Generated a blank default CR file: %s\n", DefaultCRFilePath())
-		} else {
-			fmt.Fprintf(cmd.OutOrStdout(), "The default CR file already exists, reusing: %s\n", DefaultCRFilePath())
-		}
-	}
+	// if defaultCRFileConfigured() {
+	// 	defaultCRFileExists, err := DefaultCRFileExists()
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// 	if !defaultCRFileExists {
+	// 		fmt.Fprintln(cmd.OutOrStdout(), "Generating default CR file")
+	// 		if err := GenerateDefaultCRFile(); err != nil {
+	// 			return fmt.Errorf("%w: %s\n", errDefaultCRCreationFailed, err.Error())
+	// 		}
+	// 		fmt.Fprintf(cmd.OutOrStdout(), "Generated a blank default CR file: %s\n", DefaultCRFilePath())
+	// 	} else {
+	// 		fmt.Fprintf(cmd.OutOrStdout(), "The default CR file already exists, reusing: %s\n", DefaultCRFilePath())
+	// 	}
+	// }
 
-	if securityConfigFileConfigured() {
-		secConfExists, err := SecurityConfigFileExists()
-		if err != nil {
-			return err
-		}
-		fmt.Fprintln(cmd.OutOrStdout(), "Configuring Security-Scanners config file...")
+	// if securityConfigFileConfigured() {
+	// 	secConfExists, err := SecurityConfigFileExists()
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// 	fmt.Fprintln(cmd.OutOrStdout(), "Configuring Security-Scanners config file...")
 
-		if !secConfExists {
-			fmt.Fprintln(cmd.OutOrStdout(), "Generating security-scanners config file")
-			if err := GenerateSecurityConfigFile(); err != nil {
-				return fmt.Errorf("%w: %s\n", errSecurityConfigCreationFailed, err.Error())
-			}
-			fmt.Fprintf(cmd.OutOrStdout(), "Generated security-scanners config file: %s\n", SecurityConfigFilePath())
-		} else {
-			fmt.Fprintf(cmd.OutOrStdout(), "The security-scanners config file already exists, reusing: %s\n", SecurityConfigFilePath())
-		}
-	}
+	// 	if !secConfExists {
+	// 		fmt.Fprintln(cmd.OutOrStdout(), "Generating security-scanners config file")
+	// 		if err := GenerateSecurityConfigFile(); err != nil {
+	// 			return fmt.Errorf("%w: %s\n", errSecurityConfigCreationFailed, err.Error())
+	// 		}
+	// 		fmt.Fprintf(cmd.OutOrStdout(), "Generated security-scanners config file: %s\n", SecurityConfigFilePath())
+	// 	} else {
+	// 		fmt.Fprintf(cmd.OutOrStdout(), "The security-scanners config file already exists, reusing: %s\n", SecurityConfigFilePath())
+	// 	}
+	// }
 
 	fmt.Fprintln(cmd.OutOrStdout(), "Generating module config file...")
 

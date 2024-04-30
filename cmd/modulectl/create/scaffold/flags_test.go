@@ -20,6 +20,8 @@ func Test_ScaffoldFlagsDefaults(t *testing.T) {
 		{name: scaffold.ModuleConfigFileOverwriteFlagName, value: strconv.FormatBool(scaffold.ModuleConfigFileOverwriteFlagDefault), expected: "false"},
 		{name: scaffold.ManifestFileFlagName, value: scaffold.ManifestFileFlagDefault, expected: "manifest.yaml"},
 		{name: scaffold.DefaultCRFlagName, value: scaffold.DefaultCRFlagDefault, expected: "default-cr.yaml"},
+		{name: scaffold.SecurityConfigFileFlagName, value: scaffold.SecurityConfigFileFlagDefault, expected: "sec-scanners-config.yaml"},
+		{name: scaffold.ModuleNameFlagName, value: scaffold.ModuleNameFlagDefault, expected: "kyma-project.io/module/mymodule"},
 	}
 
 	for _, testcase := range tests {

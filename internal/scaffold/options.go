@@ -13,6 +13,8 @@ type Options struct {
 	ModuleConfigFileOverwrite bool
 	ManifestFileName          string
 	DefaultCRFileName         string
+	SecurityConfigFileName    string
+	ModuleName                string
 }
 
 func (opts Options) validate() error {
@@ -32,9 +34,17 @@ func (opts Options) validate() error {
 		return fmt.Errorf("%w: opts.ManifestFileName must not be empty", ErrInvalidOption)
 	}
 
+	if opts.ModuleName == "" {
+		return fmt.Errorf("%w: opts.ModuleName must not be empty", ErrInvalidOption)
+	}
+
 	return nil
 }
 
 func (opts Options) defaultCRFileNameConfigured() bool {
 	return opts.DefaultCRFileName != ""
+}
+
+func (opts Options) securityConfigFileNameConfigured() bool {
+	return opts.SecurityConfigFileName != ""
 }
