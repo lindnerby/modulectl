@@ -15,6 +15,9 @@ const (
 	// // taken from "https://github.com/open-component-model/ocm/blob/4473dacca406e4c84c0ac5e6e14393c659384afc/resources/component-descriptor-v2-schema.yaml#L40"
 	moduleNamePattern   = "^[a-z][-a-z0-9]*([.][a-z][-a-z0-9]*)*[.][a-z]{2,}(/[a-z][-a-z0-9_]*([.][a-z][-a-z0-9_]*)*)+$"
 	moduleNameMaxLength = 255
+	channelMinLength    = 3
+	channelMaxLength    = 32
+	channelPattern      = "^[a-z]+$"
 )
 
 type Options struct {
@@ -43,20 +46,20 @@ func (opts Options) validate() error {
 		return err
 	}
 
+	if err := opts.validateVersion(); err != nil {
+		return err
+	}
+
+	if err := opts.validateChannel(); err != nil {
+		return err
+	}
+
 	if opts.ModuleConfigFileName == "" {
 		return fmt.Errorf("%w: opts.ModuleConfigFileName must not be empty", ErrInvalidOption)
 	}
 
 	if opts.ManifestFileName == "" {
 		return fmt.Errorf("%w: opts.ManifestFileName must not be empty", ErrInvalidOption)
-	}
-
-	if err := opts.validateVersion(); err != nil {
-		return err
-	}
-
-	if opts.ModuleChannel == "" {
-		return fmt.Errorf("%w: opts.ModuleChannel must not be empty", ErrInvalidOption)
 	}
 
 	return nil
@@ -90,7 +93,7 @@ func (opts Options) validateModuleName() error {
 	}
 
 	if len(opts.ModuleName) > moduleNameMaxLength {
-		return fmt.Errorf("%w: opts.ModuleName length must not exceed 255 characters", ErrInvalidOption)
+		return fmt.Errorf("%w: opts.ModuleName length must not exceed %q characters", ErrInvalidOption, moduleNameMaxLength)
 
 	}
 
@@ -124,6 +127,28 @@ func (opts Options) validateSemanticVersion() error {
 	_, err := semver.StrictNewVersion(val)
 	if err != nil {
 		return fmt.Errorf("%w: opts.ModuleVersion failed to parse as semantic version: %w", ErrInvalidOption, err)
+	}
+
+	return nil
+}
+
+func (opts Options) validateChannel() error {
+	if opts.ModuleChannel == "" {
+		return fmt.Errorf("%w: opts.ModuleChannel must not be empty", ErrInvalidOption)
+	}
+
+	if len(opts.ModuleChannel) > channelMaxLength {
+		return fmt.Errorf("%w: opts.ModuleChannel length must not exceed %q characters", ErrInvalidOption, channelMaxLength)
+	}
+
+	if len(opts.ModuleChannel) < channelMinLength {
+		return fmt.Errorf("%w: opts.ModuleChannel length must be at least %q characters", ErrInvalidOption, channelMinLength)
+	}
+
+	if matched, err := regexp.MatchString(channelPattern, opts.ModuleChannel); err != nil {
+		return fmt.Errorf("%w: failed to evaluate regex pattern for opts.ModuleChannel", ErrInvalidOption)
+	} else if !matched {
+		return fmt.Errorf("%w: opts.ModuleChannel must match the required pattern, only characters from a-z are allowed", ErrInvalidOption)
 	}
 
 	return nil

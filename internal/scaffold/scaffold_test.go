@@ -159,6 +159,51 @@ func Test_RunScaffold_ReturnsError_WhenModuleChannelIsEmpty(t *testing.T) {
 	assert.Contains(t, result.Error(), "opts.ModuleChannel")
 }
 
+func Test_RunScaffold_ReturnsError_WhenModuleChannelIsExceedingLength(t *testing.T) {
+	svc := scaffold.NewScaffoldService(
+		&moduleConfigPreventOverwriteErrorStub{},
+		&manifestServiceErrorStub{},
+		&defaultCRServiceErrorStub{},
+		&fileGeneratorErrorStub{})
+	opts := newScaffoldOptionsBuilder().withModuleChannel(getRandomName(33)).build()
+
+	result := svc.CreateScaffold(opts)
+
+	require.ErrorIs(t, result, scaffold.ErrInvalidOption)
+	assert.Contains(t, result.Error(), "opts.ModuleChannel")
+	assert.Contains(t, result.Error(), "length")
+}
+
+func Test_RunScaffold_ReturnsError_WhenModuleChannelFallsBelowLength(t *testing.T) {
+	svc := scaffold.NewScaffoldService(
+		&moduleConfigPreventOverwriteErrorStub{},
+		&manifestServiceErrorStub{},
+		&defaultCRServiceErrorStub{},
+		&fileGeneratorErrorStub{})
+	opts := newScaffoldOptionsBuilder().withModuleChannel(getRandomName(2)).build()
+
+	result := svc.CreateScaffold(opts)
+
+	require.ErrorIs(t, result, scaffold.ErrInvalidOption)
+	assert.Contains(t, result.Error(), "opts.ModuleChannel")
+	assert.Contains(t, result.Error(), "length")
+}
+
+func Test_RunScaffold_ReturnsError_WhenModuleChannelNotMatchingCharset(t *testing.T) {
+	svc := scaffold.NewScaffoldService(
+		&moduleConfigPreventOverwriteErrorStub{},
+		&manifestServiceErrorStub{},
+		&defaultCRServiceErrorStub{},
+		&fileGeneratorErrorStub{})
+	opts := newScaffoldOptionsBuilder().withModuleChannel("with not allowed chars 123%&").build()
+
+	result := svc.CreateScaffold(opts)
+
+	require.ErrorIs(t, result, scaffold.ErrInvalidOption)
+	assert.Contains(t, result.Error(), "opts.ModuleChannel")
+	assert.Contains(t, result.Error(), "pattern")
+}
+
 func Test_RunScaffold_ReturnsError_WhenModuleConfigServicePreventOverwriteReturnsError(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
 		&moduleConfigPreventOverwriteErrorStub{},
