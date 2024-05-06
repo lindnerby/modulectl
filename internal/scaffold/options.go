@@ -1,7 +1,9 @@
 package scaffold
 
 import (
+	"errors"
 	"fmt"
+	"os"
 
 	"github.com/kyma-project/modulectl/tools/io"
 )
@@ -24,8 +26,8 @@ func (opts Options) validate() error {
 		return fmt.Errorf("%w: opts.Out must not be nil", ErrInvalidOption)
 	}
 
-	if opts.Directory == "" {
-		return fmt.Errorf("%w: opts.Directory must not be empty", ErrInvalidOption)
+	if err := opts.validateDirectory(); err != nil {
+		return err
 	}
 
 	if opts.ModuleConfigFileName == "" {
@@ -46,6 +48,28 @@ func (opts Options) validate() error {
 
 	if opts.ModuleChannel == "" {
 		return fmt.Errorf("%w: opts.ModuleChannel must not be empty", ErrInvalidOption)
+	}
+
+	return nil
+}
+
+// TODO check how this can be unit tested without making a service out of it
+func (opts Options) validateDirectory() error {
+	fileInfo, err := os.Stat(opts.Directory)
+
+	if opts.Directory == "" {
+		return fmt.Errorf("%w: opts.Directory must not be empty", ErrInvalidOption)
+	}
+
+	if err != nil {
+		if errors.Is(err, os.ErrNotExist) {
+			return fmt.Errorf("%w: directory %s does not exist", ErrInvalidOption, opts.Directory)
+		}
+		return err
+	}
+
+	if !fileInfo.IsDir() {
+		return fmt.Errorf("%w: %s is not a directory", ErrInvalidOption, opts.Directory)
 	}
 
 	return nil
