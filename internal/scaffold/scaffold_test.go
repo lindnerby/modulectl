@@ -3,6 +3,7 @@ package scaffold_test
 import (
 	"errors"
 	"io"
+	"math/rand"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -83,6 +84,36 @@ func Test_RunScaffold_ReturnsError_WhenModuleNameIsEmpty(t *testing.T) {
 
 	require.ErrorIs(t, result, scaffold.ErrInvalidOption)
 	assert.Contains(t, result.Error(), "opts.ModuleName")
+}
+
+func Test_RunScaffold_ReturnsError_WhenModuleNameIsExceedingLength(t *testing.T) {
+	svc := scaffold.NewScaffoldService(
+		&moduleConfigPreventOverwriteErrorStub{},
+		&manifestServiceErrorStub{},
+		&defaultCRServiceErrorStub{},
+		&fileGeneratorErrorStub{})
+	opts := newScaffoldOptionsBuilder().withModuleName(getRandomName(256)).build()
+
+	result := svc.CreateScaffold(opts)
+
+	require.ErrorIs(t, result, scaffold.ErrInvalidOption)
+	assert.Contains(t, result.Error(), "opts.ModuleName")
+	assert.Contains(t, result.Error(), "length")
+}
+
+func Test_RunScaffold_ReturnsError_WhenModuleNameIsNotMatchingPattern(t *testing.T) {
+	svc := scaffold.NewScaffoldService(
+		&moduleConfigPreventOverwriteErrorStub{},
+		&manifestServiceErrorStub{},
+		&defaultCRServiceErrorStub{},
+		&fileGeneratorErrorStub{})
+	opts := newScaffoldOptionsBuilder().withModuleName(getRandomName(10)).build()
+
+	result := svc.CreateScaffold(opts)
+
+	require.ErrorIs(t, result, scaffold.ErrInvalidOption)
+	assert.Contains(t, result.Error(), "opts.ModuleName")
+	assert.Contains(t, result.Error(), "pattern")
 }
 
 func Test_RunScaffold_ReturnsError_WhenModuleVersionIsEmpty(t *testing.T) {
@@ -344,7 +375,7 @@ func newScaffoldOptionsBuilder() *scaffoldOptionsBuilder {
 		withDefaultCRFileName("default-cr.yaml").
 		withModuleConfigFileOverwrite(false).
 		withSecurityConfigFileName("security-config.yaml").
-		withModuleName("test-module").
+		withModuleName("github.com/kyma-project/test").
 		withModuleVersion("0.0.1").
 		withModuleChannel("experimental")
 }
@@ -401,4 +432,18 @@ func (b *scaffoldOptionsBuilder) withModuleVersion(moduleVersion string) *scaffo
 func (b *scaffoldOptionsBuilder) withModuleChannel(moduleChannel string) *scaffoldOptionsBuilder {
 	b.options.ModuleChannel = moduleChannel
 	return b
+}
+
+// ***************
+// Test Helpers
+// ***************
+
+const charset = "abcdefghijklmnopqrstuvwxyz"
+
+func getRandomName(length int) string {
+	b := make([]byte, length)
+	for i := range b {
+		b[i] = charset[rand.Intn(len(charset))]
+	}
+	return string(b)
 }
