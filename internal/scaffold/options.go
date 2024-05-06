@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strings"
 
+	"github.com/Masterminds/semver/v3"
 	"github.com/kyma-project/modulectl/tools/io"
 )
 
@@ -49,8 +51,8 @@ func (opts Options) validate() error {
 		return fmt.Errorf("%w: opts.ManifestFileName must not be empty", ErrInvalidOption)
 	}
 
-	if opts.ModuleVersion == "" {
-		return fmt.Errorf("%w: opts.ModuleVersion must not be empty", ErrInvalidOption)
+	if err := opts.validateVersion(); err != nil {
+		return err
 	}
 
 	if opts.ModuleChannel == "" {
@@ -96,6 +98,32 @@ func (opts Options) validateModuleName() error {
 		return fmt.Errorf("%w: failed to evaluate regex pattern for opts.ModuleName", ErrInvalidOption)
 	} else if !matched {
 		return fmt.Errorf("%w: opts.ModuleName must match the required pattern, e.g: 'github.com/path-to/your-repo'", ErrInvalidOption)
+	}
+
+	return nil
+}
+
+func (opts Options) validateVersion() error {
+	if opts.ModuleVersion == "" {
+		return fmt.Errorf("%w: opts.ModuleVersion must not be empty", ErrInvalidOption)
+	}
+
+	if err := opts.validateSemanticVersion(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func (opts Options) validateSemanticVersion() error {
+	val := strings.TrimSpace(opts.ModuleVersion)
+
+	// strip the leading "v", if any, because it's not part of a proper semver
+	val = strings.TrimPrefix(val, "v")
+
+	_, err := semver.StrictNewVersion(val)
+	if err != nil {
+		return fmt.Errorf("%w: opts.ModuleVersion failed to parse as semantic version: %w", ErrInvalidOption, err)
 	}
 
 	return nil

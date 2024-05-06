@@ -130,6 +130,21 @@ func Test_RunScaffold_ReturnsError_WhenModuleVersionIsEmpty(t *testing.T) {
 	assert.Contains(t, result.Error(), "opts.ModuleVersion")
 }
 
+func Test_RunScaffold_ReturnsError_WhenModuleVersionIsInvalid(t *testing.T) {
+	svc := scaffold.NewScaffoldService(
+		&moduleConfigPreventOverwriteErrorStub{},
+		&manifestServiceErrorStub{},
+		&defaultCRServiceErrorStub{},
+		&fileGeneratorErrorStub{})
+	opts := newScaffoldOptionsBuilder().withModuleVersion(getRandomName(10)).build()
+
+	result := svc.CreateScaffold(opts)
+
+	require.ErrorIs(t, result, scaffold.ErrInvalidOption)
+	assert.Contains(t, result.Error(), "opts.ModuleVersion")
+	assert.Contains(t, result.Error(), "failed to parse")
+}
+
 func Test_RunScaffold_ReturnsError_WhenModuleChannelIsEmpty(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
 		&moduleConfigPreventOverwriteErrorStub{},
