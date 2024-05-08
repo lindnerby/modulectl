@@ -60,6 +60,28 @@ func Test_PreventOverwrite_ReturnsNil_WhenFileDoesNotExist(t *testing.T) {
 	require.NoError(t, result)
 }
 
+func Test_GenerateFile_ReturnsError_WhenFileGeneratorReturnsError(t *testing.T) {
+	svc := moduleconfig.NewModuleConfigService(
+		&errorStub{},
+		&fileGeneratorErrorStub{},
+	)
+
+	result := svc.GenerateFile(nil, moduleConfigFile, types.KeyValueArgs{})
+
+	require.ErrorIs(t, result, errSomeFileGeneratorError)
+}
+
+func Test_GenerateFile_Succeeds(t *testing.T) {
+	svc := moduleconfig.NewModuleConfigService(
+		&errorStub{},
+		&fileGeneratorStub{},
+	)
+
+	result := svc.GenerateFile(nil, moduleConfigFile, types.KeyValueArgs{})
+
+	require.NoError(t, result)
+}
+
 // ***************
 // Test Stubs
 // ***************
@@ -82,6 +104,12 @@ type errorStub struct{}
 
 func (*errorStub) FileExists(_ string) (bool, error) {
 	return false, errSomeOSError
+}
+
+type fileGeneratorStub struct{}
+
+func (*fileGeneratorStub) GenerateFile(_ io.Out, _ string, _ types.KeyValueArgs) error {
+	return nil
 }
 
 type fileGeneratorErrorStub struct{}
