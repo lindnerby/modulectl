@@ -1,5 +1,5 @@
 packages:
-  github.com/kyma-project/modulectl/internal/scaffold: 92
-  github.com/kyma-project/modulectl/internal/scaffold/contentprovider: 100
-  github.com/kyma-project/modulectl/internal/scaffold/filegenerator: 100
-  github.com/kyma-project/modulectl/internal/scaffold/moduleconfig: 100
+  internal/scaffold: 92
+  internal/scaffold/contentprovider: 100
+  internal/scaffold/filegenerator: 100
+  internal/scaffold/moduleconfig: 100
