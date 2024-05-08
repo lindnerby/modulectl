@@ -1,2 +1,6 @@
 packages:
+  cmd/modulectl/create/scaffold: 100
   internal/scaffold: 100
+  internal/scaffold/contentprovider: 100
+  internal/scaffold/filegenerator: 100
+  internal/scaffold/moduleconfig: 100
