@@ -2,12 +2,13 @@ package modulectl
 
 import (
 	"fmt"
+
 	"github.com/kyma-project/modulectl/cmd/modulectl/create"
 	"github.com/spf13/cobra"
 )
 
 func NewCmd() *cobra.Command {
-	rootCommand := &cobra.Command{
+	rootCmd := &cobra.Command{
 		Use:   "modulectl",
 		Short: "This is the Kyma Module Controller CLI",
 		Long:  "A CLI from the Kyma Module Controller. Wonderful to use.",
@@ -16,7 +17,7 @@ func NewCmd() *cobra.Command {
 		},
 	}
 
-	rootCommand.AddCommand(create.NewCmd())
+	rootCmd.AddCommand(create.NewCmd())
 
-	return rootCommand
+	return rootCmd
 }

@@ -1,14 +1,15 @@
 package main
 
 import (
-	"github.com/kyma-project/modulectl/cmd/modulectl"
 	"os"
+
+	"github.com/kyma-project/modulectl/cmd/modulectl"
 )
 
 func main() {
-	command := modulectl.NewCmd()
+	cmd := modulectl.NewCmd()
 
-	if err := command.Execute(); err != nil {
+	if err := cmd.Execute(); err != nil {
 		os.Exit(-1)
 	}
 }
