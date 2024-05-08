@@ -27,7 +27,7 @@ jobs:
           cache-dependency-path: 'go.sum'
       - name: Build modulectl
         run: |
-          make resolve validate build-linux
+          make build-linux
           chmod +x ./bin/modulectl-linux
           ls -la ./bin
           mv ./bin/modulectl-linux /usr/local/bin/modulectl
