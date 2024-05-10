@@ -21,6 +21,10 @@ lint:
 
 FLAGS = -ldflags '-s -w -X github.com/kyma-project/modulectl/cmd/modulectl/version.Version=$(VERSION)'
 
+.PHONY: resolve
+resolve:
+	go mod tidy
+
 .PHONY: validate
 validate:
 	./hack/verify-generated-docs.sh
