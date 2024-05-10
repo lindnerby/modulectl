@@ -2,7 +2,6 @@ package contentprovider
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/kyma-project/modulectl/internal/scaffold/common/types"
@@ -40,9 +39,6 @@ func Test_DefaultCRContentProvider_SetsDefaultCorrectly(t *testing.T) {
 	for _, testcase := range tests {
 		testcase := testcase
 		testName := fmt.Sprintf("TestCorrectContentProviderFor_%s", testcase.name)
-
-		testcase.value = strings.TrimSpace(testcase.value)
-		testcase.expected = strings.TrimSpace(testcase.expected)
 
 		t.Run(testName, func(t *testing.T) {
 			t.Parallel()
