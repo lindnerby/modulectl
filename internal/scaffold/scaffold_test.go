@@ -87,8 +87,8 @@ func Test_RunScaffold_ReturnsError_WhenModuleNameIsEmpty(t *testing.T) {
 func Test_RunScaffold_ReturnsError_WhenModuleNameIsExceedingLength(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
 		&moduleConfigPreventOverwriteErrorStub{},
-		&manifestServiceErrorStub{},
-		&defaultCRServiceErrorStub{},
+		&fileGeneratorErrorStub{},
+		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{})
 	opts := newScaffoldOptionsBuilder().withModuleName(getRandomName(256)).build()
 
@@ -102,8 +102,8 @@ func Test_RunScaffold_ReturnsError_WhenModuleNameIsExceedingLength(t *testing.T)
 func Test_RunScaffold_ReturnsError_WhenModuleNameIsNotMatchingPattern(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
 		&moduleConfigPreventOverwriteErrorStub{},
-		&manifestServiceErrorStub{},
-		&defaultCRServiceErrorStub{},
+		&fileGeneratorErrorStub{},
+		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{})
 	opts := newScaffoldOptionsBuilder().withModuleName(getRandomName(10)).build()
 
@@ -131,8 +131,8 @@ func Test_RunScaffold_ReturnsError_WhenModuleVersionIsEmpty(t *testing.T) {
 func Test_RunScaffold_ReturnsError_WhenModuleVersionIsInvalid(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
 		&moduleConfigPreventOverwriteErrorStub{},
-		&manifestServiceErrorStub{},
-		&defaultCRServiceErrorStub{},
+		&fileGeneratorErrorStub{},
+		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{})
 	opts := newScaffoldOptionsBuilder().withModuleVersion(getRandomName(10)).build()
 
@@ -160,8 +160,8 @@ func Test_RunScaffold_ReturnsError_WhenModuleChannelIsEmpty(t *testing.T) {
 func Test_RunScaffold_ReturnsError_WhenModuleChannelIsExceedingLength(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
 		&moduleConfigPreventOverwriteErrorStub{},
-		&manifestServiceErrorStub{},
-		&defaultCRServiceErrorStub{},
+		&fileGeneratorErrorStub{},
+		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{})
 	opts := newScaffoldOptionsBuilder().withModuleChannel(getRandomName(33)).build()
 
@@ -175,8 +175,8 @@ func Test_RunScaffold_ReturnsError_WhenModuleChannelIsExceedingLength(t *testing
 func Test_RunScaffold_ReturnsError_WhenModuleChannelFallsBelowLength(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
 		&moduleConfigPreventOverwriteErrorStub{},
-		&manifestServiceErrorStub{},
-		&defaultCRServiceErrorStub{},
+		&fileGeneratorErrorStub{},
+		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{})
 	opts := newScaffoldOptionsBuilder().withModuleChannel(getRandomName(2)).build()
 
@@ -190,8 +190,8 @@ func Test_RunScaffold_ReturnsError_WhenModuleChannelFallsBelowLength(t *testing.
 func Test_RunScaffold_ReturnsError_WhenModuleChannelNotMatchingCharset(t *testing.T) {
 	svc := scaffold.NewScaffoldService(
 		&moduleConfigPreventOverwriteErrorStub{},
-		&manifestServiceErrorStub{},
-		&defaultCRServiceErrorStub{},
+		&fileGeneratorErrorStub{},
+		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{})
 	opts := newScaffoldOptionsBuilder().withModuleChannel("with not allowed chars 123%&").build()
 
