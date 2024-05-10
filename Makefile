@@ -24,6 +24,10 @@ lint:
 
 FLAGS = -ldflags '-s -w'
 
+.PHONY: validate
+validate:
+	./hack/verify-generated-docs.sh
+
 .PHONY: build
 build: build-windows build-linux build-darwin build-windows-arm build-linux-arm build-darwin-arm
 
@@ -52,3 +56,8 @@ build-darwin-arm:
 .PHONY: build-linux-arm
 build-linux-arm:
 	CGO_ENABLED=0 GOOS=linux GOARCH=arm64 go build -o ./bin/modulectl-linux-arm $(FLAGS) ./cmd
+
+.PHONY: docs
+docs:
+	rm -f ./docs/gen-docs/*
+	go run ./cmd/gendocs/gendocs.go
