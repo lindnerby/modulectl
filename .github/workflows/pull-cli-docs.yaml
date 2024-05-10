@@ -10,7 +10,7 @@ jobs:
     name: docs validation
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout Kyma CLI
+      - name: Checkout modulectl
         uses: actions/checkout@v4
       - name: Set up Go
         uses: actions/setup-go@v4
