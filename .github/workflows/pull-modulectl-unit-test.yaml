@@ -1,4 +1,4 @@
-name: pull-cli-unit-test
+name: pull-modulectl-unit-test
 on:
   pull_request:
     branches:
