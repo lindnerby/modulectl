@@ -4,15 +4,37 @@ import (
 	"errors"
 	"testing"
 
+	commonerrors "github.com/kyma-project/modulectl/internal/scaffold/common/errors"
 	"github.com/kyma-project/modulectl/internal/scaffold/common/types"
 	"github.com/kyma-project/modulectl/internal/scaffold/filegenerator"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
+func Test_FileGeneratorService_NewFileGeneratorService_ReturnsError_WhenKindIsEmpty(t *testing.T) {
+	_, err := filegenerator.NewFileGeneratorService("", &fileWriterErrorStub{}, &contentProviderErrorStub{})
+
+	require.ErrorIs(t, err, commonerrors.ErrInvalidArg)
+	assert.Contains(t, err.Error(), "kind")
+}
+
+func Test_FileGeneratorService_NewFileGeneratorService_ReturnsError_WhenFileSystemIsNil(t *testing.T) {
+	_, err := filegenerator.NewFileGeneratorService("test-kind", nil, &contentProviderErrorStub{})
+
+	require.ErrorIs(t, err, commonerrors.ErrInvalidArg)
+	assert.Contains(t, err.Error(), "fileSystem")
+}
+
+func Test_FileGeneratorService_NewFileGeneratorService_ReturnsError_WhenDefaultContentProviderIsNil(t *testing.T) {
+	_, err := filegenerator.NewFileGeneratorService("test-kind", &fileWriterErrorStub{}, nil)
+
+	require.ErrorIs(t, err, commonerrors.ErrInvalidArg)
+	assert.Contains(t, err.Error(), "defaultContentProvider")
+}
+
 func Test_FileGeneratorService_GenerateFile_ReturnsError_WhenErrorGettingDefaultContent(t *testing.T) {
 	out := &fgTestOut{}
-	svc := filegenerator.NewFileGeneratorService("test-kind", &fileWriterErrorStub{}, &contentProviderErrorStub{})
+	svc, _ := filegenerator.NewFileGeneratorService("test-kind", &fileWriterErrorStub{}, &contentProviderErrorStub{})
 
 	result := svc.GenerateFile(out, "some-path", nil)
 
@@ -23,7 +45,7 @@ func Test_FileGeneratorService_GenerateFile_ReturnsError_WhenErrorGettingDefault
 
 func Test_FileGeneratorService_GenerateFile_ReturnsError_WhenErrorWritingFile(t *testing.T) {
 	out := &fgTestOut{}
-	svc := filegenerator.NewFileGeneratorService("test-kind", &fileWriterErrorStub{}, &contentProviderStub{})
+	svc, _ := filegenerator.NewFileGeneratorService("test-kind", &fileWriterErrorStub{}, &contentProviderStub{})
 
 	result := svc.GenerateFile(out, "some-path", nil)
 
@@ -33,7 +55,7 @@ func Test_FileGeneratorService_GenerateFile_ReturnsError_WhenErrorWritingFile(t 
 
 func Test_FileGeneratorService_GenerateFile_Succeeds_WhenFileIsGenerated(t *testing.T) {
 	out := &fgTestOut{}
-	svc := filegenerator.NewFileGeneratorService("test-kind", &fileWriterStub{}, &contentProviderStub{})
+	svc, _ := filegenerator.NewFileGeneratorService("test-kind", &fileWriterStub{}, &contentProviderStub{})
 
 	result := svc.GenerateFile(out, "some-path", nil)
 

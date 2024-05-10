@@ -3,6 +3,7 @@ package contentprovider
 import (
 	"fmt"
 
+	"github.com/kyma-project/modulectl/internal/scaffold/common/errors"
 	"github.com/kyma-project/modulectl/internal/scaffold/common/types"
 )
 
@@ -10,10 +11,14 @@ type SecurityConfigContentProvider struct {
 	yamlConverter ObjectToYAMLConverter
 }
 
-func NewSecurityConfigContentProvider(yamlConverter ObjectToYAMLConverter) *SecurityConfigContentProvider {
+func NewSecurityConfigContentProvider(yamlConverter ObjectToYAMLConverter) (*SecurityConfigContentProvider, error) {
+	if yamlConverter == nil {
+		return nil, fmt.Errorf("%w: yamlConverter must not be nil", errors.ErrInvalidArg)
+	}
+
 	return &SecurityConfigContentProvider{
 		yamlConverter: yamlConverter,
-	}
+	}, nil
 }
 
 func (s *SecurityConfigContentProvider) GetDefaultContent(args types.KeyValueArgs) (string, error) {

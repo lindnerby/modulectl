@@ -4,14 +4,22 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/kyma-project/modulectl/internal/scaffold/common/errors"
 	"github.com/kyma-project/modulectl/internal/scaffold/common/types"
 	"github.com/kyma-project/modulectl/internal/scaffold/contentprovider"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
+func Test_ModuleConfigContentProvider_NewModuleConfigContentProvider_ReturnsError_WhenYamlConverterIsNil(t *testing.T) {
+	_, err := contentprovider.NewModuleConfigContentProvider(nil)
+
+	require.ErrorIs(t, err, errors.ErrInvalidArg)
+	assert.Contains(t, err.Error(), "yamlConverter")
+}
+
 func Test_ModuleConfigContentProvider_GetDefaultContent_ReturnsError_WhenArgsIsNil(t *testing.T) {
-	svc := contentprovider.NewModuleConfigContentProvider(&mcObjectToYAMLConverterStub{})
+	svc, _ := contentprovider.NewModuleConfigContentProvider(&mcObjectToYAMLConverterStub{})
 
 	result, err := svc.GetDefaultContent(nil)
 
@@ -49,7 +57,7 @@ func Test_ModuleConfigContentProvider_ReturnsError_WhenRequiredArgsMissing(t *te
 		},
 	}
 
-	svc := contentprovider.NewModuleConfigContentProvider(&mcObjectToYAMLConverterStub{})
+	svc, _ := contentprovider.NewModuleConfigContentProvider(&mcObjectToYAMLConverterStub{})
 
 	for _, testcase := range tests {
 		testcase := testcase
@@ -98,7 +106,7 @@ func Test_ModuleConfigContentProvider_ReturnsError_WhenRequiredArgIsEmpty(t *tes
 		},
 	}
 
-	svc := contentprovider.NewModuleConfigContentProvider(&mcObjectToYAMLConverterStub{})
+	svc, _ := contentprovider.NewModuleConfigContentProvider(&mcObjectToYAMLConverterStub{})
 
 	for _, testcase := range tests {
 		testcase := testcase
@@ -116,7 +124,7 @@ func Test_ModuleConfigContentProvider_ReturnsError_WhenRequiredArgIsEmpty(t *tes
 }
 
 func Test_ModuleConfigContentProvider_ReturnsConvertedContent(t *testing.T) {
-	svc := contentprovider.NewModuleConfigContentProvider(&mcObjectToYAMLConverterStub{})
+	svc, _ := contentprovider.NewModuleConfigContentProvider(&mcObjectToYAMLConverterStub{})
 
 	result, err := svc.GetDefaultContent(types.KeyValueArgs{
 		contentprovider.ArgModuleName:    "module-name",

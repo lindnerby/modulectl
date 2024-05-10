@@ -5,6 +5,7 @@ import (
 
 	"github.com/kyma-project/lifecycle-manager/api/v1beta2"
 
+	"github.com/kyma-project/modulectl/internal/scaffold/common/errors"
 	"github.com/kyma-project/modulectl/internal/scaffold/common/types"
 )
 
@@ -12,10 +13,14 @@ type ModuleConfigContentProvider struct {
 	yamlConverter ObjectToYAMLConverter
 }
 
-func NewModuleConfigContentProvider(yamlConverter ObjectToYAMLConverter) *ModuleConfigContentProvider {
+func NewModuleConfigContentProvider(yamlConverter ObjectToYAMLConverter) (*ModuleConfigContentProvider, error) {
+	if yamlConverter == nil {
+		return nil, fmt.Errorf("%w: yamlConverter must not be nil", errors.ErrInvalidArg)
+	}
+
 	return &ModuleConfigContentProvider{
 		yamlConverter: yamlConverter,
-	}
+	}, nil
 }
 
 func (s *ModuleConfigContentProvider) GetDefaultContent(args types.KeyValueArgs) (string, error) {

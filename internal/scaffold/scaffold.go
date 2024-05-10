@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"path"
 
+	"github.com/kyma-project/modulectl/internal/scaffold/common/errors"
 	"github.com/kyma-project/modulectl/internal/scaffold/common/types"
 	"github.com/kyma-project/modulectl/internal/scaffold/contentprovider"
 	"github.com/kyma-project/modulectl/tools/io"
@@ -28,13 +29,29 @@ type ScaffoldService struct {
 func NewScaffoldService(moduleConfigService ModuleConfigService,
 	manifestService FileGeneratorService,
 	defaultCRService FileGeneratorService,
-	securityConfigService FileGeneratorService) *ScaffoldService {
+	securityConfigService FileGeneratorService) (*ScaffoldService, error) {
+	if moduleConfigService == nil {
+		return nil, fmt.Errorf("%w: moduleConfigService must not be nil", errors.ErrInvalidArg)
+	}
+
+	if manifestService == nil {
+		return nil, fmt.Errorf("%w: manifestService must not be nil", errors.ErrInvalidArg)
+	}
+
+	if defaultCRService == nil {
+		return nil, fmt.Errorf("%w: defaultCRService must not be nil", errors.ErrInvalidArg)
+	}
+
+	if securityConfigService == nil {
+		return nil, fmt.Errorf("%w: securityConfigService must not be nil", errors.ErrInvalidArg)
+	}
+
 	return &ScaffoldService{
 		moduleConfigService:   moduleConfigService,
 		manifestService:       manifestService,
 		defaultCRService:      defaultCRService,
 		securityConfigService: securityConfigService,
-	}
+	}, nil
 }
 
 func (s *ScaffoldService) CreateScaffold(opts Options) error {

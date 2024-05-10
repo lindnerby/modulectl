@@ -3,14 +3,22 @@ package contentprovider_test
 import (
 	"testing"
 
+	"github.com/kyma-project/modulectl/internal/scaffold/common/errors"
 	"github.com/kyma-project/modulectl/internal/scaffold/common/types"
 	"github.com/kyma-project/modulectl/internal/scaffold/contentprovider"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
+func Test_NewSecurityConfigContentProvider_ReturnsError_WhenYamlConverterIsNil(t *testing.T) {
+	_, err := contentprovider.NewSecurityConfigContentProvider(nil)
+
+	require.ErrorIs(t, err, errors.ErrInvalidArg)
+	assert.Contains(t, err.Error(), "yamlConverter")
+}
+
 func Test_GetDefaultContent_ReturnsError_WhenArgsIsNil(t *testing.T) {
-	svc := contentprovider.NewSecurityConfigContentProvider(&objectToYAMLConverterStub{})
+	svc, _ := contentprovider.NewSecurityConfigContentProvider(&objectToYAMLConverterStub{})
 
 	result, err := svc.GetDefaultContent(nil)
 
@@ -20,7 +28,7 @@ func Test_GetDefaultContent_ReturnsError_WhenArgsIsNil(t *testing.T) {
 }
 
 func Test_GetDefaultContent_ReturnsError_WhenModuleNameArgMissing(t *testing.T) {
-	svc := contentprovider.NewSecurityConfigContentProvider(&objectToYAMLConverterStub{})
+	svc, _ := contentprovider.NewSecurityConfigContentProvider(&objectToYAMLConverterStub{})
 
 	result, err := svc.GetDefaultContent(types.KeyValueArgs{})
 
@@ -30,7 +38,7 @@ func Test_GetDefaultContent_ReturnsError_WhenModuleNameArgMissing(t *testing.T) 
 }
 
 func Test_GetDefaultContent_ReturnsError_WhenModuleNameArgIsEmpty(t *testing.T) {
-	svc := contentprovider.NewSecurityConfigContentProvider(&objectToYAMLConverterStub{})
+	svc, _ := contentprovider.NewSecurityConfigContentProvider(&objectToYAMLConverterStub{})
 
 	result, err := svc.GetDefaultContent(types.KeyValueArgs{contentprovider.ArgModuleName: ""})
 
@@ -40,7 +48,7 @@ func Test_GetDefaultContent_ReturnsError_WhenModuleNameArgIsEmpty(t *testing.T) 
 }
 
 func Test_GetDefaultContent_ReturnsConvertedContent(t *testing.T) {
-	svc := contentprovider.NewSecurityConfigContentProvider(&objectToYAMLConverterStub{})
+	svc, _ := contentprovider.NewSecurityConfigContentProvider(&objectToYAMLConverterStub{})
 
 	result, err := svc.GetDefaultContent(types.KeyValueArgs{contentprovider.ArgModuleName: "module-name"})
 

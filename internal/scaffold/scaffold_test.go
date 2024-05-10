@@ -10,12 +10,56 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/kyma-project/modulectl/internal/scaffold"
+	commonerrors "github.com/kyma-project/modulectl/internal/scaffold/common/errors"
 	"github.com/kyma-project/modulectl/internal/scaffold/common/types"
 	iotools "github.com/kyma-project/modulectl/tools/io"
 )
 
+func Test_NewScaffoldService_ReturnsError_WhenModuleConfigServiceIsNil(t *testing.T) {
+	_, err := scaffold.NewScaffoldService(
+		nil,
+		&fileGeneratorErrorStub{},
+		&fileGeneratorErrorStub{},
+		&fileGeneratorErrorStub{})
+
+	require.ErrorIs(t, err, commonerrors.ErrInvalidArg)
+	assert.Contains(t, err.Error(), "moduleConfigService")
+}
+
+func Test_NewScaffoldService_ReturnsError_WhenManifestServiceIsNil(t *testing.T) {
+	_, err := scaffold.NewScaffoldService(
+		&moduleConfigPreventOverwriteErrorStub{},
+		nil,
+		&fileGeneratorErrorStub{},
+		&fileGeneratorErrorStub{})
+
+	require.ErrorIs(t, err, commonerrors.ErrInvalidArg)
+	assert.Contains(t, err.Error(), "manifestService")
+}
+func Test_NewScaffoldService_ReturnsError_WhenDefaultCRServiceIsNil(t *testing.T) {
+	_, err := scaffold.NewScaffoldService(
+		&moduleConfigPreventOverwriteErrorStub{},
+		&fileGeneratorErrorStub{},
+		nil,
+		&fileGeneratorErrorStub{})
+
+	require.ErrorIs(t, err, commonerrors.ErrInvalidArg)
+	assert.Contains(t, err.Error(), "defaultCRService")
+}
+
+func Test_NewScaffoldService_ReturnsError_WhenSecurityConfigServiceIsNil(t *testing.T) {
+	_, err := scaffold.NewScaffoldService(
+		&moduleConfigPreventOverwriteErrorStub{},
+		&fileGeneratorErrorStub{},
+		&fileGeneratorErrorStub{},
+		nil)
+
+	require.ErrorIs(t, err, commonerrors.ErrInvalidArg)
+	assert.Contains(t, err.Error(), "securityConfigService")
+}
+
 func Test_RunScaffold_ReturnsError_WhenOutIsNil(t *testing.T) {
-	svc := scaffold.NewScaffoldService(
+	svc, _ := scaffold.NewScaffoldService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -29,7 +73,7 @@ func Test_RunScaffold_ReturnsError_WhenOutIsNil(t *testing.T) {
 }
 
 func Test_RunScaffold_ReturnsError_WhenDirectoryIsEmpty(t *testing.T) {
-	svc := scaffold.NewScaffoldService(
+	svc, _ := scaffold.NewScaffoldService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -43,7 +87,7 @@ func Test_RunScaffold_ReturnsError_WhenDirectoryIsEmpty(t *testing.T) {
 }
 
 func Test_RunScaffold_ReturnsError_WhenModuleConfigFileIsEmpty(t *testing.T) {
-	svc := scaffold.NewScaffoldService(
+	svc, _ := scaffold.NewScaffoldService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -57,7 +101,7 @@ func Test_RunScaffold_ReturnsError_WhenModuleConfigFileIsEmpty(t *testing.T) {
 }
 
 func Test_RunScaffold_ReturnsError_WhenManifestFileIsEmpty(t *testing.T) {
-	svc := scaffold.NewScaffoldService(
+	svc, _ := scaffold.NewScaffoldService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -71,7 +115,7 @@ func Test_RunScaffold_ReturnsError_WhenManifestFileIsEmpty(t *testing.T) {
 }
 
 func Test_RunScaffold_ReturnsError_WhenModuleNameIsEmpty(t *testing.T) {
-	svc := scaffold.NewScaffoldService(
+	svc, _ := scaffold.NewScaffoldService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -85,7 +129,7 @@ func Test_RunScaffold_ReturnsError_WhenModuleNameIsEmpty(t *testing.T) {
 }
 
 func Test_RunScaffold_ReturnsError_WhenModuleNameIsExceedingLength(t *testing.T) {
-	svc := scaffold.NewScaffoldService(
+	svc, _ := scaffold.NewScaffoldService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -100,7 +144,7 @@ func Test_RunScaffold_ReturnsError_WhenModuleNameIsExceedingLength(t *testing.T)
 }
 
 func Test_RunScaffold_ReturnsError_WhenModuleNameIsNotMatchingPattern(t *testing.T) {
-	svc := scaffold.NewScaffoldService(
+	svc, _ := scaffold.NewScaffoldService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -115,7 +159,7 @@ func Test_RunScaffold_ReturnsError_WhenModuleNameIsNotMatchingPattern(t *testing
 }
 
 func Test_RunScaffold_ReturnsError_WhenModuleVersionIsEmpty(t *testing.T) {
-	svc := scaffold.NewScaffoldService(
+	svc, _ := scaffold.NewScaffoldService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -129,7 +173,7 @@ func Test_RunScaffold_ReturnsError_WhenModuleVersionIsEmpty(t *testing.T) {
 }
 
 func Test_RunScaffold_ReturnsError_WhenModuleVersionIsInvalid(t *testing.T) {
-	svc := scaffold.NewScaffoldService(
+	svc, _ := scaffold.NewScaffoldService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -144,7 +188,7 @@ func Test_RunScaffold_ReturnsError_WhenModuleVersionIsInvalid(t *testing.T) {
 }
 
 func Test_RunScaffold_ReturnsError_WhenModuleChannelIsEmpty(t *testing.T) {
-	svc := scaffold.NewScaffoldService(
+	svc, _ := scaffold.NewScaffoldService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -158,7 +202,7 @@ func Test_RunScaffold_ReturnsError_WhenModuleChannelIsEmpty(t *testing.T) {
 }
 
 func Test_RunScaffold_ReturnsError_WhenModuleChannelIsExceedingLength(t *testing.T) {
-	svc := scaffold.NewScaffoldService(
+	svc, _ := scaffold.NewScaffoldService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -173,7 +217,7 @@ func Test_RunScaffold_ReturnsError_WhenModuleChannelIsExceedingLength(t *testing
 }
 
 func Test_RunScaffold_ReturnsError_WhenModuleChannelFallsBelowLength(t *testing.T) {
-	svc := scaffold.NewScaffoldService(
+	svc, _ := scaffold.NewScaffoldService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -188,7 +232,7 @@ func Test_RunScaffold_ReturnsError_WhenModuleChannelFallsBelowLength(t *testing.
 }
 
 func Test_RunScaffold_ReturnsError_WhenModuleChannelNotMatchingCharset(t *testing.T) {
-	svc := scaffold.NewScaffoldService(
+	svc, _ := scaffold.NewScaffoldService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -203,7 +247,7 @@ func Test_RunScaffold_ReturnsError_WhenModuleChannelNotMatchingCharset(t *testin
 }
 
 func Test_RunScaffold_ReturnsError_WhenModuleConfigServicePreventOverwriteReturnsError(t *testing.T) {
-	svc := scaffold.NewScaffoldService(
+	svc, _ := scaffold.NewScaffoldService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -215,7 +259,7 @@ func Test_RunScaffold_ReturnsError_WhenModuleConfigServicePreventOverwriteReturn
 }
 
 func Test_RunScaffold_ReturnsError_WhenGeneratingManifestFileFails(t *testing.T) {
-	svc := scaffold.NewScaffoldService(
+	svc, _ := scaffold.NewScaffoldService(
 		&moduleConfigGenerateFileErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -229,7 +273,7 @@ func Test_RunScaffold_ReturnsError_WhenGeneratingManifestFileFails(t *testing.T)
 }
 
 func Test_RunScaffold_Succeeds_WhenGeneratingManifestFile(t *testing.T) {
-	svc := scaffold.NewScaffoldService(
+	svc, _ := scaffold.NewScaffoldService(
 		&moduleConfigStub{},
 		&fileGeneratorStub{},
 		&fileGeneratorStub{},
@@ -241,7 +285,7 @@ func Test_RunScaffold_Succeeds_WhenGeneratingManifestFile(t *testing.T) {
 }
 
 func Test_RunScaffold_Succeeds_WhenDefaultCRFileIsNotConfigured(t *testing.T) {
-	svc := scaffold.NewScaffoldService(
+	svc, _ := scaffold.NewScaffoldService(
 		&moduleConfigStub{},
 		&fileGeneratorStub{},
 		&fileGeneratorErrorStub{},
@@ -253,7 +297,7 @@ func Test_RunScaffold_Succeeds_WhenDefaultCRFileIsNotConfigured(t *testing.T) {
 }
 
 func Test_RunScaffold_ReturnsError_WhenGeneratingDefaultCRFileFails(t *testing.T) {
-	svc := scaffold.NewScaffoldService(
+	svc, _ := scaffold.NewScaffoldService(
 		&moduleConfigGenerateFileErrorStub{},
 		&fileGeneratorStub{},
 		&fileGeneratorErrorStub{},
@@ -267,7 +311,7 @@ func Test_RunScaffold_ReturnsError_WhenGeneratingDefaultCRFileFails(t *testing.T
 }
 
 func Test_RunScaffold_Succeeds_WhenGeneratingDefaultCRFile(t *testing.T) {
-	svc := scaffold.NewScaffoldService(
+	svc, _ := scaffold.NewScaffoldService(
 		&moduleConfigStub{},
 		&fileGeneratorStub{},
 		&fileGeneratorStub{},
@@ -279,7 +323,7 @@ func Test_RunScaffold_Succeeds_WhenGeneratingDefaultCRFile(t *testing.T) {
 }
 
 func Test_RunScaffold_Succeeds_WhenSecurityConfigFileIsNotConfigured(t *testing.T) {
-	svc := scaffold.NewScaffoldService(
+	svc, _ := scaffold.NewScaffoldService(
 		&moduleConfigStub{},
 		&fileGeneratorStub{},
 		&fileGeneratorStub{},
@@ -291,7 +335,7 @@ func Test_RunScaffold_Succeeds_WhenSecurityConfigFileIsNotConfigured(t *testing.
 }
 
 func Test_RunScaffold_ReturnsError_WhenGeneratingSecurityConfigFileFails(t *testing.T) {
-	svc := scaffold.NewScaffoldService(
+	svc, _ := scaffold.NewScaffoldService(
 		&moduleConfigGenerateFileErrorStub{},
 		&fileGeneratorStub{},
 		&fileGeneratorStub{},
@@ -305,7 +349,7 @@ func Test_RunScaffold_ReturnsError_WhenGeneratingSecurityConfigFileFails(t *test
 }
 
 func Test_RunScaffold_Succeeds_WhenGeneratingSecurityConfigFile(t *testing.T) {
-	svc := scaffold.NewScaffoldService(
+	svc, _ := scaffold.NewScaffoldService(
 		&moduleConfigStub{},
 		&fileGeneratorStub{},
 		&fileGeneratorStub{},
@@ -317,7 +361,7 @@ func Test_RunScaffold_Succeeds_WhenGeneratingSecurityConfigFile(t *testing.T) {
 }
 
 func Test_RunScaffold_ReturnsError_WhenGeneratingModuleConfigReturnsError(t *testing.T) {
-	svc := scaffold.NewScaffoldService(
+	svc, _ := scaffold.NewScaffoldService(
 		&moduleConfigGenerateFileErrorStub{},
 		&fileGeneratorStub{},
 		&fileGeneratorStub{},
@@ -331,7 +375,7 @@ func Test_RunScaffold_ReturnsError_WhenGeneratingModuleConfigReturnsError(t *tes
 }
 
 func Test_RunScaffold_Succeeds(t *testing.T) {
-	svc := scaffold.NewScaffoldService(
+	svc, _ := scaffold.NewScaffoldService(
 		&moduleConfigStub{},
 		&fileGeneratorStub{},
 		&fileGeneratorStub{},

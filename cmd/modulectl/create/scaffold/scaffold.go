@@ -23,41 +23,66 @@ var example string
 func NewCmd() *cobra.Command {
 	fileSystemUtil := &filesystem.FileSystemUtil{}
 	yamlConverter := &yaml.ObjectToYAMLConverter{}
-	scaffoldService := scaffold.NewScaffoldService(
-		moduleconfig.NewModuleConfigService(
-			fileSystemUtil,
-			filegenerator.NewFileGeneratorService(
-				"module-config",
-				fileSystemUtil,
-				contentprovider.NewModuleConfigContentProvider(yamlConverter),
-			),
-		),
-		filegenerator.NewReuseFileGeneratorService(
-			"manifest",
-			fileSystemUtil,
-			filegenerator.NewFileGeneratorService(
-				"manifest",
-				fileSystemUtil,
-				contentprovider.NewManifestContentProvider(),
-			),
-		),
-		filegenerator.NewReuseFileGeneratorService(
-			"defaultcr",
-			fileSystemUtil,
-			filegenerator.NewFileGeneratorService(
-				"defaultcr",
-				fileSystemUtil,
-				contentprovider.NewDefaultCRContentProvider(),
-			),
-		),
-		filegenerator.NewReuseFileGeneratorService(
-			"security-config",
-			fileSystemUtil,
-			filegenerator.NewFileGeneratorService(
-				"security-config",
-				fileSystemUtil,
-				contentprovider.NewSecurityConfigContentProvider(yamlConverter))),
+
+	moduleConfigContentProvider, err := contentprovider.NewModuleConfigContentProvider(yamlConverter)
+	if err != nil {
+		panic(err)
+	}
+
+	moduleConfigFileGenerator, err := filegenerator.NewFileGeneratorService("module-config", fileSystemUtil, moduleConfigContentProvider)
+	if err != nil {
+		panic(err)
+	}
+
+	moduleConfigService, err := moduleconfig.NewModuleConfigService(fileSystemUtil, moduleConfigFileGenerator)
+	if err != nil {
+		panic(err)
+	}
+
+	manifestFileGenerator, err := filegenerator.NewFileGeneratorService("manifest", fileSystemUtil, contentprovider.NewManifestContentProvider())
+	if err != nil {
+		panic(err)
+	}
+
+	manifestReuseFileGenerator, err := filegenerator.NewReuseFileGeneratorService("manifest", fileSystemUtil, manifestFileGenerator)
+	if err != nil {
+		panic(err)
+	}
+
+	defaultCRFileGenerator, err := filegenerator.NewFileGeneratorService("defaultcr", fileSystemUtil, contentprovider.NewDefaultCRContentProvider())
+	if err != nil {
+		panic(err)
+	}
+
+	defaultCRReuseFileGenerator, err := filegenerator.NewReuseFileGeneratorService("defaultcr", fileSystemUtil, defaultCRFileGenerator)
+	if err != nil {
+		panic(err)
+	}
+
+	securitConfigContentProvider, err := contentprovider.NewSecurityConfigContentProvider(yamlConverter)
+	if err != nil {
+		panic(err)
+	}
+
+	securityConfigFileGenerator, err := filegenerator.NewFileGeneratorService("security-config", fileSystemUtil, securitConfigContentProvider)
+	if err != nil {
+		panic(err)
+	}
+
+	securityConfigReuseFileGenerator, err := filegenerator.NewReuseFileGeneratorService("security-config", fileSystemUtil, securityConfigFileGenerator)
+	if err != nil {
+		panic(err)
+	}
+
+	scaffoldService, err := scaffold.NewScaffoldService(
+		moduleConfigService,
+		manifestReuseFileGenerator,
+		defaultCRReuseFileGenerator,
+		securityConfigReuseFileGenerator,
 	)
+	if err != nil {
+		panic(err)
+	}
 
 	opts := scaffold.Options{}
 

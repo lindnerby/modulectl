@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	commonerrors "github.com/kyma-project/modulectl/internal/scaffold/common/errors"
 	"github.com/kyma-project/modulectl/internal/scaffold/common/types"
 	"github.com/kyma-project/modulectl/tools/io"
 )
@@ -22,12 +23,25 @@ type FileGeneratorService struct {
 	defaultContentProvider DefaultContentProvider
 }
 
-func NewFileGeneratorService(kind string, fileSystem FileWriter, defaultContentProvider DefaultContentProvider) *FileGeneratorService {
+func NewFileGeneratorService(kind string, fileSystem FileWriter, defaultContentProvider DefaultContentProvider) (*FileGeneratorService, error) {
+	if kind == "" {
+		return nil, fmt.Errorf("%w: kind must not be empty", commonerrors.ErrInvalidArg)
+	}
+
+	if fileSystem == nil {
+		return nil, fmt.Errorf("%w: fileSystem must not be nil", commonerrors.ErrInvalidArg)
+
+	}
+
+	if defaultContentProvider == nil {
+		return nil, fmt.Errorf("%w: defaultContentProvider must not be nil", commonerrors.ErrInvalidArg)
+	}
+
 	return &FileGeneratorService{
 		kind:                   kind,
 		fileWriter:             fileSystem,
 		defaultContentProvider: defaultContentProvider,
-	}
+	}, nil
 }
 
 func (s *FileGeneratorService) GenerateFile(out io.Out, path string, args types.KeyValueArgs) error {
