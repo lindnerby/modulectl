@@ -82,5 +82,5 @@ Generate a scaffold with a manifest file, default CR and security-scanners confi
 
 ## See also
 
-* [modulectl create](modulectl_create.md)	 - Creates resources on the Kyma cluster.
+* [modulectl create](modulectl_create.md)	 - Creates artifacts related to module development
 

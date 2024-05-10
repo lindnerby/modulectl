@@ -20,5 +20,5 @@ modulectl [flags]
 
 ## See also
 
-* [modulectl create](modulectl_create.md)	 - Creates resources on the Kyma cluster.
+* [modulectl create](modulectl_create.md)	 - Creates artifacts related to module development
 

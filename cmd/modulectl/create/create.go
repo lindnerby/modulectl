@@ -8,8 +8,8 @@ import (
 func NewCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create",
-		Short: "Creates resources on the Kyma cluster.",
-		Long:  `Use this command to create resources on the Kyma cluster.`,
+		Short: "Creates artifacts related to module development",
+		Long:  `Use this command to create artifacts that are needed for module development.`,
 	}
 
 	cmd.AddCommand(scaffold.NewCmd())

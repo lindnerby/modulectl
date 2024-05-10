@@ -2,11 +2,11 @@
 title: modulectl create
 ---
 
-Creates resources on the Kyma cluster.
+Creates artifacts related to module development
 
 ## Synopsis
 
-Use this command to create resources on the Kyma cluster.
+Use this command to create artifacts that are needed for module development.
 
 ## Flags
 
