@@ -62,3 +62,9 @@ build-linux-arm:
 docs:
 	rm -f ./docs/gen-docs/*
 	go run ./cmd/gendocs/gendocs.go
+
+.PHONY: test
+test:
+	go test `go list ./... | grep -v /tests/e2e` -race -coverprofile=cover.out
+	@echo "Total test coverage: $$(go tool cover -func=cover.out | grep total | awk '{print $$3}')"
+	@rm cover.out
