@@ -389,7 +389,8 @@ func (mcb *moduleConfigBuilder) defaults() *moduleConfigBuilder {
 		withManifestPath("manifest.yaml")
 }
 
-// TODO: this is a copy of the moduleConfig struct from internal/scaffold/contentprovider/moduleconfig.go
+// TODO: https://github.com/kyma-project/modulectl/issues/10
+// This is a copy of the moduleConfig struct from internal/scaffold/contentprovider/moduleconfig.go
 // to not make the moduleConfig public just for the sake of testing.
 // It is expected that the moduleConfig struct will be made public in the future when introducing more commands.
 // Once it is public, this struct should be removed.

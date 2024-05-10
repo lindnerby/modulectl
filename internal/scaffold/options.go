@@ -65,7 +65,6 @@ func (opts Options) validate() error {
 	return nil
 }
 
-// TODO check how this can be unit tested without making a service out of it
 func (opts Options) validateDirectory() error {
 	fileInfo, err := os.Stat(opts.Directory)
 
