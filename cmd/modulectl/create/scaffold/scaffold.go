@@ -7,9 +7,7 @@ import (
 
 	"github.com/kyma-project/modulectl/internal/scaffold"
 	"github.com/kyma-project/modulectl/internal/scaffold/contentprovider"
-	"github.com/kyma-project/modulectl/internal/scaffold/defaultcr"
 	"github.com/kyma-project/modulectl/internal/scaffold/filegenerator"
-	"github.com/kyma-project/modulectl/internal/scaffold/manifest"
 	"github.com/kyma-project/modulectl/internal/scaffold/moduleconfig"
 	"github.com/kyma-project/modulectl/tools/filesystem"
 	"github.com/kyma-project/modulectl/tools/io"
@@ -34,11 +32,23 @@ func NewCmd() *cobra.Command {
 				contentprovider.NewModuleConfigContentProvider(yamlConverter),
 			),
 		),
-		manifest.NewManifestService(
+		filegenerator.NewReuseFileGeneratorService(
+			"manifest",
 			fileSystemUtil,
+			filegenerator.NewFileGeneratorService(
+				"manifest",
+				fileSystemUtil,
+				contentprovider.NewManifestContentProvider(),
+			),
 		),
-		defaultcr.NewDefaultCRService(
+		filegenerator.NewReuseFileGeneratorService(
+			"defaultcr",
 			fileSystemUtil,
+			filegenerator.NewFileGeneratorService(
+				"defaultcr",
+				fileSystemUtil,
+				contentprovider.NewDefaultCRContentProvider(),
+			),
 		),
 		filegenerator.NewReuseFileGeneratorService(
 			"security-config",
