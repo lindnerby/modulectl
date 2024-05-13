@@ -1,6 +1,6 @@
 package contentprovider
 
-import "github.com/kyma-project/modulectl/internal/scaffold/common/types"
+import "github.com/kyma-project/modulectl/internal/common/types"
 
 type DefaultCR struct{}
 

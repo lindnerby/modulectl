@@ -1,7 +1,7 @@
 package contentprovider
 
 import (
-	"github.com/kyma-project/modulectl/internal/scaffold/common/types"
+	"github.com/kyma-project/modulectl/internal/common/types"
 )
 
 type Manifest struct{}

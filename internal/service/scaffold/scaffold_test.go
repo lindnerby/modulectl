@@ -9,8 +9,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	commonerrors "github.com/kyma-project/modulectl/internal/scaffold/common/errors"
-	"github.com/kyma-project/modulectl/internal/scaffold/common/types"
+	commonerrors "github.com/kyma-project/modulectl/internal/common/errors"
+	"github.com/kyma-project/modulectl/internal/common/types"
 	"github.com/kyma-project/modulectl/internal/service/scaffold"
 	iotools "github.com/kyma-project/modulectl/tools/io"
 )

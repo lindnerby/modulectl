@@ -5,8 +5,8 @@ import (
 
 	"github.com/kyma-project/lifecycle-manager/api/v1beta2"
 
-	"github.com/kyma-project/modulectl/internal/scaffold/common/errors"
-	"github.com/kyma-project/modulectl/internal/scaffold/common/types"
+	"github.com/kyma-project/modulectl/internal/common/errors"
+	"github.com/kyma-project/modulectl/internal/common/types"
 )
 
 type ModuleConfig struct {
