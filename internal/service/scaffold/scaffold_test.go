@@ -28,7 +28,7 @@ func Test_NewService_ReturnsError_WhenModuleConfigServiceIsNil(t *testing.T) {
 
 func Test_NewService_ReturnsError_WhenManifestServiceIsNil(t *testing.T) {
 	_, err := scaffold.NewService(
-		&moduleConfigPreventOverwriteErrorStub{},
+		&moduleConfigForceExplicitOverwriteErrorStub{},
 		nil,
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{})
@@ -38,7 +38,7 @@ func Test_NewService_ReturnsError_WhenManifestServiceIsNil(t *testing.T) {
 }
 func Test_NewService_ReturnsError_WhenDefaultCRServiceIsNil(t *testing.T) {
 	_, err := scaffold.NewService(
-		&moduleConfigPreventOverwriteErrorStub{},
+		&moduleConfigForceExplicitOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		nil,
 		&fileGeneratorErrorStub{})
@@ -49,7 +49,7 @@ func Test_NewService_ReturnsError_WhenDefaultCRServiceIsNil(t *testing.T) {
 
 func Test_NewService_ReturnsError_WhenSecurityConfigServiceIsNil(t *testing.T) {
 	_, err := scaffold.NewService(
-		&moduleConfigPreventOverwriteErrorStub{},
+		&moduleConfigForceExplicitOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
 		nil)
@@ -60,7 +60,7 @@ func Test_NewService_ReturnsError_WhenSecurityConfigServiceIsNil(t *testing.T) {
 
 func Test_CreateScaffold_ReturnsError_WhenOutIsNil(t *testing.T) {
 	svc, _ := scaffold.NewService(
-		&moduleConfigPreventOverwriteErrorStub{},
+		&moduleConfigForceExplicitOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{})
@@ -74,7 +74,7 @@ func Test_CreateScaffold_ReturnsError_WhenOutIsNil(t *testing.T) {
 
 func Test_CreateScaffold_ReturnsError_WhenDirectoryIsEmpty(t *testing.T) {
 	svc, _ := scaffold.NewService(
-		&moduleConfigPreventOverwriteErrorStub{},
+		&moduleConfigForceExplicitOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{})
@@ -88,7 +88,7 @@ func Test_CreateScaffold_ReturnsError_WhenDirectoryIsEmpty(t *testing.T) {
 
 func Test_CreateScaffold_ReturnsError_WhenModuleConfigFileIsEmpty(t *testing.T) {
 	svc, _ := scaffold.NewService(
-		&moduleConfigPreventOverwriteErrorStub{},
+		&moduleConfigForceExplicitOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{})
@@ -102,7 +102,7 @@ func Test_CreateScaffold_ReturnsError_WhenModuleConfigFileIsEmpty(t *testing.T) 
 
 func Test_CreateScaffold_ReturnsError_WhenManifestFileIsEmpty(t *testing.T) {
 	svc, _ := scaffold.NewService(
-		&moduleConfigPreventOverwriteErrorStub{},
+		&moduleConfigForceExplicitOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{})
@@ -116,7 +116,7 @@ func Test_CreateScaffold_ReturnsError_WhenManifestFileIsEmpty(t *testing.T) {
 
 func Test_CreateScaffold_ReturnsError_WhenModuleNameIsEmpty(t *testing.T) {
 	svc, _ := scaffold.NewService(
-		&moduleConfigPreventOverwriteErrorStub{},
+		&moduleConfigForceExplicitOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{})
@@ -130,7 +130,7 @@ func Test_CreateScaffold_ReturnsError_WhenModuleNameIsEmpty(t *testing.T) {
 
 func Test_CreateScaffold_ReturnsError_WhenModuleNameIsExceedingLength(t *testing.T) {
 	svc, _ := scaffold.NewService(
-		&moduleConfigPreventOverwriteErrorStub{},
+		&moduleConfigForceExplicitOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{})
@@ -145,7 +145,7 @@ func Test_CreateScaffold_ReturnsError_WhenModuleNameIsExceedingLength(t *testing
 
 func Test_CreateScaffold_ReturnsError_WhenModuleNameIsNotMatchingPattern(t *testing.T) {
 	svc, _ := scaffold.NewService(
-		&moduleConfigPreventOverwriteErrorStub{},
+		&moduleConfigForceExplicitOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{})
@@ -160,7 +160,7 @@ func Test_CreateScaffold_ReturnsError_WhenModuleNameIsNotMatchingPattern(t *test
 
 func Test_CreateScaffold_ReturnsError_WhenModuleVersionIsEmpty(t *testing.T) {
 	svc, _ := scaffold.NewService(
-		&moduleConfigPreventOverwriteErrorStub{},
+		&moduleConfigForceExplicitOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{})
@@ -174,7 +174,7 @@ func Test_CreateScaffold_ReturnsError_WhenModuleVersionIsEmpty(t *testing.T) {
 
 func Test_CreateScaffold_ReturnsError_WhenModuleVersionIsInvalid(t *testing.T) {
 	svc, _ := scaffold.NewService(
-		&moduleConfigPreventOverwriteErrorStub{},
+		&moduleConfigForceExplicitOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{})
@@ -189,7 +189,7 @@ func Test_CreateScaffold_ReturnsError_WhenModuleVersionIsInvalid(t *testing.T) {
 
 func Test_CreateScaffold_ReturnsError_WhenModuleChannelIsEmpty(t *testing.T) {
 	svc, _ := scaffold.NewService(
-		&moduleConfigPreventOverwriteErrorStub{},
+		&moduleConfigForceExplicitOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{})
@@ -203,7 +203,7 @@ func Test_CreateScaffold_ReturnsError_WhenModuleChannelIsEmpty(t *testing.T) {
 
 func Test_CreateScaffold_ReturnsError_WhenModuleChannelIsExceedingLength(t *testing.T) {
 	svc, _ := scaffold.NewService(
-		&moduleConfigPreventOverwriteErrorStub{},
+		&moduleConfigForceExplicitOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{})
@@ -218,7 +218,7 @@ func Test_CreateScaffold_ReturnsError_WhenModuleChannelIsExceedingLength(t *test
 
 func Test_CreateScaffold_ReturnsError_WhenModuleChannelFallsBelowLength(t *testing.T) {
 	svc, _ := scaffold.NewService(
-		&moduleConfigPreventOverwriteErrorStub{},
+		&moduleConfigForceExplicitOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{})
@@ -233,7 +233,7 @@ func Test_CreateScaffold_ReturnsError_WhenModuleChannelFallsBelowLength(t *testi
 
 func Test_CreateScaffold_ReturnsError_WhenModuleChannelNotMatchingCharset(t *testing.T) {
 	svc, _ := scaffold.NewService(
-		&moduleConfigPreventOverwriteErrorStub{},
+		&moduleConfigForceExplicitOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{})
@@ -246,9 +246,9 @@ func Test_CreateScaffold_ReturnsError_WhenModuleChannelNotMatchingCharset(t *tes
 	assert.Contains(t, result.Error(), "pattern")
 }
 
-func Test_CreateScaffold_ReturnsError_WhenModuleConfigServicePreventOverwriteReturnsError(t *testing.T) {
+func Test_CreateScaffold_ReturnsError_WhenModuleConfigServiceForceExplicitOverwriteReturnsError(t *testing.T) {
 	svc, _ := scaffold.NewService(
-		&moduleConfigPreventOverwriteErrorStub{},
+		&moduleConfigForceExplicitOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{})
@@ -392,21 +392,21 @@ func Test_CreateScaffold_Succeeds(t *testing.T) {
 var errSomeFileGeneratorError = errors.New("some file generator error")
 var errSomeUnexpectedError = errors.New("if you see this error, something went wrong in the test setup")
 
-type moduleConfigPreventOverwriteErrorStub struct{}
+type moduleConfigForceExplicitOverwriteErrorStub struct{}
 
 var errOverwriteError = errors.New("overwrite error")
 
-func (*moduleConfigPreventOverwriteErrorStub) PreventOverwrite(_, _ string, _ bool) error {
+func (*moduleConfigForceExplicitOverwriteErrorStub) ForceExplicitOverwrite(_, _ string, _ bool) error {
 	return errOverwriteError
 }
 
-func (*moduleConfigPreventOverwriteErrorStub) GenerateFile(_ iotools.Out, _ string, _ types.KeyValueArgs) error {
+func (*moduleConfigForceExplicitOverwriteErrorStub) GenerateFile(_ iotools.Out, _ string, _ types.KeyValueArgs) error {
 	return errSomeUnexpectedError
 }
 
 type moduleConfigGenerateFileErrorStub struct{}
 
-func (*moduleConfigGenerateFileErrorStub) PreventOverwrite(_, _ string, _ bool) error {
+func (*moduleConfigGenerateFileErrorStub) ForceExplicitOverwrite(_, _ string, _ bool) error {
 	return nil
 }
 
@@ -416,7 +416,7 @@ func (*moduleConfigGenerateFileErrorStub) GenerateFile(_ iotools.Out, _ string, 
 
 type moduleConfigStub struct{}
 
-func (*moduleConfigStub) PreventOverwrite(_, _ string, _ bool) error {
+func (*moduleConfigStub) ForceExplicitOverwrite(_, _ string, _ bool) error {
 	return nil
 }
 

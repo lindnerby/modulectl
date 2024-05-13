@@ -38,46 +38,46 @@ func Test_NewService_ReturnsError_WhenFileGeneratorIsNil(t *testing.T) {
 	assert.Contains(t, err.Error(), "fileGenerator must not be nil")
 }
 
-func Test_PreventOverwrite_ReturnsError_WhenFilesystemReturnsError(t *testing.T) {
+func Test_ForceExplicitOverwrite_ReturnsError_WhenFilesystemReturnsError(t *testing.T) {
 	svc, _ := moduleconfig.NewService(
 		&errorStub{},
 		&fileGeneratorErrorStub{},
 	)
 
-	result := svc.PreventOverwrite(directory, moduleConfigFile, true)
+	result := svc.ForceExplicitOverwrite(directory, moduleConfigFile, true)
 
 	require.ErrorIs(t, result, errSomeOSError)
 }
 
-func Test_PreventOverwrite_ReturnsError_WhenFileExistsAndNoOverwrite(t *testing.T) {
+func Test_ForceExplicitOverwrite_ReturnsError_WhenFileExistsAndNoOverwrite(t *testing.T) {
 	svc, _ := moduleconfig.NewService(
 		&fileExistsStub{},
 		&fileGeneratorErrorStub{},
 	)
 
-	result := svc.PreventOverwrite(directory, moduleConfigFile, false)
+	result := svc.ForceExplicitOverwrite(directory, moduleConfigFile, false)
 
 	require.ErrorIs(t, result, moduleconfig.ErrFileExists)
 }
 
-func Test_PreventOverwrite_ReturnsNil_WhenFileExistsAndOverwrite(t *testing.T) {
+func Test_ForceExplicitOverwrite_ReturnsNil_WhenFileExistsAndOverwrite(t *testing.T) {
 	svc, _ := moduleconfig.NewService(
 		&fileExistsStub{},
 		&fileGeneratorErrorStub{},
 	)
 
-	result := svc.PreventOverwrite(directory, moduleConfigFile, true)
+	result := svc.ForceExplicitOverwrite(directory, moduleConfigFile, true)
 
 	require.NoError(t, result)
 }
 
-func Test_PreventOverwrite_ReturnsNil_WhenFileDoesNotExist(t *testing.T) {
+func Test_ForceExplicitOverwrite_ReturnsNil_WhenFileDoesNotExist(t *testing.T) {
 	svc, _ := moduleconfig.NewService(
 		&fileDoesNotExistStub{},
 		&fileGeneratorErrorStub{},
 	)
 
-	result := svc.PreventOverwrite(directory, moduleConfigFile, true)
+	result := svc.ForceExplicitOverwrite(directory, moduleConfigFile, true)
 
 	require.NoError(t, result)
 }

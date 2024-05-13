@@ -38,7 +38,7 @@ func NewService(fileSystem FileSystem, fileGenerator FileGenerator) (*Service, e
 	}, nil
 }
 
-func (s *Service) PreventOverwrite(directory, fileName string, overwrite bool) error {
+func (s *Service) ForceExplicitOverwrite(directory, fileName string, overwrite bool) error {
 	exists, err := s.fileSystem.FileExists(path.Join(directory, fileName))
 	if err != nil {
 		return err

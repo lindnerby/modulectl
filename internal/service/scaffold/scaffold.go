@@ -12,7 +12,7 @@ import (
 
 type ModuleConfigService interface {
 	FileGeneratorService
-	PreventOverwrite(directory, moduleConfigFileName string, overwrite bool) error
+	ForceExplicitOverwrite(directory, moduleConfigFileName string, overwrite bool) error
 }
 
 type FileGeneratorService interface {
@@ -59,7 +59,7 @@ func (s *Service) CreateScaffold(opts Options) error {
 		return err
 	}
 
-	if err := s.moduleConfigService.PreventOverwrite(opts.Directory, opts.ModuleConfigFileName, opts.ModuleConfigFileOverwrite); err != nil {
+	if err := s.moduleConfigService.ForceExplicitOverwrite(opts.Directory, opts.ModuleConfigFileName, opts.ModuleConfigFileOverwrite); err != nil {
 		return err
 	}
 
