@@ -2,8 +2,16 @@ package create
 
 import (
 	_ "embed"
+	"fmt"
 
-	"github.com/kyma-project/modulectl/cmd/modulectl/create/scaffold"
+	scaffoldcmd "github.com/kyma-project/modulectl/cmd/modulectl/create/scaffold"
+	"github.com/kyma-project/modulectl/internal/service/contentprovider"
+	"github.com/kyma-project/modulectl/internal/service/filegenerator"
+	"github.com/kyma-project/modulectl/internal/service/filegenerator/reusefilegenerator"
+	"github.com/kyma-project/modulectl/internal/service/moduleconfig"
+	scaffoldsvc "github.com/kyma-project/modulectl/internal/service/scaffold"
+	"github.com/kyma-project/modulectl/tools/filesystem"
+	"github.com/kyma-project/modulectl/tools/yaml"
 	"github.com/spf13/cobra"
 )
 
@@ -16,14 +24,90 @@ var short string
 //go:embed long.txt
 var long string
 
-func NewCmd() *cobra.Command {
-	cmd := &cobra.Command{
+func NewCmd() (*cobra.Command, error) {
+	rootCmd := &cobra.Command{
 		Use:   use,
 		Short: short,
 		Long:  long,
 	}
 
-	cmd.AddCommand(scaffold.NewCmd())
+	svc, err := buildScaffoldService()
+	if err != nil {
+		return nil, fmt.Errorf("failed to build scaffold service: %w", err)
+	}
 
-	return cmd
+	cmd, err := scaffoldcmd.NewCmd(svc)
+	if err != nil {
+		return nil, fmt.Errorf("failed to build scaffold command: %w", err)
+	}
+
+	rootCmd.AddCommand(cmd)
+	return rootCmd, nil
+}
+
+func buildScaffoldService() (*scaffoldsvc.Service, error) {
+	fileSystemUtil := &filesystem.FileSystemUtil{}
+	yamlConverter := &yaml.ObjectToYAMLConverter{}
+
+	moduleConfigContentProvider, err := contentprovider.NewModuleConfig(yamlConverter)
+	if err != nil {
+		return nil, err
+	}
+
+	moduleConfigFileGenerator, err := filegenerator.NewService("module-config", fileSystemUtil, moduleConfigContentProvider)
+	if err != nil {
+		return nil, err
+	}
+
+	moduleConfigService, err := moduleconfig.NewService(fileSystemUtil, moduleConfigFileGenerator)
+	if err != nil {
+		return nil, err
+	}
+
+	manifestFileGenerator, err := filegenerator.NewService("manifest", fileSystemUtil, contentprovider.NewManifest())
+	if err != nil {
+		return nil, err
+	}
+
+	manifestReuseFileGenerator, err := reusefilegenerator.NewService("manifest", fileSystemUtil, manifestFileGenerator)
+	if err != nil {
+		return nil, err
+	}
+
+	defaultCRFileGenerator, err := filegenerator.NewService("defaultcr", fileSystemUtil, contentprovider.NewDefaultCR())
+	if err != nil {
+		return nil, err
+	}
+
+	defaultCRReuseFileGenerator, err := reusefilegenerator.NewService("defaultcr", fileSystemUtil, defaultCRFileGenerator)
+	if err != nil {
+		return nil, err
+	}
+
+	securitConfigContentProvider, err := contentprovider.NewSecurityConfig(yamlConverter)
+	if err != nil {
+		return nil, err
+	}
+
+	securityConfigFileGenerator, err := filegenerator.NewService("security-config", fileSystemUtil, securitConfigContentProvider)
+	if err != nil {
+		return nil, err
+	}
+
+	securityConfigReuseFileGenerator, err := reusefilegenerator.NewService("security-config", fileSystemUtil, securityConfigFileGenerator)
+	if err != nil {
+		return nil, err
+	}
+
+	scaffoldService, err := scaffoldsvc.NewService(
+		moduleConfigService,
+		manifestReuseFileGenerator,
+		defaultCRReuseFileGenerator,
+		securityConfigReuseFileGenerator,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return scaffoldService, nil
 }

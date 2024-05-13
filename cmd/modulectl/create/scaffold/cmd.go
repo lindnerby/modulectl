@@ -2,17 +2,13 @@ package scaffold
 
 import (
 	_ "embed"
+	"fmt"
 
 	"github.com/spf13/cobra"
 
-	"github.com/kyma-project/modulectl/internal/service/contentprovider"
-	"github.com/kyma-project/modulectl/internal/service/filegenerator"
-	"github.com/kyma-project/modulectl/internal/service/filegenerator/reusefilegenerator"
-	"github.com/kyma-project/modulectl/internal/service/moduleconfig"
+	"github.com/kyma-project/modulectl/internal/common/errors"
 	"github.com/kyma-project/modulectl/internal/service/scaffold"
-	"github.com/kyma-project/modulectl/tools/filesystem"
 	"github.com/kyma-project/modulectl/tools/io"
-	"github.com/kyma-project/modulectl/tools/yaml"
 )
 
 //go:embed use.txt
@@ -27,68 +23,13 @@ var long string
 //go:embed example.txt
 var example string
 
-func NewCmd() *cobra.Command {
-	fileSystemUtil := &filesystem.FileSystemUtil{}
-	yamlConverter := &yaml.ObjectToYAMLConverter{}
+type ScaffoldService interface {
+	CreateScaffold(opts scaffold.Options) error
+}
 
-	moduleConfigContentProvider, err := contentprovider.NewModuleConfig(yamlConverter)
-	if err != nil {
-		panic(err)
-	}
-
-	moduleConfigFileGenerator, err := filegenerator.NewService("module-config", fileSystemUtil, moduleConfigContentProvider)
-	if err != nil {
-		panic(err)
-	}
-
-	moduleConfigService, err := moduleconfig.NewService(fileSystemUtil, moduleConfigFileGenerator)
-	if err != nil {
-		panic(err)
-	}
-
-	manifestFileGenerator, err := filegenerator.NewService("manifest", fileSystemUtil, contentprovider.NewManifest())
-	if err != nil {
-		panic(err)
-	}
-
-	manifestReuseFileGenerator, err := reusefilegenerator.NewService("manifest", fileSystemUtil, manifestFileGenerator)
-	if err != nil {
-		panic(err)
-	}
-
-	defaultCRFileGenerator, err := filegenerator.NewService("defaultcr", fileSystemUtil, contentprovider.NewDefaultCR())
-	if err != nil {
-		panic(err)
-	}
-
-	defaultCRReuseFileGenerator, err := reusefilegenerator.NewService("defaultcr", fileSystemUtil, defaultCRFileGenerator)
-	if err != nil {
-		panic(err)
-	}
-
-	securitConfigContentProvider, err := contentprovider.NewSecurityConfig(yamlConverter)
-	if err != nil {
-		panic(err)
-	}
-
-	securityConfigFileGenerator, err := filegenerator.NewService("security-config", fileSystemUtil, securitConfigContentProvider)
-	if err != nil {
-		panic(err)
-	}
-
-	securityConfigReuseFileGenerator, err := reusefilegenerator.NewService("security-config", fileSystemUtil, securityConfigFileGenerator)
-	if err != nil {
-		panic(err)
-	}
-
-	scaffoldService, err := scaffold.NewService(
-		moduleConfigService,
-		manifestReuseFileGenerator,
-		defaultCRReuseFileGenerator,
-		securityConfigReuseFileGenerator,
-	)
-	if err != nil {
-		panic(err)
+func NewCmd(scaffoldService ScaffoldService) (*cobra.Command, error) {
+	if scaffoldService == nil {
+		return nil, fmt.Errorf("%w: scaffoldService must not be nil", errors.ErrInvalidArg)
 	}
 
 	opts := scaffold.Options{}
@@ -107,5 +48,5 @@ func NewCmd() *cobra.Command {
 	opts.Out = io.NewDefaultOut(cmd.OutOrStdout())
 	parseFlags(cmd.Flags(), &opts)
 
-	return cmd
+	return cmd, nil
 }

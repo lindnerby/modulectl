@@ -18,7 +18,7 @@ var short string
 //go:embed long.txt
 var long string
 
-func NewCmd() *cobra.Command {
+func NewCmd() (*cobra.Command, error) {
 	rootCmd := &cobra.Command{
 		Use:   use,
 		Short: short,
@@ -28,7 +28,12 @@ func NewCmd() *cobra.Command {
 		},
 	}
 
-	rootCmd.AddCommand(create.NewCmd())
+	cmd, err := create.NewCmd()
+	if err != nil {
+		return nil, fmt.Errorf("failed to build create command: %w", err)
+	}
 
-	return rootCmd
+	rootCmd.AddCommand(cmd)
+
+	return rootCmd, nil
 }
