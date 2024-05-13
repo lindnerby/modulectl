@@ -15,6 +15,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
+const (
+	moduleConfigKind   = "module-config"
+	manifestKind       = "manifest"
+	defaultCRKind      = "defaultcr"
+	securityConfigKind = "security-config"
+)
+
 //go:embed use.txt
 var use string
 
@@ -54,7 +61,7 @@ func buildScaffoldService() (*scaffoldsvc.Service, error) {
 		return nil, err
 	}
 
-	moduleConfigFileGenerator, err := filegenerator.NewService("module-config", fileSystemUtil, moduleConfigContentProvider)
+	moduleConfigFileGenerator, err := filegenerator.NewService(moduleConfigKind, fileSystemUtil, moduleConfigContentProvider)
 	if err != nil {
 		return nil, err
 	}
@@ -64,22 +71,22 @@ func buildScaffoldService() (*scaffoldsvc.Service, error) {
 		return nil, err
 	}
 
-	manifestFileGenerator, err := filegenerator.NewService("manifest", fileSystemUtil, contentprovider.NewManifest())
+	manifestFileGenerator, err := filegenerator.NewService(manifestKind, fileSystemUtil, contentprovider.NewManifest())
 	if err != nil {
 		return nil, err
 	}
 
-	manifestReuseFileGenerator, err := reusefilegenerator.NewService("manifest", fileSystemUtil, manifestFileGenerator)
+	manifestReuseFileGenerator, err := reusefilegenerator.NewService(manifestKind, fileSystemUtil, manifestFileGenerator)
 	if err != nil {
 		return nil, err
 	}
 
-	defaultCRFileGenerator, err := filegenerator.NewService("defaultcr", fileSystemUtil, contentprovider.NewDefaultCR())
+	defaultCRFileGenerator, err := filegenerator.NewService(defaultCRKind, fileSystemUtil, contentprovider.NewDefaultCR())
 	if err != nil {
 		return nil, err
 	}
 
-	defaultCRReuseFileGenerator, err := reusefilegenerator.NewService("defaultcr", fileSystemUtil, defaultCRFileGenerator)
+	defaultCRReuseFileGenerator, err := reusefilegenerator.NewService(defaultCRKind, fileSystemUtil, defaultCRFileGenerator)
 	if err != nil {
 		return nil, err
 	}
@@ -89,12 +96,12 @@ func buildScaffoldService() (*scaffoldsvc.Service, error) {
 		return nil, err
 	}
 
-	securityConfigFileGenerator, err := filegenerator.NewService("security-config", fileSystemUtil, securitConfigContentProvider)
+	securityConfigFileGenerator, err := filegenerator.NewService(securityConfigKind, fileSystemUtil, securitConfigContentProvider)
 	if err != nil {
 		return nil, err
 	}
 
-	securityConfigReuseFileGenerator, err := reusefilegenerator.NewService("security-config", fileSystemUtil, securityConfigFileGenerator)
+	securityConfigReuseFileGenerator, err := reusefilegenerator.NewService(securityConfigKind, fileSystemUtil, securityConfigFileGenerator)
 	if err != nil {
 		return nil, err
 	}
