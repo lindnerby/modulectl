@@ -1,7 +1,7 @@
 package scaffold
 
 import (
-	"github.com/kyma-project/modulectl/internal/scaffold"
+	"github.com/kyma-project/modulectl/internal/service/scaffold"
 	"github.com/spf13/pflag"
 )
 

@@ -19,17 +19,17 @@ type FileGeneratorService interface {
 	GenerateFile(out io.Out, path string, args types.KeyValueArgs) error
 }
 
-type ScaffoldService struct {
+type Service struct {
 	moduleConfigService   ModuleConfigService
 	manifestService       FileGeneratorService
 	defaultCRService      FileGeneratorService
 	securityConfigService FileGeneratorService
 }
 
-func NewScaffoldService(moduleConfigService ModuleConfigService,
+func NewService(moduleConfigService ModuleConfigService,
 	manifestService FileGeneratorService,
 	defaultCRService FileGeneratorService,
-	securityConfigService FileGeneratorService) (*ScaffoldService, error) {
+	securityConfigService FileGeneratorService) (*Service, error) {
 	if moduleConfigService == nil {
 		return nil, fmt.Errorf("%w: moduleConfigService must not be nil", errors.ErrInvalidArg)
 	}
@@ -46,7 +46,7 @@ func NewScaffoldService(moduleConfigService ModuleConfigService,
 		return nil, fmt.Errorf("%w: securityConfigService must not be nil", errors.ErrInvalidArg)
 	}
 
-	return &ScaffoldService{
+	return &Service{
 		moduleConfigService:   moduleConfigService,
 		manifestService:       manifestService,
 		defaultCRService:      defaultCRService,
@@ -54,7 +54,7 @@ func NewScaffoldService(moduleConfigService ModuleConfigService,
 	}, nil
 }
 
-func (s *ScaffoldService) CreateScaffold(opts Options) error {
+func (s *Service) CreateScaffold(opts Options) error {
 	if err := opts.validate(); err != nil {
 		return err
 	}

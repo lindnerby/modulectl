@@ -9,14 +9,14 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	"github.com/kyma-project/modulectl/internal/scaffold"
 	commonerrors "github.com/kyma-project/modulectl/internal/scaffold/common/errors"
 	"github.com/kyma-project/modulectl/internal/scaffold/common/types"
+	"github.com/kyma-project/modulectl/internal/service/scaffold"
 	iotools "github.com/kyma-project/modulectl/tools/io"
 )
 
-func Test_NewScaffoldService_ReturnsError_WhenModuleConfigServiceIsNil(t *testing.T) {
-	_, err := scaffold.NewScaffoldService(
+func Test_NewService_ReturnsError_WhenModuleConfigServiceIsNil(t *testing.T) {
+	_, err := scaffold.NewService(
 		nil,
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -26,8 +26,8 @@ func Test_NewScaffoldService_ReturnsError_WhenModuleConfigServiceIsNil(t *testin
 	assert.Contains(t, err.Error(), "moduleConfigService")
 }
 
-func Test_NewScaffoldService_ReturnsError_WhenManifestServiceIsNil(t *testing.T) {
-	_, err := scaffold.NewScaffoldService(
+func Test_NewService_ReturnsError_WhenManifestServiceIsNil(t *testing.T) {
+	_, err := scaffold.NewService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		nil,
 		&fileGeneratorErrorStub{},
@@ -36,8 +36,8 @@ func Test_NewScaffoldService_ReturnsError_WhenManifestServiceIsNil(t *testing.T)
 	require.ErrorIs(t, err, commonerrors.ErrInvalidArg)
 	assert.Contains(t, err.Error(), "manifestService")
 }
-func Test_NewScaffoldService_ReturnsError_WhenDefaultCRServiceIsNil(t *testing.T) {
-	_, err := scaffold.NewScaffoldService(
+func Test_NewService_ReturnsError_WhenDefaultCRServiceIsNil(t *testing.T) {
+	_, err := scaffold.NewService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		nil,
@@ -47,8 +47,8 @@ func Test_NewScaffoldService_ReturnsError_WhenDefaultCRServiceIsNil(t *testing.T
 	assert.Contains(t, err.Error(), "defaultCRService")
 }
 
-func Test_NewScaffoldService_ReturnsError_WhenSecurityConfigServiceIsNil(t *testing.T) {
-	_, err := scaffold.NewScaffoldService(
+func Test_NewService_ReturnsError_WhenSecurityConfigServiceIsNil(t *testing.T) {
+	_, err := scaffold.NewService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -58,8 +58,8 @@ func Test_NewScaffoldService_ReturnsError_WhenSecurityConfigServiceIsNil(t *test
 	assert.Contains(t, err.Error(), "securityConfigService")
 }
 
-func Test_RunScaffold_ReturnsError_WhenOutIsNil(t *testing.T) {
-	svc, _ := scaffold.NewScaffoldService(
+func Test_CreateScaffold_ReturnsError_WhenOutIsNil(t *testing.T) {
+	svc, _ := scaffold.NewService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -72,8 +72,8 @@ func Test_RunScaffold_ReturnsError_WhenOutIsNil(t *testing.T) {
 	assert.Contains(t, result.Error(), "opts.Out")
 }
 
-func Test_RunScaffold_ReturnsError_WhenDirectoryIsEmpty(t *testing.T) {
-	svc, _ := scaffold.NewScaffoldService(
+func Test_CreateScaffold_ReturnsError_WhenDirectoryIsEmpty(t *testing.T) {
+	svc, _ := scaffold.NewService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -86,8 +86,8 @@ func Test_RunScaffold_ReturnsError_WhenDirectoryIsEmpty(t *testing.T) {
 	assert.Contains(t, result.Error(), "opts.Directory")
 }
 
-func Test_RunScaffold_ReturnsError_WhenModuleConfigFileIsEmpty(t *testing.T) {
-	svc, _ := scaffold.NewScaffoldService(
+func Test_CreateScaffold_ReturnsError_WhenModuleConfigFileIsEmpty(t *testing.T) {
+	svc, _ := scaffold.NewService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -100,8 +100,8 @@ func Test_RunScaffold_ReturnsError_WhenModuleConfigFileIsEmpty(t *testing.T) {
 	assert.Contains(t, result.Error(), "opts.ModuleConfigFileName")
 }
 
-func Test_RunScaffold_ReturnsError_WhenManifestFileIsEmpty(t *testing.T) {
-	svc, _ := scaffold.NewScaffoldService(
+func Test_CreateScaffold_ReturnsError_WhenManifestFileIsEmpty(t *testing.T) {
+	svc, _ := scaffold.NewService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -114,8 +114,8 @@ func Test_RunScaffold_ReturnsError_WhenManifestFileIsEmpty(t *testing.T) {
 	assert.Contains(t, result.Error(), "opts.ManifestFileName")
 }
 
-func Test_RunScaffold_ReturnsError_WhenModuleNameIsEmpty(t *testing.T) {
-	svc, _ := scaffold.NewScaffoldService(
+func Test_CreateScaffold_ReturnsError_WhenModuleNameIsEmpty(t *testing.T) {
+	svc, _ := scaffold.NewService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -128,8 +128,8 @@ func Test_RunScaffold_ReturnsError_WhenModuleNameIsEmpty(t *testing.T) {
 	assert.Contains(t, result.Error(), "opts.ModuleName")
 }
 
-func Test_RunScaffold_ReturnsError_WhenModuleNameIsExceedingLength(t *testing.T) {
-	svc, _ := scaffold.NewScaffoldService(
+func Test_CreateScaffold_ReturnsError_WhenModuleNameIsExceedingLength(t *testing.T) {
+	svc, _ := scaffold.NewService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -143,8 +143,8 @@ func Test_RunScaffold_ReturnsError_WhenModuleNameIsExceedingLength(t *testing.T)
 	assert.Contains(t, result.Error(), "length")
 }
 
-func Test_RunScaffold_ReturnsError_WhenModuleNameIsNotMatchingPattern(t *testing.T) {
-	svc, _ := scaffold.NewScaffoldService(
+func Test_CreateScaffold_ReturnsError_WhenModuleNameIsNotMatchingPattern(t *testing.T) {
+	svc, _ := scaffold.NewService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -158,8 +158,8 @@ func Test_RunScaffold_ReturnsError_WhenModuleNameIsNotMatchingPattern(t *testing
 	assert.Contains(t, result.Error(), "pattern")
 }
 
-func Test_RunScaffold_ReturnsError_WhenModuleVersionIsEmpty(t *testing.T) {
-	svc, _ := scaffold.NewScaffoldService(
+func Test_CreateScaffold_ReturnsError_WhenModuleVersionIsEmpty(t *testing.T) {
+	svc, _ := scaffold.NewService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -172,8 +172,8 @@ func Test_RunScaffold_ReturnsError_WhenModuleVersionIsEmpty(t *testing.T) {
 	assert.Contains(t, result.Error(), "opts.ModuleVersion")
 }
 
-func Test_RunScaffold_ReturnsError_WhenModuleVersionIsInvalid(t *testing.T) {
-	svc, _ := scaffold.NewScaffoldService(
+func Test_CreateScaffold_ReturnsError_WhenModuleVersionIsInvalid(t *testing.T) {
+	svc, _ := scaffold.NewService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -187,8 +187,8 @@ func Test_RunScaffold_ReturnsError_WhenModuleVersionIsInvalid(t *testing.T) {
 	assert.Contains(t, result.Error(), "failed to parse")
 }
 
-func Test_RunScaffold_ReturnsError_WhenModuleChannelIsEmpty(t *testing.T) {
-	svc, _ := scaffold.NewScaffoldService(
+func Test_CreateScaffold_ReturnsError_WhenModuleChannelIsEmpty(t *testing.T) {
+	svc, _ := scaffold.NewService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -201,8 +201,8 @@ func Test_RunScaffold_ReturnsError_WhenModuleChannelIsEmpty(t *testing.T) {
 	assert.Contains(t, result.Error(), "opts.ModuleChannel")
 }
 
-func Test_RunScaffold_ReturnsError_WhenModuleChannelIsExceedingLength(t *testing.T) {
-	svc, _ := scaffold.NewScaffoldService(
+func Test_CreateScaffold_ReturnsError_WhenModuleChannelIsExceedingLength(t *testing.T) {
+	svc, _ := scaffold.NewService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -216,8 +216,8 @@ func Test_RunScaffold_ReturnsError_WhenModuleChannelIsExceedingLength(t *testing
 	assert.Contains(t, result.Error(), "length")
 }
 
-func Test_RunScaffold_ReturnsError_WhenModuleChannelFallsBelowLength(t *testing.T) {
-	svc, _ := scaffold.NewScaffoldService(
+func Test_CreateScaffold_ReturnsError_WhenModuleChannelFallsBelowLength(t *testing.T) {
+	svc, _ := scaffold.NewService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -231,8 +231,8 @@ func Test_RunScaffold_ReturnsError_WhenModuleChannelFallsBelowLength(t *testing.
 	assert.Contains(t, result.Error(), "length")
 }
 
-func Test_RunScaffold_ReturnsError_WhenModuleChannelNotMatchingCharset(t *testing.T) {
-	svc, _ := scaffold.NewScaffoldService(
+func Test_CreateScaffold_ReturnsError_WhenModuleChannelNotMatchingCharset(t *testing.T) {
+	svc, _ := scaffold.NewService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -246,8 +246,8 @@ func Test_RunScaffold_ReturnsError_WhenModuleChannelNotMatchingCharset(t *testin
 	assert.Contains(t, result.Error(), "pattern")
 }
 
-func Test_RunScaffold_ReturnsError_WhenModuleConfigServicePreventOverwriteReturnsError(t *testing.T) {
-	svc, _ := scaffold.NewScaffoldService(
+func Test_CreateScaffold_ReturnsError_WhenModuleConfigServicePreventOverwriteReturnsError(t *testing.T) {
+	svc, _ := scaffold.NewService(
 		&moduleConfigPreventOverwriteErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -258,8 +258,8 @@ func Test_RunScaffold_ReturnsError_WhenModuleConfigServicePreventOverwriteReturn
 	require.ErrorIs(t, result, errOverwriteError)
 }
 
-func Test_RunScaffold_ReturnsError_WhenGeneratingManifestFileFails(t *testing.T) {
-	svc, _ := scaffold.NewScaffoldService(
+func Test_CreateScaffold_ReturnsError_WhenGeneratingManifestFileFails(t *testing.T) {
+	svc, _ := scaffold.NewService(
 		&moduleConfigGenerateFileErrorStub{},
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{},
@@ -272,8 +272,8 @@ func Test_RunScaffold_ReturnsError_WhenGeneratingManifestFileFails(t *testing.T)
 	assert.Contains(t, result.Error(), "manifest.yaml")
 }
 
-func Test_RunScaffold_Succeeds_WhenGeneratingManifestFile(t *testing.T) {
-	svc, _ := scaffold.NewScaffoldService(
+func Test_CreateScaffold_Succeeds_WhenGeneratingManifestFile(t *testing.T) {
+	svc, _ := scaffold.NewService(
 		&moduleConfigStub{},
 		&fileGeneratorStub{},
 		&fileGeneratorStub{},
@@ -284,8 +284,8 @@ func Test_RunScaffold_Succeeds_WhenGeneratingManifestFile(t *testing.T) {
 	require.NoError(t, result)
 }
 
-func Test_RunScaffold_Succeeds_WhenDefaultCRFileIsNotConfigured(t *testing.T) {
-	svc, _ := scaffold.NewScaffoldService(
+func Test_CreateScaffold_Succeeds_WhenDefaultCRFileIsNotConfigured(t *testing.T) {
+	svc, _ := scaffold.NewService(
 		&moduleConfigStub{},
 		&fileGeneratorStub{},
 		&fileGeneratorErrorStub{},
@@ -296,8 +296,8 @@ func Test_RunScaffold_Succeeds_WhenDefaultCRFileIsNotConfigured(t *testing.T) {
 	require.NoError(t, result)
 }
 
-func Test_RunScaffold_ReturnsError_WhenGeneratingDefaultCRFileFails(t *testing.T) {
-	svc, _ := scaffold.NewScaffoldService(
+func Test_CreateScaffold_ReturnsError_WhenGeneratingDefaultCRFileFails(t *testing.T) {
+	svc, _ := scaffold.NewService(
 		&moduleConfigGenerateFileErrorStub{},
 		&fileGeneratorStub{},
 		&fileGeneratorErrorStub{},
@@ -310,8 +310,8 @@ func Test_RunScaffold_ReturnsError_WhenGeneratingDefaultCRFileFails(t *testing.T
 	assert.Contains(t, result.Error(), "default-cr.yaml")
 }
 
-func Test_RunScaffold_Succeeds_WhenGeneratingDefaultCRFile(t *testing.T) {
-	svc, _ := scaffold.NewScaffoldService(
+func Test_CreateScaffold_Succeeds_WhenGeneratingDefaultCRFile(t *testing.T) {
+	svc, _ := scaffold.NewService(
 		&moduleConfigStub{},
 		&fileGeneratorStub{},
 		&fileGeneratorStub{},
@@ -322,8 +322,8 @@ func Test_RunScaffold_Succeeds_WhenGeneratingDefaultCRFile(t *testing.T) {
 	require.NoError(t, result)
 }
 
-func Test_RunScaffold_Succeeds_WhenSecurityConfigFileIsNotConfigured(t *testing.T) {
-	svc, _ := scaffold.NewScaffoldService(
+func Test_CreateScaffold_Succeeds_WhenSecurityConfigFileIsNotConfigured(t *testing.T) {
+	svc, _ := scaffold.NewService(
 		&moduleConfigStub{},
 		&fileGeneratorStub{},
 		&fileGeneratorStub{},
@@ -334,8 +334,8 @@ func Test_RunScaffold_Succeeds_WhenSecurityConfigFileIsNotConfigured(t *testing.
 	require.NoError(t, result)
 }
 
-func Test_RunScaffold_ReturnsError_WhenGeneratingSecurityConfigFileFails(t *testing.T) {
-	svc, _ := scaffold.NewScaffoldService(
+func Test_CreateScaffold_ReturnsError_WhenGeneratingSecurityConfigFileFails(t *testing.T) {
+	svc, _ := scaffold.NewService(
 		&moduleConfigGenerateFileErrorStub{},
 		&fileGeneratorStub{},
 		&fileGeneratorStub{},
@@ -348,8 +348,8 @@ func Test_RunScaffold_ReturnsError_WhenGeneratingSecurityConfigFileFails(t *test
 	assert.Contains(t, result.Error(), "security-config.yaml")
 }
 
-func Test_RunScaffold_Succeeds_WhenGeneratingSecurityConfigFile(t *testing.T) {
-	svc, _ := scaffold.NewScaffoldService(
+func Test_CreateScaffold_Succeeds_WhenGeneratingSecurityConfigFile(t *testing.T) {
+	svc, _ := scaffold.NewService(
 		&moduleConfigStub{},
 		&fileGeneratorStub{},
 		&fileGeneratorStub{},
@@ -360,8 +360,8 @@ func Test_RunScaffold_Succeeds_WhenGeneratingSecurityConfigFile(t *testing.T) {
 	require.NoError(t, result)
 }
 
-func Test_RunScaffold_ReturnsError_WhenGeneratingModuleConfigReturnsError(t *testing.T) {
-	svc, _ := scaffold.NewScaffoldService(
+func Test_CreateScaffold_ReturnsError_WhenGeneratingModuleConfigReturnsError(t *testing.T) {
+	svc, _ := scaffold.NewService(
 		&moduleConfigGenerateFileErrorStub{},
 		&fileGeneratorStub{},
 		&fileGeneratorStub{},
@@ -374,8 +374,8 @@ func Test_RunScaffold_ReturnsError_WhenGeneratingModuleConfigReturnsError(t *tes
 	assert.Contains(t, result.Error(), "module-config.yaml")
 }
 
-func Test_RunScaffold_Succeeds(t *testing.T) {
-	svc, _ := scaffold.NewScaffoldService(
+func Test_CreateScaffold_Succeeds(t *testing.T) {
+	svc, _ := scaffold.NewService(
 		&moduleConfigStub{},
 		&fileGeneratorStub{},
 		&fileGeneratorStub{},
