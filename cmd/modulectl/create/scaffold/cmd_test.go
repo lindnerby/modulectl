@@ -1,6 +1,7 @@
 package scaffold_test
 
 import (
+	"errors"
 	"fmt"
 	"math/rand"
 	"os"
@@ -33,6 +34,14 @@ func Test_Execute_CallsScaffoldService(t *testing.T) {
 
 	require.NoError(t, err)
 	require.True(t, svc.called)
+}
+
+func Test_Execute_ReturnsError_WhenServiceReturnsError(t *testing.T) {
+	cmd, _ := scaffoldcmd.NewCmd(&scaffoldServiceErrorStub{})
+
+	err := cmd.Execute()
+
+	require.ErrorIs(t, err, errSomeTestError)
 }
 
 func Test_Execute_ParsesOptions(t *testing.T) {
@@ -136,6 +145,14 @@ func (s *scaffoldServiceStub) CreateScaffold(opts scaffoldsvc.Options) error {
 	s.called = true
 	s.opts = opts
 	return nil
+}
+
+type scaffoldServiceErrorStub struct{}
+
+var errSomeTestError = errors.New("some test error")
+
+func (s *scaffoldServiceErrorStub) CreateScaffold(_ scaffoldsvc.Options) error {
+	return errSomeTestError
 }
 
 // ***************
