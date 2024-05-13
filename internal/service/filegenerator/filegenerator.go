@@ -17,13 +17,13 @@ type DefaultContentProvider interface {
 	GetDefaultContent(args types.KeyValueArgs) (string, error)
 }
 
-type FileGeneratorService struct {
+type Service struct {
 	kind                   string
 	fileWriter             FileWriter
 	defaultContentProvider DefaultContentProvider
 }
 
-func NewFileGeneratorService(kind string, fileSystem FileWriter, defaultContentProvider DefaultContentProvider) (*FileGeneratorService, error) {
+func NewService(kind string, fileSystem FileWriter, defaultContentProvider DefaultContentProvider) (*Service, error) {
 	if kind == "" {
 		return nil, fmt.Errorf("%w: kind must not be empty", commonerrors.ErrInvalidArg)
 	}
@@ -37,14 +37,14 @@ func NewFileGeneratorService(kind string, fileSystem FileWriter, defaultContentP
 		return nil, fmt.Errorf("%w: defaultContentProvider must not be nil", commonerrors.ErrInvalidArg)
 	}
 
-	return &FileGeneratorService{
+	return &Service{
 		kind:                   kind,
 		fileWriter:             fileSystem,
 		defaultContentProvider: defaultContentProvider,
 	}, nil
 }
 
-func (s *FileGeneratorService) GenerateFile(out io.Out, path string, args types.KeyValueArgs) error {
+func (s *Service) GenerateFile(out io.Out, path string, args types.KeyValueArgs) error {
 	defaultContent, err := s.defaultContentProvider.GetDefaultContent(args)
 	if err != nil {
 		return errors.Join(ErrGettingDefaultContent, err)
@@ -59,7 +59,7 @@ func (s *FileGeneratorService) GenerateFile(out io.Out, path string, args types.
 	return nil
 }
 
-func (s *FileGeneratorService) writeFile(content, path string) error {
+func (s *Service) writeFile(content, path string) error {
 	if err := s.fileWriter.WriteFile(path, content); err != nil {
 		return fmt.Errorf("%w %s: %w", ErrWritingFile, path, err)
 	}

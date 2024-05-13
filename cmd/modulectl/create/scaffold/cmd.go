@@ -5,9 +5,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/kyma-project/modulectl/internal/scaffold/filegenerator"
 	"github.com/kyma-project/modulectl/internal/scaffold/moduleconfig"
 	"github.com/kyma-project/modulectl/internal/service/contentprovider"
+	"github.com/kyma-project/modulectl/internal/service/filegenerator"
+	"github.com/kyma-project/modulectl/internal/service/filegenerator/reusefilegenerator"
 	"github.com/kyma-project/modulectl/internal/service/scaffold"
 	"github.com/kyma-project/modulectl/tools/filesystem"
 	"github.com/kyma-project/modulectl/tools/io"
@@ -35,7 +36,7 @@ func NewCmd() *cobra.Command {
 		panic(err)
 	}
 
-	moduleConfigFileGenerator, err := filegenerator.NewFileGeneratorService("module-config", fileSystemUtil, moduleConfigContentProvider)
+	moduleConfigFileGenerator, err := filegenerator.NewService("module-config", fileSystemUtil, moduleConfigContentProvider)
 	if err != nil {
 		panic(err)
 	}
@@ -45,22 +46,22 @@ func NewCmd() *cobra.Command {
 		panic(err)
 	}
 
-	manifestFileGenerator, err := filegenerator.NewFileGeneratorService("manifest", fileSystemUtil, contentprovider.NewManifest())
+	manifestFileGenerator, err := filegenerator.NewService("manifest", fileSystemUtil, contentprovider.NewManifest())
 	if err != nil {
 		panic(err)
 	}
 
-	manifestReuseFileGenerator, err := filegenerator.NewReuseFileGeneratorService("manifest", fileSystemUtil, manifestFileGenerator)
+	manifestReuseFileGenerator, err := reusefilegenerator.NewService("manifest", fileSystemUtil, manifestFileGenerator)
 	if err != nil {
 		panic(err)
 	}
 
-	defaultCRFileGenerator, err := filegenerator.NewFileGeneratorService("defaultcr", fileSystemUtil, contentprovider.NewDefaultCR())
+	defaultCRFileGenerator, err := filegenerator.NewService("defaultcr", fileSystemUtil, contentprovider.NewDefaultCR())
 	if err != nil {
 		panic(err)
 	}
 
-	defaultCRReuseFileGenerator, err := filegenerator.NewReuseFileGeneratorService("defaultcr", fileSystemUtil, defaultCRFileGenerator)
+	defaultCRReuseFileGenerator, err := reusefilegenerator.NewService("defaultcr", fileSystemUtil, defaultCRFileGenerator)
 	if err != nil {
 		panic(err)
 	}
@@ -70,12 +71,12 @@ func NewCmd() *cobra.Command {
 		panic(err)
 	}
 
-	securityConfigFileGenerator, err := filegenerator.NewFileGeneratorService("security-config", fileSystemUtil, securitConfigContentProvider)
+	securityConfigFileGenerator, err := filegenerator.NewService("security-config", fileSystemUtil, securitConfigContentProvider)
 	if err != nil {
 		panic(err)
 	}
 
-	securityConfigReuseFileGenerator, err := filegenerator.NewReuseFileGeneratorService("security-config", fileSystemUtil, securityConfigFileGenerator)
+	securityConfigReuseFileGenerator, err := reusefilegenerator.NewService("security-config", fileSystemUtil, securityConfigFileGenerator)
 	if err != nil {
 		panic(err)
 	}

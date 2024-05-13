@@ -1,4 +1,4 @@
-package filegenerator
+package reusefilegenerator
 
 import (
 	"fmt"
@@ -16,17 +16,17 @@ type FileGenerator interface {
 	GenerateFile(out io.Out, path string, args types.KeyValueArgs) error
 }
 
-type ReuseFileGeneratorService struct {
+type Service struct {
 	kind          string
 	fileReader    FileReader
 	fileGenerator FileGenerator
 }
 
-func NewReuseFileGeneratorService(
+func NewService(
 	kind string,
 	fileSystem FileReader,
 	fileGenerator FileGenerator,
-) (*ReuseFileGeneratorService, error) {
+) (*Service, error) {
 	if kind == "" {
 		return nil, fmt.Errorf("%w: kind must not be empty", errors.ErrInvalidArg)
 	}
@@ -40,14 +40,14 @@ func NewReuseFileGeneratorService(
 		return nil, fmt.Errorf("%w: fileGenerator must not be nil", errors.ErrInvalidArg)
 	}
 
-	return &ReuseFileGeneratorService{
+	return &Service{
 		kind:          kind,
 		fileReader:    fileSystem,
 		fileGenerator: fileGenerator,
 	}, nil
 }
 
-func (s *ReuseFileGeneratorService) GenerateFile(out io.Out, path string, args types.KeyValueArgs) error {
+func (s *Service) GenerateFile(out io.Out, path string, args types.KeyValueArgs) error {
 	fileExists, err := s.fileReader.FileExists(path)
 	if err != nil {
 		return fmt.Errorf("%w %s: %w", ErrCheckingFileExistence, path, err)
