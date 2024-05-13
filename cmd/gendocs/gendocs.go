@@ -23,9 +23,13 @@ title: %s
 )
 
 func main() {
-	command := modulectl.NewCmd()
+	command, err := modulectl.NewCmd()
+	if err != nil {
+		fmt.Println("unable to generate docs", err.Error())
+		os.Exit(1)
+	}
 
-	err := genMarkdownTree(command, docsTargetDir)
+	err = genMarkdownTree(command, docsTargetDir)
 	if err != nil {
 		fmt.Println("unable to generate docs", err.Error())
 		os.Exit(1)
