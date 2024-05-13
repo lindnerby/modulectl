@@ -25,8 +25,8 @@ FLAGS = -ldflags '-s -w -X github.com/kyma-project/modulectl/cmd/modulectl/versi
 resolve:
 	go mod tidy
 
-.PHONY: validate
-validate:
+.PHONY: validate-docs
+validate-docs:
 	./hack/verify-generated-docs.sh
 
 .PHONY: build
