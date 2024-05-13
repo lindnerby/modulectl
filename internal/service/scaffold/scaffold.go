@@ -6,7 +6,7 @@ import (
 
 	"github.com/kyma-project/modulectl/internal/scaffold/common/errors"
 	"github.com/kyma-project/modulectl/internal/scaffold/common/types"
-	"github.com/kyma-project/modulectl/internal/scaffold/contentprovider"
+	"github.com/kyma-project/modulectl/internal/service/contentprovider"
 	"github.com/kyma-project/modulectl/tools/io"
 )
 

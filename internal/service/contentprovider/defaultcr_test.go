@@ -1,14 +1,15 @@
-package contentprovider
+package contentprovider_test
 
 import (
 	"fmt"
 	"testing"
 
 	"github.com/kyma-project/modulectl/internal/scaffold/common/types"
+	"github.com/kyma-project/modulectl/internal/service/contentprovider"
 )
 
-func Test_DefaultCRContentProvider_SetsDefaultCorrectly(t *testing.T) {
-	defaultCRContentProvider := NewDefaultCRContentProvider()
+func Test_DefaultCR_GetDefaultContent_ReturnsExpectedValue(t *testing.T) {
+	defaultCRContentProvider := contentprovider.NewDefaultCR()
 
 	expectedDefault := `# This is the file that contains the defaultCR for your module, which is the Custom Resource that will be created upon module enablement.
 # Make sure this file contains *ONLY* the Custom Resource (not the Custom Resource Definition, which should be a part of your module manifest)

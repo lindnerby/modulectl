@@ -1,14 +1,15 @@
-package contentprovider
+package contentprovider_test
 
 import (
 	"fmt"
 	"testing"
 
 	"github.com/kyma-project/modulectl/internal/scaffold/common/types"
+	"github.com/kyma-project/modulectl/internal/service/contentprovider"
 )
 
-func Test_ManifestContentProvider_SetsDefaultCorrectly(t *testing.T) {
-	manifestContentProvider := NewManifestContentProvider()
+func Test_Manifest_GetDefaultContent_ReturnsExpectedValue(t *testing.T) {
+	manifestContentProvider := contentprovider.NewManifest()
 
 	expectedDefault := `# This file holds the Manifest of your module, encompassing all resources installed in the cluster once the module is activated.
 # It should include the Custom Resource Definition for your module's default CustomResource, if it exists.

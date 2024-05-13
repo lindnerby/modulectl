@@ -6,20 +6,20 @@ import (
 
 	"github.com/kyma-project/modulectl/internal/scaffold/common/errors"
 	"github.com/kyma-project/modulectl/internal/scaffold/common/types"
-	"github.com/kyma-project/modulectl/internal/scaffold/contentprovider"
+	"github.com/kyma-project/modulectl/internal/service/contentprovider"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func Test_ModuleConfigContentProvider_NewModuleConfigContentProvider_ReturnsError_WhenYamlConverterIsNil(t *testing.T) {
-	_, err := contentprovider.NewModuleConfigContentProvider(nil)
+func Test_ModuleConfig_NewModuleConfig_ReturnsError_WhenYamlConverterIsNil(t *testing.T) {
+	_, err := contentprovider.NewModuleConfig(nil)
 
 	require.ErrorIs(t, err, errors.ErrInvalidArg)
 	assert.Contains(t, err.Error(), "yamlConverter")
 }
 
-func Test_ModuleConfigContentProvider_GetDefaultContent_ReturnsError_WhenArgsIsNil(t *testing.T) {
-	svc, _ := contentprovider.NewModuleConfigContentProvider(&mcObjectToYAMLConverterStub{})
+func Test_ModuleConfig_GetDefaultContent_ReturnsError_WhenArgsIsNil(t *testing.T) {
+	svc, _ := contentprovider.NewModuleConfig(&mcObjectToYAMLConverterStub{})
 
 	result, err := svc.GetDefaultContent(nil)
 
@@ -28,7 +28,7 @@ func Test_ModuleConfigContentProvider_GetDefaultContent_ReturnsError_WhenArgsIsN
 	assert.Contains(t, err.Error(), "args")
 }
 
-func Test_ModuleConfigContentProvider_ReturnsError_WhenRequiredArgsMissing(t *testing.T) {
+func Test_ModuleConfig_GetDefaultContent_ReturnsError_WhenRequiredArgsMissing(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		argName string
@@ -57,7 +57,7 @@ func Test_ModuleConfigContentProvider_ReturnsError_WhenRequiredArgsMissing(t *te
 		},
 	}
 
-	svc, _ := contentprovider.NewModuleConfigContentProvider(&mcObjectToYAMLConverterStub{})
+	svc, _ := contentprovider.NewModuleConfig(&mcObjectToYAMLConverterStub{})
 
 	for _, testcase := range tests {
 		testcase := testcase
@@ -74,7 +74,7 @@ func Test_ModuleConfigContentProvider_ReturnsError_WhenRequiredArgsMissing(t *te
 	}
 }
 
-func Test_ModuleConfigContentProvider_ReturnsError_WhenRequiredArgIsEmpty(t *testing.T) {
+func Test_ModuleConfig_GetDefaultContent_ReturnsError_WhenRequiredArgIsEmpty(t *testing.T) {
 	t.Parallel()
 	tests := []struct {
 		argName string
@@ -106,7 +106,7 @@ func Test_ModuleConfigContentProvider_ReturnsError_WhenRequiredArgIsEmpty(t *tes
 		},
 	}
 
-	svc, _ := contentprovider.NewModuleConfigContentProvider(&mcObjectToYAMLConverterStub{})
+	svc, _ := contentprovider.NewModuleConfig(&mcObjectToYAMLConverterStub{})
 
 	for _, testcase := range tests {
 		testcase := testcase
@@ -123,8 +123,8 @@ func Test_ModuleConfigContentProvider_ReturnsError_WhenRequiredArgIsEmpty(t *tes
 	}
 }
 
-func Test_ModuleConfigContentProvider_ReturnsConvertedContent(t *testing.T) {
-	svc, _ := contentprovider.NewModuleConfigContentProvider(&mcObjectToYAMLConverterStub{})
+func Test_ModuleConfig_GetDefaultContent_ReturnsConvertedContent(t *testing.T) {
+	svc, _ := contentprovider.NewModuleConfig(&mcObjectToYAMLConverterStub{})
 
 	result, err := svc.GetDefaultContent(types.KeyValueArgs{
 		contentprovider.ArgModuleName:    "module-name",

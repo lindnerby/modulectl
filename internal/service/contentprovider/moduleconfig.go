@@ -9,21 +9,21 @@ import (
 	"github.com/kyma-project/modulectl/internal/scaffold/common/types"
 )
 
-type ModuleConfigContentProvider struct {
+type ModuleConfig struct {
 	yamlConverter ObjectToYAMLConverter
 }
 
-func NewModuleConfigContentProvider(yamlConverter ObjectToYAMLConverter) (*ModuleConfigContentProvider, error) {
+func NewModuleConfig(yamlConverter ObjectToYAMLConverter) (*ModuleConfig, error) {
 	if yamlConverter == nil {
 		return nil, fmt.Errorf("%w: yamlConverter must not be nil", errors.ErrInvalidArg)
 	}
 
-	return &ModuleConfigContentProvider{
+	return &ModuleConfig{
 		yamlConverter: yamlConverter,
 	}, nil
 }
 
-func (s *ModuleConfigContentProvider) GetDefaultContent(args types.KeyValueArgs) (string, error) {
+func (s *ModuleConfig) GetDefaultContent(args types.KeyValueArgs) (string, error) {
 	if err := s.validateArgs(args); err != nil {
 		return "", err
 	}
@@ -33,7 +33,7 @@ func (s *ModuleConfigContentProvider) GetDefaultContent(args types.KeyValueArgs)
 	return s.yamlConverter.ConvertToYaml(moduleConfig), nil
 }
 
-func (s *ModuleConfigContentProvider) getModuleConfig(args types.KeyValueArgs) moduleConfig {
+func (s *ModuleConfig) getModuleConfig(args types.KeyValueArgs) moduleConfig {
 	return moduleConfig{
 		Name:          args[ArgModuleName],
 		Version:       args[ArgModuleVersion],
@@ -44,7 +44,7 @@ func (s *ModuleConfigContentProvider) getModuleConfig(args types.KeyValueArgs) m
 	}
 }
 
-func (s *ModuleConfigContentProvider) validateArgs(args types.KeyValueArgs) error {
+func (s *ModuleConfig) validateArgs(args types.KeyValueArgs) error {
 	if args == nil {
 		return fmt.Errorf("%w: args must not be nil", ErrInvalidArg)
 	}

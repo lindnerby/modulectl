@@ -5,9 +5,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/kyma-project/modulectl/internal/scaffold/contentprovider"
 	"github.com/kyma-project/modulectl/internal/scaffold/filegenerator"
 	"github.com/kyma-project/modulectl/internal/scaffold/moduleconfig"
+	"github.com/kyma-project/modulectl/internal/service/contentprovider"
 	"github.com/kyma-project/modulectl/internal/service/scaffold"
 	"github.com/kyma-project/modulectl/tools/filesystem"
 	"github.com/kyma-project/modulectl/tools/io"
@@ -30,7 +30,7 @@ func NewCmd() *cobra.Command {
 	fileSystemUtil := &filesystem.FileSystemUtil{}
 	yamlConverter := &yaml.ObjectToYAMLConverter{}
 
-	moduleConfigContentProvider, err := contentprovider.NewModuleConfigContentProvider(yamlConverter)
+	moduleConfigContentProvider, err := contentprovider.NewModuleConfig(yamlConverter)
 	if err != nil {
 		panic(err)
 	}
@@ -45,7 +45,7 @@ func NewCmd() *cobra.Command {
 		panic(err)
 	}
 
-	manifestFileGenerator, err := filegenerator.NewFileGeneratorService("manifest", fileSystemUtil, contentprovider.NewManifestContentProvider())
+	manifestFileGenerator, err := filegenerator.NewFileGeneratorService("manifest", fileSystemUtil, contentprovider.NewManifest())
 	if err != nil {
 		panic(err)
 	}
@@ -55,7 +55,7 @@ func NewCmd() *cobra.Command {
 		panic(err)
 	}
 
-	defaultCRFileGenerator, err := filegenerator.NewFileGeneratorService("defaultcr", fileSystemUtil, contentprovider.NewDefaultCRContentProvider())
+	defaultCRFileGenerator, err := filegenerator.NewFileGeneratorService("defaultcr", fileSystemUtil, contentprovider.NewDefaultCR())
 	if err != nil {
 		panic(err)
 	}
@@ -65,7 +65,7 @@ func NewCmd() *cobra.Command {
 		panic(err)
 	}
 
-	securitConfigContentProvider, err := contentprovider.NewSecurityConfigContentProvider(yamlConverter)
+	securitConfigContentProvider, err := contentprovider.NewSecurityConfig(yamlConverter)
 	if err != nil {
 		panic(err)
 	}

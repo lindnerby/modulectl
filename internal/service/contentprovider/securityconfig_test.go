@@ -5,20 +5,20 @@ import (
 
 	"github.com/kyma-project/modulectl/internal/scaffold/common/errors"
 	"github.com/kyma-project/modulectl/internal/scaffold/common/types"
-	"github.com/kyma-project/modulectl/internal/scaffold/contentprovider"
+	"github.com/kyma-project/modulectl/internal/service/contentprovider"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
-func Test_NewSecurityConfigContentProvider_ReturnsError_WhenYamlConverterIsNil(t *testing.T) {
-	_, err := contentprovider.NewSecurityConfigContentProvider(nil)
+func Test_SecurityConfig_NewSecurityConfig_ReturnsError_WhenYamlConverterIsNil(t *testing.T) {
+	_, err := contentprovider.NewSecurityConfig(nil)
 
 	require.ErrorIs(t, err, errors.ErrInvalidArg)
 	assert.Contains(t, err.Error(), "yamlConverter")
 }
 
-func Test_GetDefaultContent_ReturnsError_WhenArgsIsNil(t *testing.T) {
-	svc, _ := contentprovider.NewSecurityConfigContentProvider(&objectToYAMLConverterStub{})
+func Test_SecurityConfig_GetDefaultContent_ReturnsError_WhenArgsIsNil(t *testing.T) {
+	svc, _ := contentprovider.NewSecurityConfig(&objectToYAMLConverterStub{})
 
 	result, err := svc.GetDefaultContent(nil)
 
@@ -27,8 +27,8 @@ func Test_GetDefaultContent_ReturnsError_WhenArgsIsNil(t *testing.T) {
 	assert.Contains(t, err.Error(), "args")
 }
 
-func Test_GetDefaultContent_ReturnsError_WhenModuleNameArgMissing(t *testing.T) {
-	svc, _ := contentprovider.NewSecurityConfigContentProvider(&objectToYAMLConverterStub{})
+func Test_SecurityConfig_GetDefaultContent_ReturnsError_WhenModuleNameArgMissing(t *testing.T) {
+	svc, _ := contentprovider.NewSecurityConfig(&objectToYAMLConverterStub{})
 
 	result, err := svc.GetDefaultContent(types.KeyValueArgs{})
 
@@ -37,8 +37,8 @@ func Test_GetDefaultContent_ReturnsError_WhenModuleNameArgMissing(t *testing.T) 
 	assert.Contains(t, err.Error(), "moduleName")
 }
 
-func Test_GetDefaultContent_ReturnsError_WhenModuleNameArgIsEmpty(t *testing.T) {
-	svc, _ := contentprovider.NewSecurityConfigContentProvider(&objectToYAMLConverterStub{})
+func Test_SecurityConfig_GetDefaultContent_ReturnsError_WhenModuleNameArgIsEmpty(t *testing.T) {
+	svc, _ := contentprovider.NewSecurityConfig(&objectToYAMLConverterStub{})
 
 	result, err := svc.GetDefaultContent(types.KeyValueArgs{contentprovider.ArgModuleName: ""})
 
@@ -47,8 +47,8 @@ func Test_GetDefaultContent_ReturnsError_WhenModuleNameArgIsEmpty(t *testing.T) 
 	assert.Contains(t, err.Error(), "moduleName")
 }
 
-func Test_GetDefaultContent_ReturnsConvertedContent(t *testing.T) {
-	svc, _ := contentprovider.NewSecurityConfigContentProvider(&objectToYAMLConverterStub{})
+func Test_SecurityConfig_GetDefaultContent_ReturnsConvertedContent(t *testing.T) {
+	svc, _ := contentprovider.NewSecurityConfig(&objectToYAMLConverterStub{})
 
 	result, err := svc.GetDefaultContent(types.KeyValueArgs{contentprovider.ArgModuleName: "module-name"})
 

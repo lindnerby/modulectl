@@ -7,21 +7,21 @@ import (
 	"github.com/kyma-project/modulectl/internal/scaffold/common/types"
 )
 
-type SecurityConfigContentProvider struct {
+type SecurityConfig struct {
 	yamlConverter ObjectToYAMLConverter
 }
 
-func NewSecurityConfigContentProvider(yamlConverter ObjectToYAMLConverter) (*SecurityConfigContentProvider, error) {
+func NewSecurityConfig(yamlConverter ObjectToYAMLConverter) (*SecurityConfig, error) {
 	if yamlConverter == nil {
 		return nil, fmt.Errorf("%w: yamlConverter must not be nil", errors.ErrInvalidArg)
 	}
 
-	return &SecurityConfigContentProvider{
+	return &SecurityConfig{
 		yamlConverter: yamlConverter,
 	}, nil
 }
 
-func (s *SecurityConfigContentProvider) GetDefaultContent(args types.KeyValueArgs) (string, error) {
+func (s *SecurityConfig) GetDefaultContent(args types.KeyValueArgs) (string, error) {
 	if err := s.validateArgs(args); err != nil {
 		return "", err
 	}
@@ -29,7 +29,7 @@ func (s *SecurityConfigContentProvider) GetDefaultContent(args types.KeyValueArg
 	return s.yamlConverter.ConvertToYaml(s.getSecurityConfig(args[ArgModuleName])), nil
 }
 
-func (s *SecurityConfigContentProvider) validateArgs(args types.KeyValueArgs) error {
+func (s *SecurityConfig) validateArgs(args types.KeyValueArgs) error {
 	if args == nil {
 		return fmt.Errorf("%w: args must not be nil", ErrInvalidArg)
 	}
@@ -46,7 +46,7 @@ func (s *SecurityConfigContentProvider) validateArgs(args types.KeyValueArgs) er
 	return nil
 }
 
-func (s *SecurityConfigContentProvider) getSecurityConfig(moduleName string) securityScanConfig {
+func (s *SecurityConfig) getSecurityConfig(moduleName string) securityScanConfig {
 	return securityScanConfig{
 		ModuleName: moduleName,
 		Protecode: []string{"europe-docker.pkg.dev/kyma-project/prod/myimage:1.2.3",

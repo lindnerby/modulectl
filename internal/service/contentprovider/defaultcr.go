@@ -2,13 +2,13 @@ package contentprovider
 
 import "github.com/kyma-project/modulectl/internal/scaffold/common/types"
 
-type DefaultCRContentProvider struct{}
+type DefaultCR struct{}
 
-func NewDefaultCRContentProvider() *DefaultCRContentProvider {
-	return &DefaultCRContentProvider{}
+func NewDefaultCR() *DefaultCR {
+	return &DefaultCR{}
 }
 
-func (s *DefaultCRContentProvider) GetDefaultContent(_ types.KeyValueArgs) (string, error) {
+func (s *DefaultCR) GetDefaultContent(_ types.KeyValueArgs) (string, error) {
 	return `# This is the file that contains the defaultCR for your module, which is the Custom Resource that will be created upon module enablement.
 # Make sure this file contains *ONLY* the Custom Resource (not the Custom Resource Definition, which should be a part of your module manifest)
 
