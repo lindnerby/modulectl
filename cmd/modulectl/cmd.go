@@ -1,17 +1,28 @@
 package modulectl
 
 import (
+	_ "embed"
+
 	"fmt"
 
 	"github.com/kyma-project/modulectl/cmd/modulectl/create"
 	"github.com/spf13/cobra"
 )
 
+//go:embed use.txt
+var use string
+
+//go:embed short.txt
+var short string
+
+//go:embed long.txt
+var long string
+
 func NewCmd() *cobra.Command {
 	rootCmd := &cobra.Command{
-		Use:   "modulectl",
-		Short: "This is the Kyma Module Controller CLI",
-		Long:  "A CLI from the Kyma Module Controller. Wonderful to use.",
+		Use:   use,
+		Short: short,
+		Long:  long,
 		Run: func(cmd *cobra.Command, args []string) {
 			fmt.Println("This is the Kyma ModuleCtl command executed")
 		},

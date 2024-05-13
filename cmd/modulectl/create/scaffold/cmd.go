@@ -14,10 +14,16 @@ import (
 	"github.com/kyma-project/modulectl/tools/yaml"
 )
 
-//go:embed cmd_description.txt
-var description string
+//go:embed use.txt
+var use string
 
-//go:embed cmd_example.txt
+//go:embed short.txt
+var short string
+
+//go:embed long.txt
+var long string
+
+//go:embed example.txt
 var example string
 
 func NewCmd() *cobra.Command {
@@ -87,9 +93,9 @@ func NewCmd() *cobra.Command {
 	opts := scaffold.Options{}
 
 	cmd := &cobra.Command{
-		Use:     "scaffold [--module-name MODULE_NAME --module-version MODULE_VERSION --module-channel CHANNEL] [--directory MODULE_DIRECTORY] [flags]",
-		Short:   "Generates necessary files required for module creation",
-		Long:    description,
+		Use:     use,
+		Short:   short,
+		Long:    long,
 		Example: example,
 		Args:    cobra.NoArgs,
 		RunE: func(_ *cobra.Command, _ []string) error {
