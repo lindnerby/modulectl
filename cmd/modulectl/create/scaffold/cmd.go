@@ -5,10 +5,10 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"github.com/kyma-project/modulectl/internal/scaffold/moduleconfig"
 	"github.com/kyma-project/modulectl/internal/service/contentprovider"
 	"github.com/kyma-project/modulectl/internal/service/filegenerator"
 	"github.com/kyma-project/modulectl/internal/service/filegenerator/reusefilegenerator"
+	"github.com/kyma-project/modulectl/internal/service/moduleconfig"
 	"github.com/kyma-project/modulectl/internal/service/scaffold"
 	"github.com/kyma-project/modulectl/tools/filesystem"
 	"github.com/kyma-project/modulectl/tools/io"
@@ -41,7 +41,7 @@ func NewCmd() *cobra.Command {
 		panic(err)
 	}
 
-	moduleConfigService, err := moduleconfig.NewModuleConfigService(fileSystemUtil, moduleConfigFileGenerator)
+	moduleConfigService, err := moduleconfig.NewService(fileSystemUtil, moduleConfigFileGenerator)
 	if err != nil {
 		panic(err)
 	}
