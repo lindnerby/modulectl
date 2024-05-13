@@ -47,7 +47,7 @@ const (
 	moduleChannelFlagUsage   = "Specifies the module channel in the generated module config file"
 )
 
-func parseFlags(flags *pflag.FlagSet, opts *scaffold.Options) error {
+func parseFlags(flags *pflag.FlagSet, opts *scaffold.Options) {
 	flags.StringVarP(&opts.Directory, DirectoryFlagName, directoryFlagShort, DirectoryFlagDefault, directoryFlagUsage)
 	flags.StringVar(&opts.ModuleConfigFileName, ModuleConfigFileFlagName, ModuleConfigFileFlagDefault, moduleConfigFileFlagUsage)
 	flags.BoolVarP(&opts.ModuleConfigFileOverwrite, ModuleConfigFileOverwriteFlagName, moduleConfigFileOverwriteFlagShort, ModuleConfigFileOverwriteFlagDefault, moduleConfigFileOverwriteFlagUsage)
@@ -60,6 +60,4 @@ func parseFlags(flags *pflag.FlagSet, opts *scaffold.Options) error {
 
 	flags.Lookup(SecurityConfigFileFlagName).NoOptDefVal = SecurityConfigFileFlagNoOptDefault
 	flags.Lookup(DefaultCRFlagName).NoOptDefVal = DefaultCRFlagNoOptDefault
-
-	return nil
 }
