@@ -4,9 +4,11 @@ title: modulectl
 
 This is the Kyma Module Controller CLI
 
+
 ## Synopsis
 
 A CLI from the Kyma Module Controller. Wonderful to use.
+
 
 ```bash
 modulectl [flags]
@@ -21,4 +23,5 @@ modulectl [flags]
 ## See also
 
 * [modulectl create](modulectl_create.md)	 - Creates artifacts related to module development
+
 

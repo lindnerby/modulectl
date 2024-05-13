@@ -4,6 +4,7 @@ title: modulectl create scaffold
 
 Generates necessary files required for module creation
 
+
 ## Synopsis
 
 Scaffold generates or configures the necessary files for creating a new module in Kyma. This includes setting up 
@@ -83,4 +84,5 @@ Generate a scaffold with a manifest file, default CR and security-scanners confi
 ## See also
 
 * [modulectl create](modulectl_create.md)	 - Creates artifacts related to module development
+
 
