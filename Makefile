@@ -47,7 +47,7 @@ build-linux-arm:
 .PHONY: docs
 docs:
 	rm -f ./docs/gen-docs/*
-	go run ./cmd/gendocs/gendocs.go
+	go run ./scripts/gendocs/gendocs.go
 
 test:
 	go test `go list ./... | grep -v /tests/e2e` -race -coverprofile=cover.out
