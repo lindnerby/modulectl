@@ -1,4 +1,4 @@
-name: TestSuite E2E - Create Scaffold
+name: E2E Test - Create Scaffold
 
 on:
   push:
@@ -14,8 +14,8 @@ on:
       - 'go.sum'
       - '**.go'
 jobs:
-  e2e:
-    name: Run E2E Test - Create Scaffold
+  e2e-test:
+    name: E2E Test - Create Scaffold
     runs-on: ubuntu-latest
     steps:
       - name: Checkout modulectl
@@ -32,7 +32,7 @@ jobs:
           ls -la ./bin
           mv ./bin/modulectl-linux /usr/local/bin/modulectl
         timeout-minutes: 10
-      - name: Run create scaffold test
+      - name: Run E2E Test - Create Scaffold
         run: |
           make -C tests/e2e test-create-scaffold
         timeout-minutes: 3

@@ -1,4 +1,4 @@
-name: pull-modulectl-unit-test
+name: Validate Docs
 on:
   pull_request:
     branches:
@@ -6,8 +6,8 @@ on:
       - 'release-**'
   workflow_dispatch:
 jobs:
-  unit-tests:
-    name: unit tests
+  validate:
+    name: Validate Docs
     runs-on: ubuntu-latest
     steps:
       - name: Checkout modulectl
@@ -17,5 +17,5 @@ jobs:
         with:
           go-version-file: 'go.mod'
           cache-dependency-path: 'go.sum'
-      - name: Run Unit Tests
-        run: make test
+      - name: Run Docs Validation
+        run: make validate-docs
