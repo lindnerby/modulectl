@@ -66,11 +66,11 @@ func (opts Options) validate() error {
 }
 
 func (opts Options) validateDirectory() error {
-	fileInfo, err := os.Stat(opts.Directory)
-
 	if opts.Directory == "" {
 		return fmt.Errorf("%w: opts.Directory must not be empty", ErrInvalidOption)
 	}
+
+	fileInfo, err := os.Stat(opts.Directory)
 
 	if err != nil {
 		if errors.Is(err, os.ErrNotExist) {
