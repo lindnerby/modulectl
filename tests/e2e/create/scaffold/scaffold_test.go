@@ -21,24 +21,22 @@ const (
 var _ = Describe("Create Scaffold Command", Ordered, func() {
 	var initialDir string
 	var workDir string
-	var workDirCleanup func()
 
 	setup := func() {
 		var err error
 		initialDir, err = os.Getwd()
-		Expect(err).To(BeNil())
-		workDir, workDirCleanup = resolveWorkingDirectory()
+		Expect(err).ToNot(HaveOccurred())
+		workDir = resolveWorkingDirectory()
 		err = os.Chdir(workDir)
-		Expect(err).To(BeNil())
-
+		Expect(err).ToNot(HaveOccurred())
 	}
+
 	teardown := func() {
 		err := os.Chdir(initialDir)
-		Expect(err).To(BeNil())
-		workDirCleanup()
+		Expect(err).ToNot(HaveOccurred())
+		cleanupWorkingDirectory(workDir)
 		workDir = ""
 		initialDir = ""
-
 	}
 
 	Context("Given an empty directory", func() {
@@ -82,7 +80,7 @@ var _ = Describe("Create Scaffold Command", Ordered, func() {
 		})
 		It("Then the command should fail", func() {
 			err := cmd.execute()
-			Expect(err).ShouldNot(BeNil())
+			Expect(err).Should(HaveOccurred())
 			Expect(err.Error()).Should(ContainSubstring("module config file already exists"))
 
 			By("And no files should be generated")
@@ -172,7 +170,6 @@ var _ = Describe("Create Scaffold Command", Ordered, func() {
 			Expect(createMarkerFile("custom-manifest.yaml")).To(Succeed())
 			Expect(createMarkerFile("custom-default-cr.yaml")).To(Succeed())
 			Expect(createMarkerFile("custom-security-scanners-config.yaml")).To(Succeed())
-
 		})
 		AfterAll(func() { teardown() })
 
@@ -212,35 +209,35 @@ var _ = Describe("Create Scaffold Command", Ordered, func() {
 
 func getMarkerFileData(name string) string {
 	data, err := os.ReadFile(name)
-	Expect(err).To(BeNil())
+	Expect(err).ToNot(HaveOccurred())
 	return string(data)
 }
 
 func createMarkerFile(name string) error {
-	err := os.WriteFile(name, []byte(markerFileData), 0600)
+	err := os.WriteFile(name, []byte(markerFileData), 0o600)
 	return err
 }
 
 func moduleConfigFromFile(dir, fileName string) *moduleConfig {
 	filePath := path.Join(dir, fileName)
 	data, err := os.ReadFile(filePath)
-	Expect(err).To(BeNil())
+	Expect(err).ToNot(HaveOccurred())
 	res := moduleConfig{}
 	err = yaml.Unmarshal(data, &res)
-	Expect(err).To(BeNil())
+	Expect(err).ToNot(HaveOccurred())
 	return &res
 }
 
 func filesIn(dir string) []string {
 	fi, err := os.Stat(dir)
-	Expect(err).To(BeNil())
+	Expect(err).ToNot(HaveOccurred())
 	Expect(fi.IsDir()).To(BeTrueBecause("The provided path should be a directory: %s", dir))
 
 	dirFs := os.DirFS(dir)
 	entries, err := fs.ReadDir(dirFs, ".")
-	Expect(err).To(BeNil())
+	Expect(err).ToNot(HaveOccurred())
 
-	res := []string{}
+	var res []string
 	for _, ent := range entries {
 		if ent.Type().IsRegular() {
 			res = append(res, ent.Name())
@@ -250,21 +247,23 @@ func filesIn(dir string) []string {
 	return res
 }
 
-func resolveWorkingDirectory() (path string, cleanup func()) {
-	path = os.Getenv("SCAFFOLD_DIR")
-	if len(path) > 0 {
-		cleanup = func() {}
-	} else {
-		var err error
-		path, err = os.MkdirTemp("", "create_scaffold_test")
-		if err != nil {
-			Fail(err.Error())
-		}
-		cleanup = func() {
-			os.RemoveAll(path)
-		}
+func resolveWorkingDirectory() string {
+	scaffoldDir := os.Getenv("SCAFFOLD_DIR")
+	if len(scaffoldDir) > 0 {
+		return scaffoldDir
 	}
-	return
+
+	scaffoldDir, err := os.MkdirTemp("", "create_scaffold_test")
+	if err != nil {
+		Fail(err.Error())
+	}
+	return scaffoldDir
+}
+
+func cleanupWorkingDirectory(path string) {
+	if len(os.Getenv("SCAFFOLD_DIR")) == 0 {
+		_ = os.RemoveAll(path)
+	}
 }
 
 type createScaffoldCmd struct {
@@ -284,31 +283,31 @@ func (cmd *createScaffoldCmd) execute() error {
 	args := []string{"create", "scaffold"}
 
 	if cmd.moduleName != "" {
-		args = append(args, fmt.Sprintf("--module-name=%s", cmd.moduleName))
+		args = append(args, "--module-name="+cmd.moduleName)
 	}
 
 	if cmd.moduleVersion != "" {
-		args = append(args, fmt.Sprintf("--module-version=%s", cmd.moduleVersion))
+		args = append(args, "--module-version="+cmd.moduleVersion)
 	}
 
 	if cmd.moduleChannel != "" {
-		args = append(args, fmt.Sprintf("--module-channel=%s", cmd.moduleChannel))
+		args = append(args, "--module-channel="+cmd.moduleChannel)
 	}
 
 	if cmd.moduleConfigFileFlag != "" {
-		args = append(args, fmt.Sprintf("--module-config=%s", cmd.moduleConfigFileFlag))
+		args = append(args, "--module-config="+cmd.moduleConfigFileFlag)
 	}
 
 	if cmd.genDefaultCRFlag != "" {
-		args = append(args, fmt.Sprintf("--gen-default-cr=%s", cmd.genDefaultCRFlag))
+		args = append(args, "--gen-default-cr="+cmd.genDefaultCRFlag)
 	}
 
 	if cmd.genSecurityScannersConfigFlag != "" {
-		args = append(args, fmt.Sprintf("--gen-security-config=%s", cmd.genSecurityScannersConfigFlag))
+		args = append(args, "--gen-security-config="+cmd.genSecurityScannersConfigFlag)
 	}
 
 	if cmd.genManifestFlag != "" {
-		args = append(args, fmt.Sprintf("--gen-manifest=%s", cmd.genManifestFlag))
+		args = append(args, "--gen-manifest="+cmd.genManifestFlag)
 	}
 
 	if cmd.overwrite {
@@ -317,7 +316,6 @@ func (cmd *createScaffoldCmd) execute() error {
 
 	command = exec.Command("modulectl", args...)
 	cmdOut, err := command.CombinedOutput()
-
 	if err != nil {
 		return fmt.Errorf("create scaffold command failed with output: %s and error: %w", cmdOut, err)
 	}
@@ -357,30 +355,37 @@ func (mcb *moduleConfigBuilder) get() *moduleConfig {
 	res := mcb.moduleConfig
 	return &res
 }
+
 func (mcb *moduleConfigBuilder) withName(val string) *moduleConfigBuilder {
 	mcb.Name = val
 	return mcb
 }
+
 func (mcb *moduleConfigBuilder) withVersion(val string) *moduleConfigBuilder {
 	mcb.Version = val
 	return mcb
 }
+
 func (mcb *moduleConfigBuilder) withChannel(val string) *moduleConfigBuilder {
 	mcb.Channel = val
 	return mcb
 }
+
 func (mcb *moduleConfigBuilder) withManifestPath(val string) *moduleConfigBuilder {
 	mcb.ManifestPath = val
 	return mcb
 }
+
 func (mcb *moduleConfigBuilder) withDefaultCRPath(val string) *moduleConfigBuilder {
 	mcb.DefaultCRPath = val
 	return mcb
 }
+
 func (mcb *moduleConfigBuilder) withSecurityScannersPath(val string) *moduleConfigBuilder {
 	mcb.Security = val
 	return mcb
 }
+
 func (mcb *moduleConfigBuilder) defaults() *moduleConfigBuilder {
 	return mcb.
 		withName("kyma-project.io/module/mymodule").
