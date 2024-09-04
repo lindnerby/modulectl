@@ -1,12 +1,11 @@
-name: "E2E test: modulectl scaffold"
+name: "E2E test - modulectl scaffold"
 on:
   pull_request:
     branches:
       - main
       - 'release-**'
 jobs:
-  e2e-test:
-    name: E2E test - modulectl scaffold
+  test:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout

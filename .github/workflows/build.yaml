@@ -1,4 +1,4 @@
-name: Build modulectl
+name: Build modulectl1
 on:
   pull_request:
     branches:
@@ -6,8 +6,8 @@ on:
       - 'release-**'
   workflow_dispatch:
 jobs:
-  build:
-    name: Build modulectl
+  build2:
+    name: Build modulectl3
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
