@@ -1,4 +1,4 @@
-name: E2E test - module scaffold
+name: "E2E test: modulectl scaffold"
 on:
   pull_request:
     branches:
@@ -6,7 +6,7 @@ on:
       - 'release-**'
 jobs:
   e2e-test:
-    name: E2E test - module scaffold
+    name: E2E test - modulectl scaffold
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -23,7 +23,7 @@ jobs:
           ls -la ./bin
           mv ./bin/modulectl-linux /usr/local/bin/modulectl
         timeout-minutes: 5
-      - name: Run E2E test - module scaffold
+      - name: Run tests
         run: |
           make -C tests/e2e test-module-scaffold
         timeout-minutes: 3
