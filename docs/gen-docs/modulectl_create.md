@@ -1,3 +1,11 @@
+---
+title: modulectl create
+---
+
+Creates a module bundled as an OCI artifact.
+
+## Synopsis
+
 Use this command to create a Kyma module, bundle it as an OCI artifact, and push it to the OCI registry optionally.
 
 ### Detailed description
@@ -47,3 +55,35 @@ You can also trigger an on-demand **defaultCR** validation with "--validateCR=tr
 
 #### Name Mapping
 To push the artifact into some registries, for example, the central docker.io registry, you have to change the OCM Component Name Mapping with the following flag: "--name-mapping=sha256-digest". This is necessary because the registry does not accept artifact URLs with more than two path segments, and such URLs are generated with the default name mapping: **urlPath**. In the case of the "sha256-digest" mapping, the artifact URL contains just a sha256 digest of the full Component Name and fits the path length restrictions. The downside of the "sha256-mapping" is that the module name is no longer visible in the artifact URL, as it contains the sha256 digest of the defined name.
+
+```bash
+modulectl create [--module-config-file MODULE_CONFIG_FILE | --name MODULE_NAME --version MODULE_VERSION] [--path MODULE_DIRECTORY] [--registry MODULE_REGISTRY] [flags]
+```
+
+## Examples
+
+```bash
+Examples:
+Build a simple module and push it to a remote registry
+		modulectl create --module-config-file=/path/to/module-config-file --registry http://localhost:5001/unsigned --insecure
+```
+
+## Flags
+
+```bash
+-c, --credentials string              Basic authentication credentials for the given repository in the <user:password> format.
+    --git-remote string               Specifies the remote name of the wanted GitHub repository. For example "origin" or "upstream" (default "origin").
+-h, --help                            Provides help for the create command.
+    --insecure                        Uses an insecure connection to access the registry.
+    --module-config-file string       Specifies the module configuration file.
+-o, --output string                   File to write the module template if the module is uploaded to a registry (default "template.yaml").
+    --registry string                 Context URL of the repository. The repository URL will be automatically added to the repository contexts in the module descriptor.
+    --registry-cred-selector string   Label selector to identify an externally created Secret of type "kubernetes.io/dockerconfigjson". It allows the image to be accessed in private image registries. It can be used when you push your module to a registry with authenticated access. For example, "label1=value1,label2=value2".
+    --sec-scanners-config string      Path to the file holding the security scan configuration (default "sec-scanners-config.yaml").
+```
+
+## See also
+
+* [modulectl](modulectl.md)	 - This is the Kyma Module Controller CLI.
+
+

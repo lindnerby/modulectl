@@ -2,15 +2,15 @@ package scaffold_test
 
 import (
 	"errors"
-	"math/rand"
 	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 
-	scaffoldcmd "github.com/kyma-project/modulectl/cmd/modulectl/create/scaffold"
+	scaffoldcmd "github.com/kyma-project/modulectl/cmd/modulectl/scaffold"
 	"github.com/kyma-project/modulectl/internal/service/scaffold"
+	"github.com/kyma-project/modulectl/internal/testutils"
 )
 
 func Test_NewCmd_ReturnsError_WhenScaffoldServiceIsNil(t *testing.T) {
@@ -45,14 +45,14 @@ func Test_Execute_ReturnsError_WhenServiceReturnsError(t *testing.T) {
 }
 
 func Test_Execute_ParsesOptions(t *testing.T) {
-	directory := getRandomName()
-	moduleConfigFile := getRandomName()
-	manifestFile := getRandomName()
-	defaultCRFile := getRandomName()
-	securityConfigFile := getRandomName()
-	moduleName := getRandomName()
+	directory := testutils.RandomName(10)
+	moduleConfigFile := testutils.RandomName(10)
+	manifestFile := testutils.RandomName(10)
+	defaultCRFile := testutils.RandomName(10)
+	securityConfigFile := testutils.RandomName(10)
+	moduleName := testutils.RandomName(10)
 	moduleVersion := "1.1.1"
-	moduleChannel := getRandomName()
+	moduleChannel := testutils.RandomName(10)
 	os.Args = []string{
 		"scaffold",
 		"--directory", directory,
@@ -68,7 +68,8 @@ func Test_Execute_ParsesOptions(t *testing.T) {
 	svc := &scaffoldServiceStub{}
 	cmd, _ := scaffoldcmd.NewCmd(svc)
 
-	_ = cmd.Execute()
+	err := cmd.Execute()
+	require.NoError(t, err)
 
 	assert.Equal(t, moduleName, svc.opts.ModuleName)
 	assert.Equal(t, directory, svc.opts.Directory)
@@ -82,7 +83,7 @@ func Test_Execute_ParsesOptions(t *testing.T) {
 }
 
 func Test_Execute_ParsesShortOptions(t *testing.T) {
-	directory := getRandomName()
+	directory := testutils.RandomName(10)
 	os.Args = []string{
 		"scaffold",
 		"-d", directory,
@@ -91,7 +92,8 @@ func Test_Execute_ParsesShortOptions(t *testing.T) {
 	svc := &scaffoldServiceStub{}
 	cmd, _ := scaffoldcmd.NewCmd(svc)
 
-	_ = cmd.Execute()
+	err := cmd.Execute()
+	require.NoError(t, err)
 
 	assert.Equal(t, directory, svc.opts.Directory)
 	assert.True(t, svc.opts.ModuleConfigFileOverwrite)
@@ -104,7 +106,8 @@ func Test_Execute_ParsesDefaults(t *testing.T) {
 	svc := &scaffoldServiceStub{}
 	cmd, _ := scaffoldcmd.NewCmd(svc)
 
-	_ = cmd.Execute()
+	err := cmd.Execute()
+	require.NoError(t, err)
 
 	assert.Equal(t, scaffoldcmd.ModuleNameFlagDefault, svc.opts.ModuleName)
 	assert.Equal(t, scaffoldcmd.DirectoryFlagDefault, svc.opts.Directory)
@@ -126,15 +129,14 @@ func Test_Execute_ParsesNoOptDefaults(t *testing.T) {
 	svc := &scaffoldServiceStub{}
 	cmd, _ := scaffoldcmd.NewCmd(svc)
 
-	_ = cmd.Execute()
+	err := cmd.Execute()
+	require.NoError(t, err)
 
 	assert.Equal(t, scaffoldcmd.DefaultCRFlagNoOptDefault, svc.opts.DefaultCRFileName)
 	assert.Equal(t, scaffoldcmd.SecurityConfigFileFlagNoOptDefault, svc.opts.SecurityConfigFileName)
 }
 
-// ***************
 // Test Stubs
-// ***************
 
 type scaffoldServiceStub struct {
 	called bool
@@ -153,21 +155,4 @@ var errSomeTestError = errors.New("some test error")
 
 func (s *scaffoldServiceErrorStub) CreateScaffold(_ scaffold.Options) error {
 	return errSomeTestError
-}
-
-// ***************
-// Test Helpers
-// ***************
-
-const (
-	charset = "abcdefghijklmnopqrstuvwxyz"
-	length  = 10
-)
-
-func getRandomName() string {
-	b := make([]byte, length)
-	for i := range b {
-		b[i] = charset[rand.Intn(len(charset))] //nolint:gosec // this is not a security-sensitive context
-	}
-	return string(b)
 }

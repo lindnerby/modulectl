@@ -8,7 +8,6 @@ linters:
     - exportloopref # deprecated (since v1.60.2), replaced by copyloopvar
     - forbidigo     # temparily disabled
     - godot         # not needed
-    - godox         # disabled for this project
     - gomnd         # deprecated (since v1.58.0), renamed to mnd
     - lll
     - nlreturn      # too strict and mostly code is not more readable
@@ -55,8 +54,10 @@ linters-settings:
         alias: iotools
       - pkg: github.com/kyma-project/modulectl/internal/common/errors
         alias: commonerrors
-      - pkg: github.com/kyma-project/modulectl/cmd/modulectl/create/scaffold
+      - pkg: github.com/kyma-project/modulectl/cmd/modulectl/scaffold
         alias: scaffoldcmd
+      - pkg: github.com/kyma-project/modulectl/cmd/modulectl/create
+        alias: createcmd
   ireturn:
     allow:
       - anon
@@ -69,6 +70,7 @@ linters-settings:
     ignore-type-assert-ok: true
     ignore-map-index-ok: true
     ignore-chan-recv-ok: true
+  godox:  # `TODO`, `BUG`, `FIXME` are the default, no need to mention again
 issues:
   exclude-rules:
     - path: "_test\\.go"

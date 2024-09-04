@@ -1,1 +1,0 @@
-Generates necessary files required for module creation
