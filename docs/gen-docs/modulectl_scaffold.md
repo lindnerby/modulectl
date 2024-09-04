@@ -1,8 +1,8 @@
 ---
-title: modulectl create scaffold
+title: modulectl scaffold
 ---
 
-Generates necessary files required for module creation
+Generates necessary files required for module creation.
 
 
 ## Synopsis
@@ -49,40 +49,40 @@ Also, edit the sec-scanners-config.yaml to be able to use it.
 
 
 ```bash
-modulectl create scaffold [--module-name MODULE_NAME --module-version MODULE_VERSION --module-channel CHANNEL] [--directory MODULE_DIRECTORY] [flags]
+modulectl scaffold [--module-name MODULE_NAME --module-version MODULE_VERSION --module-channel CHANNEL] [--directory MODULE_DIRECTORY] [flags]
 ```
 
 ## Examples
 
 ```bash
 Generate a minimal scaffold for a module - only a blank manifest file and module config file is generated using defaults
-                modulectl create scaffold
+                modulectl scaffold
 Generate a scaffold providing required values explicitly
-				modulectl create scaffold --module-name="kyma-project.io/module/testmodule" --module-version="0.1.1" --module-channel=fast
+				modulectl scaffold --module-name="kyma-project.io/module/testmodule" --module-version="0.1.1" --module-channel=fast
 Generate a scaffold with a manifest file, default CR and security-scanners config for a module
-				modulectl create scaffold --gen-default-cr --gen-security-config
+				modulectl scaffold --gen-default-cr --gen-security-config
 Generate a scaffold with a manifest file, default CR and security-scanners config for a module, overriding default values
-				modulectl create scaffold --gen-manifest="my-manifest.yaml" --gen-default-cr="my-cr.yaml" --gen-security-config="my-seccfg.yaml"
+				modulectl scaffold --gen-manifest="my-manifest.yaml" --gen-default-cr="my-cr.yaml" --gen-security-config="my-seccfg.yaml"
 
 ```
 
 ## Flags
 
 ```bash
-  -d, --directory string                                          Specifies the target directory where the scaffolding shall be generated (default "./")
-      --gen-default-cr string[="default-cr.yaml"]                 Specifies the default CR in the generated module config. A blank default CR file is generated if it doesn't exist
-      --gen-manifest string                                       Specifies the manifest in the generated module config. A blank manifest file is generated if it doesn't exist (default "manifest.yaml")
-      --gen-security-config string[="sec-scanners-config.yaml"]   Specifies the security file in the generated module config. A scaffold security config file is generated if it doesn't exist
-  -h, --help                                                      help for scaffold
-      --module-channel string                                     Specifies the module channel in the generated module config file (default "regular")
-      --module-config string                                      Specifies the name of the generated module configuration file (default "scaffold-module-config.yaml")
-      --module-name string                                        Specifies the module name in the generated config file (default "kyma-project.io/module/mymodule")
-      --module-version string                                     Specifies the module version in the generated module config file (default "0.0.1")
-  -o, --overwrite                                                 Specifies if the command overwrites an existing module configuration file
+-d, --directory string             Specifies the target directory where the scaffolding shall be generated (default "./").
+    --gen-default-cr string        Specifies the default CR in the generated module config. A blank default CR file is generated if it doesn't exist (default "default-cr.yaml").
+    --gen-manifest string          Specifies the manifest in the generated module config. A blank manifest file is generated if it doesn't exist (default "manifest.yaml").
+    --gen-security-config string   Specifies the security file in the generated module config. A scaffold security config file is generated if it doesn't exist (default "sec-scanners-config.yaml").
+-h, --help                         Provides help for the scaffold command.
+    --module-channel string        Specifies the module channel in the generated module config file (default "regular").
+    --module-config string         Specifies the name of the generated module configuration file (default "scaffold-module-config.yaml").
+    --module-name string           Specifies the module name in the generated config file (default "kyma-project.io/module/mymodule").
+    --module-version string        Specifies the module version in the generated module config file (default "0.0.1").
+-o, --overwrite                    Specifies if the command overwrites an existing module configuration file.
 ```
 
 ## See also
 
-* [modulectl create](modulectl_create.md)	 - Creates artifacts related to module development
+* [modulectl](modulectl.md)	 - This is the Kyma Module Controller CLI.
 
 
