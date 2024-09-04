@@ -1,0 +1,91 @@
+name: E2E test - module create
+on:
+  push:
+    branches:
+      - main
+      - 'release-**'
+  pull_request:
+    branches:
+      - main
+      - 'release-**'
+jobs:
+  e2e:
+    strategy:
+      matrix:
+        e2e-test: [ 'test-module-create',
+                    'test-module-create-same-version' ]
+    name: E2E test - module create
+    runs-on: ubuntu-latest
+    env:
+      K3D_VERSION: v5.4.7
+      MODULE_TEMPLATE_VERSION: 1.0.0
+      OCI_REPOSITORY_URL: http://k3d-oci.localhost:5001
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Go setup
+        uses: actions/setup-go@v4
+        with:
+          go-version-file: 'go.mod'
+          cache-dependency-path: 'go.sum'
+      - name: Build
+        run: |
+          make build-linux
+          chmod +x ./bin/modulectl-linux
+          ls -la ./bin
+          mv ./bin/modulectl-linux /usr/local/bin/modulectl
+        timeout-minutes: 5
+      - name: Checkout template-operator
+        uses: actions/checkout@v4
+        with:
+          repository: kyma-project/template-operator
+          path: ./template-operator/
+      - name: export template-operator URL
+        run: |
+          cd ./template-operator
+          echo "TEST_REPOSITORY_URL=$(git remote get-url origin)" >> "$GITHUB_ENV"
+      - name: Set up k3d
+        run: wget -qO - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=$K3D_VERSION bash
+      - name: Provision OCI Registry
+        run: |
+          k3d registry create oci.localhost --port 5001
+      - name: Run create module with module-config
+        run: |
+          cd ./template-operator
+          make build-manifests
+          modulectl create \
+          --name kyma-project.io/module/template-operator \
+          --path . \
+          --registry http://k3d-oci.localhost:5001 \
+          --insecure \
+          --module-config-file ./module-config.yaml \
+          --version $MODULE_TEMPLATE_VERSION -v \
+          --sec-scanners-config sec-scanners-config.yaml \
+          --output /tmp/module-config-template.yaml 
+          echo "MODULE_TEMPLATE_PATH=/tmp/module-config-template.yaml" >> "$GITHUB_ENV"
+      - name: Create a different security scanners config file for different layers
+        if: ${{matrix.e2e-test == 'test-module-create-same-version' }}
+        run: |
+          cd ./template-operator
+          echo \
+          "module-name: template-operator
+          rc-tag: 0.5.0
+          dev-branch: main
+          protecode:
+            - europe-west3-docker.pkg.dev/sap-kyma-jellyfish-dev/template-operator/component-descriptors/kyma-project.io/template-operator:v1.0.0-e2e-warning
+          whitesource:
+            language: golang-mod
+            exclude:
+              - \"**/test/**\"
+              - \"**/*_test.go\"" > sec-scanners-config-changed.yaml
+          cat sec-scanners-config-changed.yaml
+      - name: Verify module template
+        if: ${{ matrix.e2e-test == 'test-module-create' }}
+        run: |
+          echo $MODULE_TEMPLATE_PATH
+          make -C tests/e2e test-module-creation
+      - name: Run E2E tests
+        if: ${{ matrix.e2e-test == 'test-module-create-same-version'}}
+        run: |
+          echo $MODULE_TEMPLATE_PATH
+          make -C tests/e2e test-module-creation-same-version

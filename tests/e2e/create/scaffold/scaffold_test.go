@@ -17,7 +17,7 @@ const (
 	markerFileData = "test-marker"
 )
 
-var _ = Describe("Create Scaffold Command", Ordered, func() {
+var _ = Describe("Test 'Scaffold'", Ordered, func() {
 	var initialDir string
 	var workDir string
 

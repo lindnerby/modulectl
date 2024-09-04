@@ -1,4 +1,4 @@
-package scaffold_test
+package create_test
 
 import (
 	"testing"
@@ -7,7 +7,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestCreateScaffold(t *testing.T) {
+func TestModuleCreate(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RunSpecs(t, "'Scaffold' Command Test Suite")
+	RunSpecs(t, "'Create' Command Test Suite")
 }
