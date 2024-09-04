@@ -1,11 +1,12 @@
 package create_test
 
 import (
+	"os"
+	"testing"
+
 	"github.com/kyma-project/lifecycle-manager/api/v1beta2"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/compdesc"
 	"gopkg.in/yaml.v3"
-	"os"
-	"testing"
 
 	"github.com/kyma-project/lifecycle-manager/api/shared"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/accessmethods/ociartifact"

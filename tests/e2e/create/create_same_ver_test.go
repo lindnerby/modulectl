@@ -46,7 +46,8 @@ func Test_SameVersion_ModuleCreation(t *testing.T) {
 }
 
 func createModuleCommand(versionOverwrite bool,
-	path, registry, configFilePath, version, secScannerConfig string) error {
+	path, registry, configFilePath, version, secScannerConfig string,
+) error {
 	var createModuleCmd *exec.Cmd
 	if versionOverwrite {
 		createModuleCmd = exec.Command("kyma", "alpha", "create", "module",
@@ -58,7 +59,6 @@ func createModuleCommand(versionOverwrite bool,
 			"--version", version, "--sec-scanners-config", secScannerConfig)
 	}
 	createOut, err := createModuleCmd.CombinedOutput()
-
 	if err != nil {
 		if strings.Contains(string(createOut),
 			fmt.Sprintf("version %s already exists with different content", version)) {
