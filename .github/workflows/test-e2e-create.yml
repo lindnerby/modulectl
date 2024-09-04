@@ -1,4 +1,4 @@
-name: E2E test - module create
+name: E2E test - create command
 on:
   push:
     branches:
@@ -9,7 +9,7 @@ on:
       - main
       - 'release-**'
 jobs:
-  e2e:
+  test-create-cmd:
     strategy:
       matrix:
         e2e-test: [ 'test-module-create',
@@ -83,9 +83,9 @@ jobs:
         if: ${{ matrix.e2e-test == 'test-module-create' }}
         run: |
           echo $MODULE_TEMPLATE_PATH
-          make -C tests/e2e test-module-creation
+          make -C tests/e2e test-create-cmd
       - name: Run E2E tests
         if: ${{ matrix.e2e-test == 'test-module-create-same-version'}}
         run: |
           echo $MODULE_TEMPLATE_PATH
-          make -C tests/e2e test-module-creation-same-version
+          make -C tests/e2e test-create-cmd-same-version

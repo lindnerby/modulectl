@@ -13,11 +13,11 @@ SHELL = /usr/bin/env bash -o pipefail
 
 ##@ E2E Tests
 
-test-module-scaffold:
-	go test ./create/scaffold -ginkgo.v -ginkgo.focus "Test 'Scaffold'"
+test-scaffold-cmd:
+	go test ./scaffold -ginkgo.v -ginkgo.focus "Test 'scaffold' Command"
 
-test-module-create:
-	go test ./create/scaffold -ginkgo.v -ginkgo.focus "Module Command Test Suite"
+test-create-cmd:
+	go test ./create -ginkgo.v -ginkgo.focus "Test 'create' Command"
 
 test-module-create-same-version:
-	go test ./create/scaffold -ginkgo.v -ginkgo.focus "Module Command with same version"
+	go test ./create -ginkgo.v -ginkgo.focus "Module Command with same version"
