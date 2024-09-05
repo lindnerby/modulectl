@@ -56,7 +56,7 @@ func NewService(moduleConfigService ModuleConfigService,
 }
 
 func (s *Service) Run(opts Options) error {
-	if err := opts.validate(); err != nil {
+	if err := opts.Validate(); err != nil {
 		return err
 	}
 
