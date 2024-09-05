@@ -12,11 +12,11 @@ import (
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/accessmethods/localblob"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/accessmethods/ociartifact"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/compdesc"
-	ocmMetaV1 "github.com/open-component-model/ocm/pkg/contexts/ocm/compdesc/meta/v1"
-	v1 "github.com/open-component-model/ocm/pkg/contexts/ocm/compdesc/meta/v1"
-	v2 "github.com/open-component-model/ocm/pkg/contexts/ocm/compdesc/versions/v2"
-	ocmOCIReg "github.com/open-component-model/ocm/pkg/contexts/ocm/repositories/ocireg"
+	ocmmetav1 "github.com/open-component-model/ocm/pkg/contexts/ocm/compdesc/meta/v1"
+	compdescv2 "github.com/open-component-model/ocm/pkg/contexts/ocm/compdesc/versions/v2"
+	ocmocireg "github.com/open-component-model/ocm/pkg/contexts/ocm/repositories/ocireg"
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 	"k8s.io/apimachinery/pkg/util/yaml"
 )
 
@@ -37,10 +37,10 @@ func Test_ModuleTemplate(t *testing.T) {
 	templatePath := os.Getenv("MODULE_TEMPLATE_PATH")
 
 	template, err := readModuleTemplate(templatePath)
-	assert.Nil(t, err)
+	require.NoError(t, err)
 	descriptor := getDescriptor(template)
 	assert.NotNil(t, descriptor)
-	assert.Equal(t, descriptor.SchemaVersion(), v2.SchemaVersion)
+	assert.Equal(t, compdescv2.SchemaVersion, descriptor.SchemaVersion())
 
 	t.Run("test annotations", func(t *testing.T) {
 		annotations := template.Annotations
@@ -50,33 +50,33 @@ func Test_ModuleTemplate(t *testing.T) {
 	})
 
 	t.Run("test descriptor.component.repositoryContexts", func(t *testing.T) {
-		assert.Equal(t, 1, len(descriptor.RepositoryContexts))
+		assert.Len(t, 1, len(descriptor.RepositoryContexts))
 		repo := descriptor.GetEffectiveRepositoryContext()
 		assert.Equal(t, ociRepoURL, repo.Object["baseUrl"])
-		assert.Equal(t, string(ocmOCIReg.OCIRegistryURLPathMapping), repo.Object["componentNameMapping"])
+		assert.Equal(t, string(ocmocireg.OCIRegistryURLPathMapping), repo.Object["componentNameMapping"])
 		assert.Equal(t, ocireg.Type, repo.Object["type"])
 	})
 
 	t.Run("test descriptor.component.resources", func(t *testing.T) {
-		assert.Equal(t, 2, len(descriptor.Resources))
+		assert.Len(t, 2, len(descriptor.Resources))
 
 		resource := descriptor.Resources[0]
 		assert.Equal(t, "template-operator", resource.Name)
-		assert.Equal(t, ocmMetaV1.ExternalRelation, resource.Relation)
+		assert.Equal(t, ocmmetav1.ExternalRelation, resource.Relation)
 		assert.Equal(t, "ociImage", resource.Type)
 		expectedModuleTemplateVersion := os.Getenv("MODULE_TEMPLATE_VERSION")
 		assert.Equal(t, expectedModuleTemplateVersion, resource.Version)
 
 		resource = descriptor.Resources[1]
 		assert.Equal(t, rawManifestLayerName, resource.Name)
-		assert.Equal(t, ocmMetaV1.LocalRelation, resource.Relation)
+		assert.Equal(t, ocmmetav1.LocalRelation, resource.Relation)
 		assert.Equal(t, typeYaml, resource.Type)
 		assert.Equal(t, expectedModuleTemplateVersion, resource.Version)
 	})
 
 	t.Run("test descriptor.component.resources[0].access", func(t *testing.T) {
 		resourceAccessSpec, err := ocm.DefaultContext().AccessSpecForSpec(descriptor.Resources[0].Access)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		ociArtifactAccessSpec, ok := resourceAccessSpec.(*ociartifact.AccessSpec)
 		assert.True(t, ok)
 		assert.Equal(t, ociartifact.Type, ociArtifactAccessSpec.GetType())
@@ -86,7 +86,7 @@ func Test_ModuleTemplate(t *testing.T) {
 
 	t.Run("test descriptor.component.resources[1].access", func(t *testing.T) {
 		resourceAccessSpec, err := ocm.DefaultContext().AccessSpecForSpec(descriptor.Resources[1].Access)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		localBlobAccessSpec, ok := resourceAccessSpec.(*localblob.AccessSpec)
 		assert.True(t, ok)
 		assert.Equal(t, localblob.Type, localBlobAccessSpec.GetType())
@@ -94,10 +94,10 @@ func Test_ModuleTemplate(t *testing.T) {
 	})
 
 	t.Run("test descriptor.component.sources", func(t *testing.T) {
-		assert.Equal(t, len(descriptor.Sources), 1)
+		assert.Len(t, len(descriptor.Sources), 1)
 		source := descriptor.Sources[0]
 		sourceAccessSpec, err := ocm.DefaultContext().AccessSpecForSpec(source.Access)
-		assert.NoError(t, err)
+		require.NoError(t, err)
 		githubAccessSpec, ok := sourceAccessSpec.(*github.AccessSpec)
 		assert.True(t, ok)
 		assert.Equal(t, github.Type, githubAccessSpec.Type)
@@ -105,7 +105,7 @@ func Test_ModuleTemplate(t *testing.T) {
 	})
 
 	t.Run("test spec.mandatory", func(t *testing.T) {
-		assert.Equal(t, false, template.Spec.Mandatory)
+		assert.False(t, template.Spec.Mandatory)
 	})
 
 	t.Run("test security scan labels", func(t *testing.T) {
@@ -158,7 +158,7 @@ func getDescriptor(template *v1beta2.ModuleTemplate) *v1beta2.Descriptor {
 	return desc
 }
 
-func flatten(labels v1.Labels) map[string]string {
+func flatten(labels ocmmetav1.Labels) map[string]string {
 	labelsMap := make(map[string]string)
 	for _, l := range labels {
 		var value string
