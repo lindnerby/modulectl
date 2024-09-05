@@ -134,7 +134,7 @@ type moduleServiceStub struct {
 	opts   create.Options
 }
 
-func (m *moduleServiceStub) CreateModule(opts create.Options) error {
+func (m *moduleServiceStub) Run(opts create.Options) error {
 	m.called = true
 	m.opts = opts
 	return nil
@@ -144,6 +144,6 @@ type moduleServiceErrorStub struct{}
 
 var errSomeTestError = errors.New("some test error")
 
-func (s *moduleServiceErrorStub) CreateModule(_ create.Options) error {
+func (s *moduleServiceErrorStub) Run(_ create.Options) error {
 	return errSomeTestError
 }

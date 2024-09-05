@@ -25,12 +25,12 @@ var long string
 var example string
 
 type Service interface {
-	CreateScaffold(opts scaffold.Options) error
+	Run(opts scaffold.Options) error
 }
 
-func NewCmd(scaffoldService Service) (*cobra.Command, error) {
-	if scaffoldService == nil {
-		return nil, fmt.Errorf("%w: scaffoldService must not be nil", commonerrors.ErrInvalidArg)
+func NewCmd(service Service) (*cobra.Command, error) {
+	if service == nil {
+		return nil, fmt.Errorf("%w: scaffold Service must not be nil", commonerrors.ErrInvalidArg)
 	}
 
 	opts := scaffold.Options{}
@@ -42,7 +42,7 @@ func NewCmd(scaffoldService Service) (*cobra.Command, error) {
 		Example: example,
 		Args:    cobra.NoArgs,
 		RunE: func(_ *cobra.Command, _ []string) error {
-			return scaffoldService.CreateScaffold(opts)
+			return service.Run(opts)
 		},
 	}
 

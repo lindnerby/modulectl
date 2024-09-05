@@ -67,7 +67,7 @@ func Test_CreateScaffold_ReturnsError_WhenOutIsNil(t *testing.T) {
 		&fileGeneratorErrorStub{})
 	opts := newScaffoldOptionsBuilder().withOut(nil).build()
 
-	result := svc.CreateScaffold(opts)
+	result := svc.Run(opts)
 
 	require.ErrorIs(t, result, commonerrors.ErrInvalidOption)
 	assert.Contains(t, result.Error(), "opts.Out")
@@ -81,7 +81,7 @@ func Test_CreateScaffold_ReturnsError_WhenDirectoryIsEmpty(t *testing.T) {
 		&fileGeneratorErrorStub{})
 	opts := newScaffoldOptionsBuilder().withDirectory("").build()
 
-	result := svc.CreateScaffold(opts)
+	result := svc.Run(opts)
 
 	require.ErrorIs(t, result, commonerrors.ErrInvalidOption)
 	assert.Contains(t, result.Error(), "opts.Directory")
@@ -95,7 +95,7 @@ func Test_CreateScaffold_ReturnsError_WhenModuleConfigFileIsEmpty(t *testing.T) 
 		&fileGeneratorErrorStub{})
 	opts := newScaffoldOptionsBuilder().withModuleConfigFileName("").build()
 
-	result := svc.CreateScaffold(opts)
+	result := svc.Run(opts)
 
 	require.ErrorIs(t, result, commonerrors.ErrInvalidOption)
 	assert.Contains(t, result.Error(), "opts.ModuleConfigFileName")
@@ -109,7 +109,7 @@ func Test_CreateScaffold_ReturnsError_WhenManifestFileIsEmpty(t *testing.T) {
 		&fileGeneratorErrorStub{})
 	opts := newScaffoldOptionsBuilder().withManifestFileName("").build()
 
-	result := svc.CreateScaffold(opts)
+	result := svc.Run(opts)
 
 	require.ErrorIs(t, result, commonerrors.ErrInvalidOption)
 	assert.Contains(t, result.Error(), "opts.ManifestFileName")
@@ -123,7 +123,7 @@ func Test_CreateScaffold_ReturnsError_WhenModuleNameIsEmpty(t *testing.T) {
 		&fileGeneratorErrorStub{})
 	opts := newScaffoldOptionsBuilder().withModuleName("").build()
 
-	result := svc.CreateScaffold(opts)
+	result := svc.Run(opts)
 
 	require.ErrorIs(t, result, commonerrors.ErrInvalidOption)
 	assert.Contains(t, result.Error(), "opts.ModuleName")
@@ -137,7 +137,7 @@ func Test_CreateScaffold_ReturnsError_WhenModuleNameIsExceedingLength(t *testing
 		&fileGeneratorErrorStub{})
 	opts := newScaffoldOptionsBuilder().withModuleName(testutils.RandomName(256)).build()
 
-	result := svc.CreateScaffold(opts)
+	result := svc.Run(opts)
 
 	require.ErrorIs(t, result, commonerrors.ErrInvalidOption)
 	assert.Contains(t, result.Error(), "opts.ModuleName")
@@ -152,7 +152,7 @@ func Test_CreateScaffold_ReturnsError_WhenModuleNameIsNotMatchingPattern(t *test
 		&fileGeneratorErrorStub{})
 	opts := newScaffoldOptionsBuilder().withModuleName(testutils.RandomName(10)).build()
 
-	result := svc.CreateScaffold(opts)
+	result := svc.Run(opts)
 
 	require.ErrorIs(t, result, commonerrors.ErrInvalidOption)
 	assert.Contains(t, result.Error(), "opts.ModuleName")
@@ -167,7 +167,7 @@ func Test_CreateScaffold_ReturnsError_WhenModuleVersionIsEmpty(t *testing.T) {
 		&fileGeneratorErrorStub{})
 	opts := newScaffoldOptionsBuilder().withModuleVersion("").build()
 
-	result := svc.CreateScaffold(opts)
+	result := svc.Run(opts)
 
 	require.ErrorIs(t, result, commonerrors.ErrInvalidOption)
 	assert.Contains(t, result.Error(), "opts.ModuleVersion")
@@ -181,7 +181,7 @@ func Test_CreateScaffold_ReturnsError_WhenModuleVersionIsInvalid(t *testing.T) {
 		&fileGeneratorErrorStub{})
 	opts := newScaffoldOptionsBuilder().withModuleVersion(testutils.RandomName(10)).build()
 
-	result := svc.CreateScaffold(opts)
+	result := svc.Run(opts)
 
 	require.ErrorIs(t, result, commonerrors.ErrInvalidOption)
 	assert.Contains(t, result.Error(), "opts.ModuleVersion")
@@ -196,7 +196,7 @@ func Test_CreateScaffold_ReturnsError_WhenModuleChannelIsEmpty(t *testing.T) {
 		&fileGeneratorErrorStub{})
 	opts := newScaffoldOptionsBuilder().withModuleChannel("").build()
 
-	result := svc.CreateScaffold(opts)
+	result := svc.Run(opts)
 
 	require.ErrorIs(t, result, commonerrors.ErrInvalidOption)
 	assert.Contains(t, result.Error(), "opts.ModuleChannel")
@@ -210,7 +210,7 @@ func Test_CreateScaffold_ReturnsError_WhenModuleChannelIsExceedingLength(t *test
 		&fileGeneratorErrorStub{})
 	opts := newScaffoldOptionsBuilder().withModuleChannel(testutils.RandomName(33)).build()
 
-	result := svc.CreateScaffold(opts)
+	result := svc.Run(opts)
 
 	require.ErrorIs(t, result, commonerrors.ErrInvalidOption)
 	assert.Contains(t, result.Error(), "opts.ModuleChannel")
@@ -225,7 +225,7 @@ func Test_CreateScaffold_ReturnsError_WhenModuleChannelFallsBelowLength(t *testi
 		&fileGeneratorErrorStub{})
 	opts := newScaffoldOptionsBuilder().withModuleChannel(testutils.RandomName(2)).build()
 
-	result := svc.CreateScaffold(opts)
+	result := svc.Run(opts)
 
 	require.ErrorIs(t, result, commonerrors.ErrInvalidOption)
 	assert.Contains(t, result.Error(), "opts.ModuleChannel")
@@ -240,7 +240,7 @@ func Test_CreateScaffold_ReturnsError_WhenModuleChannelNotMatchingCharset(t *tes
 		&fileGeneratorErrorStub{})
 	opts := newScaffoldOptionsBuilder().withModuleChannel("with not allowed chars 123%&").build()
 
-	result := svc.CreateScaffold(opts)
+	result := svc.Run(opts)
 
 	require.ErrorIs(t, result, commonerrors.ErrInvalidOption)
 	assert.Contains(t, result.Error(), "opts.ModuleChannel")
@@ -254,7 +254,7 @@ func Test_CreateScaffold_ReturnsError_WhenModuleConfigServiceForceExplicitOverwr
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{})
 
-	result := svc.CreateScaffold(newScaffoldOptionsBuilder().build())
+	result := svc.Run(newScaffoldOptionsBuilder().build())
 
 	require.ErrorIs(t, result, errOverwriteError)
 }
@@ -266,7 +266,7 @@ func Test_CreateScaffold_ReturnsError_WhenGeneratingManifestFileFails(t *testing
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{})
 
-	result := svc.CreateScaffold(newScaffoldOptionsBuilder().build())
+	result := svc.Run(newScaffoldOptionsBuilder().build())
 
 	require.ErrorIs(t, result, scaffold.ErrGeneratingFile)
 	require.ErrorIs(t, result, errSomeFileGeneratorError)
@@ -280,7 +280,7 @@ func Test_CreateScaffold_Succeeds_WhenGeneratingManifestFile(t *testing.T) {
 		&fileGeneratorStub{},
 		&fileGeneratorStub{})
 
-	result := svc.CreateScaffold(newScaffoldOptionsBuilder().build())
+	result := svc.Run(newScaffoldOptionsBuilder().build())
 
 	require.NoError(t, result)
 }
@@ -292,7 +292,7 @@ func Test_CreateScaffold_Succeeds_WhenDefaultCRFileIsNotConfigured(t *testing.T)
 		&fileGeneratorErrorStub{},
 		&fileGeneratorStub{})
 
-	result := svc.CreateScaffold(newScaffoldOptionsBuilder().withDefaultCRFileName("").build())
+	result := svc.Run(newScaffoldOptionsBuilder().withDefaultCRFileName("").build())
 
 	require.NoError(t, result)
 }
@@ -304,7 +304,7 @@ func Test_CreateScaffold_ReturnsError_WhenGeneratingDefaultCRFileFails(t *testin
 		&fileGeneratorErrorStub{},
 		&fileGeneratorErrorStub{})
 
-	result := svc.CreateScaffold(newScaffoldOptionsBuilder().build())
+	result := svc.Run(newScaffoldOptionsBuilder().build())
 
 	require.ErrorIs(t, result, scaffold.ErrGeneratingFile)
 	require.ErrorIs(t, result, errSomeFileGeneratorError)
@@ -318,7 +318,7 @@ func Test_CreateScaffold_Succeeds_WhenGeneratingDefaultCRFile(t *testing.T) {
 		&fileGeneratorStub{},
 		&fileGeneratorStub{})
 
-	result := svc.CreateScaffold(newScaffoldOptionsBuilder().build())
+	result := svc.Run(newScaffoldOptionsBuilder().build())
 
 	require.NoError(t, result)
 }
@@ -330,7 +330,7 @@ func Test_CreateScaffold_Succeeds_WhenSecurityConfigFileIsNotConfigured(t *testi
 		&fileGeneratorStub{},
 		&fileGeneratorErrorStub{})
 
-	result := svc.CreateScaffold(newScaffoldOptionsBuilder().withSecurityConfigFileName("").build())
+	result := svc.Run(newScaffoldOptionsBuilder().withSecurityConfigFileName("").build())
 
 	require.NoError(t, result)
 }
@@ -342,7 +342,7 @@ func Test_CreateScaffold_ReturnsError_WhenGeneratingSecurityConfigFileFails(t *t
 		&fileGeneratorStub{},
 		&fileGeneratorErrorStub{})
 
-	result := svc.CreateScaffold(newScaffoldOptionsBuilder().build())
+	result := svc.Run(newScaffoldOptionsBuilder().build())
 
 	require.ErrorIs(t, result, scaffold.ErrGeneratingFile)
 	require.ErrorIs(t, result, errSomeFileGeneratorError)
@@ -356,7 +356,7 @@ func Test_CreateScaffold_Succeeds_WhenGeneratingSecurityConfigFile(t *testing.T)
 		&fileGeneratorStub{},
 		&fileGeneratorStub{})
 
-	result := svc.CreateScaffold(newScaffoldOptionsBuilder().build())
+	result := svc.Run(newScaffoldOptionsBuilder().build())
 
 	require.NoError(t, result)
 }
@@ -368,7 +368,7 @@ func Test_CreateScaffold_ReturnsError_WhenGeneratingModuleConfigReturnsError(t *
 		&fileGeneratorStub{},
 		&fileGeneratorStub{})
 
-	result := svc.CreateScaffold(newScaffoldOptionsBuilder().build())
+	result := svc.Run(newScaffoldOptionsBuilder().build())
 
 	require.ErrorIs(t, result, scaffold.ErrGeneratingFile)
 	require.ErrorIs(t, result, errSomeFileGeneratorError)
@@ -382,7 +382,7 @@ func Test_CreateScaffold_Succeeds(t *testing.T) {
 		&fileGeneratorStub{},
 		&fileGeneratorStub{})
 
-	result := svc.CreateScaffold(newScaffoldOptionsBuilder().build())
+	result := svc.Run(newScaffoldOptionsBuilder().build())
 
 	require.NoError(t, result)
 }

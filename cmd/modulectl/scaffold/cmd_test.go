@@ -143,7 +143,7 @@ type scaffoldServiceStub struct {
 	opts   scaffold.Options
 }
 
-func (s *scaffoldServiceStub) CreateScaffold(opts scaffold.Options) error {
+func (s *scaffoldServiceStub) Run(opts scaffold.Options) error {
 	s.called = true
 	s.opts = opts
 	return nil
@@ -153,6 +153,6 @@ type scaffoldServiceErrorStub struct{}
 
 var errSomeTestError = errors.New("some test error")
 
-func (s *scaffoldServiceErrorStub) CreateScaffold(_ scaffold.Options) error {
+func (s *scaffoldServiceErrorStub) Run(_ scaffold.Options) error {
 	return errSomeTestError
 }
