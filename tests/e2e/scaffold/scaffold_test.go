@@ -42,9 +42,9 @@ var _ = Describe("Test 'scaffold' Command", Ordered, func() {
 		BeforeAll(func() { setup() })
 		AfterAll(func() { teardown() })
 
-		var cmd createScaffoldCmd
-		It("When `modulectl create scaffold` command is invoked without any args", func() {
-			cmd = createScaffoldCmd{}
+		var cmd scaffoldCmd
+		It("When `modulectl scaffold` command is invoked without any args", func() {
+			cmd = scaffoldCmd{}
 		})
 
 		It("Then the command should succeed", func() {
@@ -73,9 +73,9 @@ var _ = Describe("Test 'scaffold' Command", Ordered, func() {
 		})
 		AfterAll(func() { teardown() })
 
-		var cmd createScaffoldCmd
-		It("When `modulectl create scaffold` command is invoked without any args", func() {
-			cmd = createScaffoldCmd{}
+		var cmd scaffoldCmd
+		It("When `modulectl scaffold` command is invoked without any args", func() {
+			cmd = scaffoldCmd{}
 		})
 		It("Then the command should fail", func() {
 			err := cmd.execute()
@@ -96,9 +96,9 @@ var _ = Describe("Test 'scaffold' Command", Ordered, func() {
 		})
 		AfterAll(func() { teardown() })
 
-		var cmd createScaffoldCmd
-		It("When `modulectl create scaffold` command is invoked with --overwrite flag", func() {
-			cmd = createScaffoldCmd{
+		var cmd scaffoldCmd
+		It("When `modulectl scaffold` command is invoked with --overwrite flag", func() {
+			cmd = scaffoldCmd{
 				overwrite: true,
 			}
 		})
@@ -126,9 +126,9 @@ var _ = Describe("Test 'scaffold' Command", Ordered, func() {
 		BeforeAll(func() { setup() })
 		AfterAll(func() { teardown() })
 
-		var cmd createScaffoldCmd
-		It("When `modulectl create scaffold` command args override defaults", func() {
-			cmd = createScaffoldCmd{
+		var cmd scaffoldCmd
+		It("When `modulectl scaffold` command args override defaults", func() {
+			cmd = scaffoldCmd{
 				moduleName:                    "github.com/custom/module",
 				moduleVersion:                 "3.2.1",
 				moduleChannel:                 "custom",
@@ -172,9 +172,9 @@ var _ = Describe("Test 'scaffold' Command", Ordered, func() {
 		})
 		AfterAll(func() { teardown() })
 
-		var cmd createScaffoldCmd
-		It("When `modulectl create scaffold` command is invoked with arguments that match existing files names", func() {
-			cmd = createScaffoldCmd{
+		var cmd scaffoldCmd
+		It("When `modulectl scaffold` command is invoked with arguments that match existing files names", func() {
+			cmd = scaffoldCmd{
 				genManifestFlag:               "custom-manifest.yaml",
 				genDefaultCRFlag:              "custom-default-cr.yaml",
 				genSecurityScannersConfigFlag: "custom-security-scanners-config.yaml",
@@ -252,7 +252,7 @@ func resolveWorkingDirectory() string {
 		return scaffoldDir
 	}
 
-	scaffoldDir, err := os.MkdirTemp("", "create_scaffold_test")
+	scaffoldDir, err := os.MkdirTemp("", "scaffold_test")
 	if err != nil {
 		Fail(err.Error())
 	}
@@ -265,7 +265,7 @@ func cleanupWorkingDirectory(path string) {
 	}
 }
 
-type createScaffoldCmd struct {
+type scaffoldCmd struct {
 	moduleName                    string
 	moduleVersion                 string
 	moduleChannel                 string
@@ -276,10 +276,10 @@ type createScaffoldCmd struct {
 	overwrite                     bool
 }
 
-func (cmd *createScaffoldCmd) execute() error {
+func (cmd *scaffoldCmd) execute() error {
 	var command *exec.Cmd
 
-	args := []string{"create", "scaffold"}
+	args := []string{"scaffold"}
 
 	if cmd.moduleName != "" {
 		args = append(args, "--module-name="+cmd.moduleName)
@@ -316,12 +316,12 @@ func (cmd *createScaffoldCmd) execute() error {
 	command = exec.Command("modulectl", args...)
 	cmdOut, err := command.CombinedOutput()
 	if err != nil {
-		return fmt.Errorf("create scaffold command failed with output: %s and error: %w", cmdOut, err)
+		return fmt.Errorf("scaffold command failed with output: %s and error: %w", cmdOut, err)
 	}
 	return nil
 }
 
-func (cmd *createScaffoldCmd) toConfigBuilder() *moduleConfigBuilder {
+func (cmd *scaffoldCmd) toConfigBuilder() *moduleConfigBuilder {
 	res := &moduleConfigBuilder{}
 	res.defaults()
 	if cmd.moduleName != "" {
@@ -393,7 +393,6 @@ func (mcb *moduleConfigBuilder) defaults() *moduleConfigBuilder {
 		withManifestPath("manifest.yaml")
 }
 
-// TODO: https://github.com/kyma-project/modulectl/issues/10
 // This is a copy of the moduleConfig struct from internal/scaffold/contentprovider/moduleconfig.go
 // to not make the moduleConfig public just for the sake of testing.
 // It is expected that the moduleConfig struct will be made public in the future when introducing more commands.

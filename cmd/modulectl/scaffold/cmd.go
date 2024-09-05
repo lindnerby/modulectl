@@ -24,11 +24,11 @@ var long string
 //go:embed example.txt
 var example string
 
-type ScaffoldService interface {
+type Service interface {
 	CreateScaffold(opts scaffold.Options) error
 }
 
-func NewCmd(scaffoldService ScaffoldService) (*cobra.Command, error) {
+func NewCmd(scaffoldService Service) (*cobra.Command, error) {
 	if scaffoldService == nil {
 		return nil, fmt.Errorf("%w: scaffoldService must not be nil", commonerrors.ErrInvalidArg)
 	}
