@@ -18,7 +18,7 @@ func Test_NewCmd_ReturnsError_WhenModuleServiceIsNil(t *testing.T) {
 	_, err := createcmd.NewCmd(nil)
 
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "createService")
+	assert.Contains(t, err.Error(), "create Service")
 }
 
 func Test_NewCmd_Succeeds(t *testing.T) {
