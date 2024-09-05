@@ -49,22 +49,13 @@ var _ = Describe("Test 'create' Command", Ordered, func() {
 			cmd = createCmd{}
 		})
 
-		It("Then the command should succeed", func() {
-			Expect(cmd.execute()).To(Succeed())
+		It("Then the command should fail", func() {
+			err := cmd.execute()
+			Expect(err).Should(HaveOccurred())
+			Expect(err.Error()).Should(ContainSubstring("Error: \"--module-config-file\" flag is required"))
 
-			By("And two files are generated")
-			Expect(filesIn(workDir)).Should(HaveLen(2))
-
-			By("And the manifest file is generated")
-			Expect(filesIn(workDir)).Should(ContainElement("manifest.yaml"))
-
-			By("And the module config file is generated")
-			Expect(filesIn(workDir)).Should(ContainElement("create-module-config.yaml"))
-
-			By("And the module config contains expected entries")
-			actualModConf := moduleConfigFromFile(workDir, "create-module-config.yaml")
-			expectedModConf := (&moduleConfigBuilder{}).defaults().get()
-			Expect(actualModConf).To(BeEquivalentTo(expectedModConf))
+			By("And no files are generated")
+			Expect(filesIn(workDir)).Should(BeEmpty())
 		})
 	})
 
@@ -76,10 +67,10 @@ var _ = Describe("Test 'create' Command", Ordered, func() {
 		AfterAll(func() { teardown() })
 
 		var cmd createCmd
-		It("When `modulectl create` command is invoked without any args", func() {
+		It("When `modulectl create` command is invoked with --module-config-file flag", func() {
 			cmd = createCmd{}
 		})
-		It("Then the command should fail", func() {
+		It("Then the command should succeed", func() {
 			err := cmd.execute()
 			Expect(err).Should(HaveOccurred())
 			Expect(err.Error()).Should(ContainSubstring("module config file already exists"))
@@ -281,7 +272,8 @@ type createCmd struct {
 func (cmd *createCmd) execute() error {
 	var command *exec.Cmd
 
-	args := []string{"create"}
+	// TODO revert to modulectl only debugging against kyma cli bin for verifying tests
+	args := []string{"alpha", "create", "module"}
 
 	if cmd.moduleName != "" {
 		args = append(args, "--module-name="+cmd.moduleName)
@@ -315,7 +307,7 @@ func (cmd *createCmd) execute() error {
 		args = append(args, "--overwrite=true")
 	}
 
-	command = exec.Command("modulectl", args...)
+	command = exec.Command("kyma", args...)
 	cmdOut, err := command.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("create command failed with output: %s and error: %w", cmdOut, err)

@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestModuleCreate(t *testing.T) {
+func Test_Create(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "'Create' Command Test Suite")
 }

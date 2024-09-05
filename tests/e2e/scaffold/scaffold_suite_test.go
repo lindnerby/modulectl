@@ -9,7 +9,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestCreateScaffold(t *testing.T) {
+func Test_Scaffold(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "'Scaffold' Command Test Suite")
 }
