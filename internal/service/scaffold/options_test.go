@@ -5,9 +5,10 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/kyma-project/modulectl/internal/service/scaffold"
 	iotools "github.com/kyma-project/modulectl/tools/io"
 	"github.com/stretchr/testify/require"
+
+	"github.com/kyma-project/modulectl/internal/service/scaffold"
 )
 
 func Test_Validate_Options(t *testing.T) {

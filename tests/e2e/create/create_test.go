@@ -4,22 +4,20 @@ import (
 	"os"
 	"testing"
 
-	"github.com/kyma-project/lifecycle-manager/api/v1beta2"
-	"github.com/open-component-model/ocm/pkg/contexts/ocm/compdesc"
-	"k8s.io/apimachinery/pkg/util/yaml"
-
 	"github.com/kyma-project/lifecycle-manager/api/shared"
-	"github.com/open-component-model/ocm/pkg/contexts/ocm/accessmethods/ociartifact"
-
+	"github.com/kyma-project/lifecycle-manager/api/v1beta2"
 	"github.com/open-component-model/ocm/pkg/contexts/oci/repositories/ocireg"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/accessmethods/github"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/accessmethods/localblob"
+	"github.com/open-component-model/ocm/pkg/contexts/ocm/accessmethods/ociartifact"
+	"github.com/open-component-model/ocm/pkg/contexts/ocm/compdesc"
 	ocmMetaV1 "github.com/open-component-model/ocm/pkg/contexts/ocm/compdesc/meta/v1"
 	v1 "github.com/open-component-model/ocm/pkg/contexts/ocm/compdesc/meta/v1"
 	v2 "github.com/open-component-model/ocm/pkg/contexts/ocm/compdesc/versions/v2"
 	ocmOCIReg "github.com/open-component-model/ocm/pkg/contexts/ocm/repositories/ocireg"
 	"github.com/stretchr/testify/assert"
+	"k8s.io/apimachinery/pkg/util/yaml"
 )
 
 const (
@@ -29,10 +27,10 @@ const (
 
 func Test_ModuleTemplate(t *testing.T) {
 	// TODO remove debugging env
-	//err := os.Setenv("OCI_REPOSITORY_URL", "http://k3d-oci.localhost:5001")
-	//err = os.Setenv("TEST_REPOSITORY_URL", "https://github.com/lindnerby/template-operator.git")
-	//err = os.Setenv("MODULE_TEMPLATE_PATH", "/tmp/module-config-template.yaml")
-	//err = os.Setenv("MODULE_TEMPLATE_VERSION", "1.0.0")
+	// err := os.Setenv("OCI_REPOSITORY_URL", "http://k3d-oci.localhost:5001")
+	// err = os.Setenv("TEST_REPOSITORY_URL", "https://github.com/lindnerby/template-operator.git")
+	// err = os.Setenv("MODULE_TEMPLATE_PATH", "/tmp/module-config-template.yaml")
+	// err = os.Setenv("MODULE_TEMPLATE_VERSION", "1.0.0")
 
 	ociRepoURL := os.Getenv("OCI_REPOSITORY_URL")
 	testRepoURL := os.Getenv("TEST_REPOSITORY_URL")
@@ -78,7 +76,7 @@ func Test_ModuleTemplate(t *testing.T) {
 
 	t.Run("test descriptor.component.resources[0].access", func(t *testing.T) {
 		resourceAccessSpec, err := ocm.DefaultContext().AccessSpecForSpec(descriptor.Resources[0].Access)
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		ociArtifactAccessSpec, ok := resourceAccessSpec.(*ociartifact.AccessSpec)
 		assert.True(t, ok)
 		assert.Equal(t, ociartifact.Type, ociArtifactAccessSpec.GetType())
@@ -88,7 +86,7 @@ func Test_ModuleTemplate(t *testing.T) {
 
 	t.Run("test descriptor.component.resources[1].access", func(t *testing.T) {
 		resourceAccessSpec, err := ocm.DefaultContext().AccessSpecForSpec(descriptor.Resources[1].Access)
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		localBlobAccessSpec, ok := resourceAccessSpec.(*localblob.AccessSpec)
 		assert.True(t, ok)
 		assert.Equal(t, localblob.Type, localBlobAccessSpec.GetType())
@@ -99,7 +97,7 @@ func Test_ModuleTemplate(t *testing.T) {
 		assert.Equal(t, len(descriptor.Sources), 1)
 		source := descriptor.Sources[0]
 		sourceAccessSpec, err := ocm.DefaultContext().AccessSpecForSpec(source.Access)
-		assert.Nil(t, err)
+		assert.NoError(t, err)
 		githubAccessSpec, ok := sourceAccessSpec.(*github.AccessSpec)
 		assert.True(t, ok)
 		assert.Equal(t, github.Type, githubAccessSpec.Type)
