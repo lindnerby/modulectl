@@ -6,7 +6,7 @@ import (
 
 	"github.com/kyma-project/lifecycle-manager/api/v1beta2"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/compdesc"
-	"gopkg.in/yaml.v3"
+	"k8s.io/apimachinery/pkg/util/yaml"
 
 	"github.com/kyma-project/lifecycle-manager/api/shared"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/accessmethods/ociartifact"
@@ -28,6 +28,12 @@ const (
 )
 
 func Test_ModuleTemplate(t *testing.T) {
+	// TODO remove debugging env
+	//err := os.Setenv("OCI_REPOSITORY_URL", "http://k3d-oci.localhost:5001")
+	//err = os.Setenv("TEST_REPOSITORY_URL", "https://github.com/lindnerby/template-operator.git")
+	//err = os.Setenv("MODULE_TEMPLATE_PATH", "/tmp/module-config-template.yaml")
+	//err = os.Setenv("MODULE_TEMPLATE_VERSION", "1.0.0")
+
 	ociRepoURL := os.Getenv("OCI_REPOSITORY_URL")
 	testRepoURL := os.Getenv("TEST_REPOSITORY_URL")
 	templatePath := os.Getenv("MODULE_TEMPLATE_PATH")
@@ -121,11 +127,13 @@ func Test_ModuleTemplate(t *testing.T) {
 func readModuleTemplate(filepath string) (*v1beta2.ModuleTemplate, error) {
 	moduleTemplate := &v1beta2.ModuleTemplate{}
 	moduleFile, err := os.ReadFile(filepath)
+	if err != nil && len(moduleFile) > 0 {
+		return nil, err
+	}
+	err = yaml.Unmarshal(moduleFile, moduleTemplate)
 	if err != nil {
 		return nil, err
 	}
-	err = yaml.Unmarshal(moduleFile, &moduleTemplate)
-
 	return moduleTemplate, err
 }
 

@@ -59,9 +59,10 @@ jobs:
           --registry http://k3d-oci.localhost:5001 \
           --insecure \
           --module-config-file ./module-config.yaml \
-          --version $MODULE_TEMPLATE_VERSION -v \
+          --version $MODULE_TEMPLATE_VERSION \
           --sec-scanners-config sec-scanners-config.yaml \
-          --output /tmp/module-config-template.yaml 
+          --output /tmp/module-config-template.yaml \
+          --verbose
           echo "MODULE_TEMPLATE_PATH=/tmp/module-config-template.yaml" >> "$GITHUB_ENV"
       - name: Create a different security scanners config file for different layers
         if: ${{matrix.e2e-test == 'test-module-create-same-version' }}
@@ -79,7 +80,7 @@ jobs:
               - \"**/test/**\"
               - \"**/*_test.go\"" > sec-scanners-config-changed.yaml
           cat sec-scanners-config-changed.yaml
-      - name: Verify module template
+      - name: Verify created module template
         if: ${{ matrix.e2e-test == 'test-module-create' }}
         run: |
           echo $MODULE_TEMPLATE_PATH
