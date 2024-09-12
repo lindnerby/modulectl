@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"os"
 	"os/exec"
+	"strings"
 	"testing"
 
 	. "github.com/onsi/ginkgo/v2"
@@ -22,9 +23,12 @@ func Test_Create(t *testing.T) {
 
 type createCmd struct {
 	name                          string
+	registry                      string
 	path                          string
+	output                        string
 	version                       string
 	moduleConfigFile              string
+	secScanConfig                 string
 	moduleArchiveVersionOverwrite bool
 	insecure                      bool
 }
@@ -47,12 +51,33 @@ func (cmd *createCmd) execute() error {
 		args = append(args, "--name="+cmd.name)
 	}
 
+	if cmd.registry != "" {
+		args = append(args, "--registry="+cmd.registry)
+	}
+
+	if cmd.secScanConfig != "" {
+		args = append(args, "--sec-scanners-config="+cmd.secScanConfig)
+	}
+
+	if cmd.output != "" {
+		args = append(args, "--output="+cmd.output)
+	}
+
 	if cmd.version != "" {
 		args = append(args, "--version="+cmd.version)
 	}
+
 	if cmd.moduleArchiveVersionOverwrite {
 		args = append(args, "--module-archive-version-overwrite")
 	}
+
+	if cmd.insecure {
+		args = append(args, "--insecure")
+	}
+
+	println("Running command: modulectl", strings.Join(args, " "))
+	// TODO Remove
+	args = append(args, "--non-interactive")
 
 	command = exec.Command("kyma", args...)
 	cmdOut, err := command.CombinedOutput()

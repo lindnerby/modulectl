@@ -40,9 +40,9 @@ jobs:
         with:
           repository: kyma-project/template-operator
           path: ./template-operator/
-      - name: Copy template-operator to e2e folder
-        run: |
-          cp -r ./template-operator/* ./tests/e2e/create/
+#      - name: Copy template-operator to e2e folder
+#        run: |
+#          cp -r ./template-operator/* ./tests/e2e/create/
       - name: Set template-operator github URL
         run: |
           cd ./template-operator
@@ -84,12 +84,6 @@ jobs:
               - \"**/*_test.go\"" > sec-scanners-config-changed.yaml
           cat sec-scanners-config-changed.yaml
       - name: Verify created module template
-        if: ${{ matrix.e2e-test == 'test-module-create' }}
         run: |
           echo $MODULE_TEMPLATE_PATH
           make -C tests/e2e test-create-cmd
-      - name: Run E2E tests
-        if: ${{ matrix.e2e-test == 'test-module-create-same-version'}}
-        run: |
-          echo $MODULE_TEMPLATE_PATH
-          make -C tests/e2e test-create-cmd-same-version
