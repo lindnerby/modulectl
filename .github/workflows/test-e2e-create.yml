@@ -10,11 +10,6 @@ on:
       - 'release-**'
 jobs:
   test-create-cmd:
-    strategy:
-      matrix:
-        e2e-test: [ 'test-module-create',
-                    'test-module-create-same-version' ]
-    name: E2E test - module create
     runs-on: ubuntu-latest
     env:
       K3D_VERSION: v5.4.7
@@ -48,26 +43,14 @@ jobs:
         run: |
           cd ./template-operator
           echo "TEST_REPOSITORY_URL=$(git remote get-url origin)" >> "$GITHUB_ENV"
-      - name: Install k3d
-        run: wget -qO - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=$K3D_VERSION bash
-      - name: Provision OCI Registry
+      - name: Install k3d and create registry
         run: |
+          wget -qO - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=$K3D_VERSION bash
           k3d registry create oci.localhost --port 5001
-      - name: Run create module with module-config
+      - name: Make manifests template-operator
         run: |
           cd ./template-operator
           make build-manifests
-          modulectl create \
-          --name kyma-project.io/module/template-operator \
-          --path . \
-          --registry http://k3d-oci.localhost:5001 \
-          --insecure \
-          --module-config-file ./module-config.yaml \
-          --version $MODULE_TEMPLATE_VERSION \
-          --sec-scanners-config sec-scanners-config.yaml \
-          --output /tmp/module-config-template.yaml \
-          --verbose
-          echo "MODULE_TEMPLATE_PATH=/tmp/module-config-template.yaml" >> "$GITHUB_ENV"
       - name: Run tests
         run: |
           make -C tests/e2e test-create-cmd

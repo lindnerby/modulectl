@@ -34,8 +34,8 @@ type createCmd struct {
 func (cmd *createCmd) execute() error {
 	var command *exec.Cmd
 
-	// TODO revert to modulectl only debugging against kyma cli bin for verifying tests
-	args := []string{"alpha", "create", "module"}
+	//args := []string{"alpha", "create", "module"}
+	args := []string{"create"}
 
 	if cmd.moduleConfigFile != "" {
 		args = append(args, "--module-config-file="+cmd.moduleConfigFile)
@@ -73,11 +73,11 @@ func (cmd *createCmd) execute() error {
 		args = append(args, "--insecure")
 	}
 
-	println("Running command: modulectl", strings.Join(args, " "))
-	// TODO Remove
-	args = append(args, "--non-interactive")
+	println(" >>> Executing command: modulectl", strings.Join(args, " "))
+	//args = append(args, "--non-interactive")
+	//command = exec.Command("kyma", args...)
 
-	command = exec.Command("kyma", args...)
+	command = exec.Command("modulectl", args...)
 	cmdOut, err := command.CombinedOutput()
 	if err != nil {
 		return fmt.Errorf("create command failed with output: %s and error: %w", cmdOut, err)
