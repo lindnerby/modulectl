@@ -40,9 +40,10 @@ jobs:
         with:
           repository: kyma-project/template-operator
           path: ./template-operator/
-#      - name: Copy template-operator to e2e folder
-#        run: |
-#          cp -r ./template-operator/* ./tests/e2e/create/
+      - name: Copy template-operator to e2e testdata folder
+        run: |
+          mkdir -p ./tests/e2e/create/testdata/template-operator/
+          cp -r ./../template-operator/ ./tests/e2e/create/testdata/template-operator/
       - name: Set template-operator github URL
         run: |
           cd ./template-operator
@@ -67,23 +68,7 @@ jobs:
           --output /tmp/module-config-template.yaml \
           --verbose
           echo "MODULE_TEMPLATE_PATH=/tmp/module-config-template.yaml" >> "$GITHUB_ENV"
-      - name: Create a different security scanners config file for different layers
-        if: ${{matrix.e2e-test == 'test-module-create-same-version' }}
+      - name: Run tests
         run: |
-          cd ./template-operator
-          echo \
-          "module-name: template-operator
-          rc-tag: 0.5.0
-          dev-branch: main
-          protecode:
-            - europe-west3-docker.pkg.dev/sap-kyma-jellyfish-dev/template-operator/component-descriptors/kyma-project.io/template-operator:v1.0.0-e2e-warning
-          whitesource:
-            language: golang-mod
-            exclude:
-              - \"**/test/**\"
-              - \"**/*_test.go\"" > sec-scanners-config-changed.yaml
-          cat sec-scanners-config-changed.yaml
-      - name: Verify created module template
-        run: |
-          echo $MODULE_TEMPLATE_PATH
           make -C tests/e2e test-create-cmd
+        timeout-minutes: 3

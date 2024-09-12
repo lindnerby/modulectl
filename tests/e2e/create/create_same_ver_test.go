@@ -14,7 +14,7 @@ import (
 )
 
 var errCreateModuleFailedWithSameVersion = errors.New(
-	"failed to create module with same version exists message")
+	"version 1.0.0 already exists with different content, please use --module-archive-version-overwrite flag to overwrite it")
 
 const (
 	ociRepositoryEnvVar         = "OCI_REPOSITORY_URL"

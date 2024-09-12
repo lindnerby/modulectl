@@ -3,91 +3,66 @@
 package create_test
 
 import (
-	"github.com/kyma-project/lifecycle-manager/api/shared"
+	"io/fs"
+	"os"
+
 	"github.com/open-component-model/ocm/pkg/contexts/oci/repositories/ocireg"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/accessmethods/github"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/accessmethods/localblob"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm/accessmethods/ociartifact"
+	"github.com/open-component-model/ocm/pkg/contexts/ocm/compdesc"
 	ocmmetav1 "github.com/open-component-model/ocm/pkg/contexts/ocm/compdesc/meta/v1"
 	compdescv2 "github.com/open-component-model/ocm/pkg/contexts/ocm/compdesc/versions/v2"
 	ocmocireg "github.com/open-component-model/ocm/pkg/contexts/ocm/repositories/ocireg"
-	"os"
+	"k8s.io/apimachinery/pkg/util/yaml"
+
+	"github.com/kyma-project/lifecycle-manager/api/shared"
+	"github.com/kyma-project/lifecycle-manager/api/v1beta2"
 
 	. "github.com/onsi/ginkgo/v2"
 	. "github.com/onsi/gomega"
 )
 
 var _ = Describe("Test 'create' command", Ordered, func() {
-	//var initialDir string
-	//var workDir string
+	// _ = os.Setenv("OCI_REPOSITORY_URL", "http://k3d-oci.localhost:5001")
+	// _ = os.Setenv("MODULE_TEMPLATE_PATH", "/tmp/module-config-template.yaml")
+	// _ = os.Setenv("MODULE_TEMPLATE_VERSION", "1.0.0")
 
-	// TODO remove debugging env
-	// err := os.Setenv("OCI_REPOSITORY_URL", "http://k3d-oci.localhost:5001")
-	// err = os.Setenv("TEST_REPOSITORY_URL", "https://github.com/lindnerby/template-operator.git")
-	// err = os.Setenv("MODULE_TEMPLATE_PATH", "/tmp/module-config-template.yaml")
-	// err = os.Setenv("MODULE_TEMPLATE_VERSION", "1.0.0")
+	// ociRegistry := os.Getenv("OCI_REPOSITORY_URL")
+	// testRepoURL := os.Getenv("TEST_REPOSITORY_URL")
+	// templateOutputPath := os.Getenv("MODULE_TEMPLATE_PATH")
+	// moduleTemplateVersion := os.Getenv("MODULE_TEMPLATE_VERSION")
 
-	// TODO decide what should be configurable
-	//ociRepoURL := os.Getenv("OCI_REPOSITORY_URL")
-	//testRepoURL := os.Getenv("TEST_REPOSITORY_URL")
-	//templatePath := os.Getenv("MODULE_TEMPLATE_PATH")
-	//moduleTemplateVersion := os.Getenv("MODULE_TEMPLATE_VERSION")
-
-	// TODO adapt path for checked out repo on pipeline
+	ociRegistry := "http://k3d-oci.localhost:5001"
 	moduleRepoPath := "./testdata/template-operator/"
-	configFilePath := "./testdata/template-operator/module-config.yaml"
-	localRegistry := "http://k3d-oci.localhost:5001"
-	templateOutput := "./testdata/template-operator/template.yaml"
 	moduleTemplateVersion := "1.0.0"
-	securityScanConfigFile := "./testdata/template-operator/sec-scanners-config.yaml"
-	changedSecScanConfigFile := "./testdata/template-operator/sec-scanners-config-changed.yaml"
-	//changedSecScannerConfigFile := "../../../../template-operator/sec-scanners-config-changed.yaml"
-
-	// TODO see if we can use elegant dir reference to template-operator
-	//setup := func() {
-	//	var err error
-	//	initialDir, err = os.Getwd()
-	//	Expect(err).ToNot(HaveOccurred())
-	//	workDir = resolveWorkingDirectory()
-	//	err = os.Chdir(workDir)
-	//	Expect(err).ToNot(HaveOccurred())
-	//}
-	//
-	//teardown := func() {
-	//	err := os.Chdir(initialDir)
-	//	Expect(err).ToNot(HaveOccurred())
-	//	cleanupWorkingDirectory(workDir)
-	//	workDir = ""
-	//	initialDir = ""
-	//}
+	moduleConfigFilePath := moduleRepoPath + "module-config.yaml"
+	templateOutputPath := moduleRepoPath + "template.yaml"
+	securityScanConfigFile := moduleRepoPath + "sec-scanners-config.yaml"
+	changedSecScanConfigFile := moduleRepoPath + "sec-scanners-config-changed.yaml"
 
 	Context("Given 'modulectl create' command", func() {
 		var cmd createCmd
 		It("When invoked without any args", func() {
-			//print current dir
-			currDir, _ := os.Getwd()
-			println(currDir)
 			cmd = createCmd{}
 		})
 
 		It("Then the command should fail", func() {
-			cmd = createCmd{}
 			err := cmd.execute()
 			Expect(err).Should(HaveOccurred())
 			Expect(err.Error()).Should(ContainSubstring("Error: \"--module-config-file\" flag is required"))
 
-			// TODO
-			//By("And no files are generated")
-			//Expect(filesIn(workDir)).Should(BeEmpty())
+			By("And no module template.yaml is generated")
+			Expect(filesIn(moduleRepoPath)).Should(Not(ContainElement("template.yaml")))
 		})
 	})
 
-	Context("Given `modulectl create` command", func() {
+	Context("Given 'modulectl create' command", func() {
 		var cmd createCmd
-		It("When invoked with --module-config-file and --path", func() {
+		It("When invoked with '--module-config-file' and '--path'", func() {
 			cmd = createCmd{
-				moduleConfigFile: configFilePath,
+				moduleConfigFile: moduleConfigFilePath,
 				path:             moduleRepoPath,
 			}
 		})
@@ -103,11 +78,11 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 		var cmd createCmd
 		It("When invoked with existing '--registry' and '--insecure' flag", func() {
 			cmd = createCmd{
-				moduleConfigFile: configFilePath,
+				moduleConfigFile: moduleConfigFilePath,
 				path:             moduleRepoPath,
-				registry:         localRegistry,
+				registry:         ociRegistry,
 				insecure:         true,
-				output:           templateOutput,
+				output:           templateOutputPath,
 			}
 		})
 		It("Then the command should succeed", func() {
@@ -117,7 +92,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			Expect(filesIn("./testdata/template-operator/")).Should(ContainElement("template.yaml"))
 		})
 		It("Then module template should contain the expected content", func() {
-			template, err := readModuleTemplate(templateOutput)
+			template, err := readModuleTemplate(templateOutputPath)
 			Expect(err).ToNot(HaveOccurred())
 			descriptor := getDescriptor(template)
 			Expect(descriptor).ToNot(BeNil())
@@ -131,7 +106,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			By("And descriptor.component.repositoryContexts should be correct")
 			Expect(descriptor.RepositoryContexts).To(HaveLen(1))
 			repo := descriptor.GetEffectiveRepositoryContext()
-			Expect(repo.Object["baseUrl"]).To(Equal(localRegistry))
+			Expect(repo.Object["baseUrl"]).To(Equal(ociRegistry))
 			Expect(repo.Object["componentNameMapping"]).To(Equal(string(ocmocireg.OCIRegistryURLPathMapping)))
 			Expect(repo.Object["type"]).To(Equal(ocireg.Type))
 
@@ -144,9 +119,9 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			Expect(resource.Version).To(Equal(moduleTemplateVersion))
 
 			resource = descriptor.Resources[1]
-			Expect(resource.Name).To(Equal(rawManifestLayerName))
+			Expect(resource.Name).To(Equal("raw-manifest"))
 			Expect(resource.Relation).To(Equal(ocmmetav1.LocalRelation))
-			Expect(resource.Type).To(Equal(typeYaml))
+			Expect(resource.Type).To(Equal("yaml"))
 			Expect(resource.Version).To(Equal(moduleTemplateVersion))
 
 			By("And descriptor.component.resources[0].access should be correct")
@@ -194,8 +169,8 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 		It("When invoked with '--module-archive-version-overwrite' flag", func() {
 			cmd = createCmd{
 				path:                          moduleRepoPath,
-				registry:                      localRegistry,
-				moduleConfigFile:              configFilePath,
+				registry:                      ociRegistry,
+				moduleConfigFile:              moduleConfigFilePath,
 				version:                       moduleTemplateVersion,
 				moduleArchiveVersionOverwrite: true,
 				secScanConfig:                 securityScanConfigFile,
@@ -211,8 +186,8 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 		It("When invoked with same version module and same content without '--module-archive-version-overwrite' flag", func() {
 			cmd = createCmd{
 				path:             moduleRepoPath,
-				registry:         localRegistry,
-				moduleConfigFile: configFilePath,
+				registry:         ociRegistry,
+				moduleConfigFile: moduleConfigFilePath,
 				version:          moduleTemplateVersion,
 				secScanConfig:    securityScanConfigFile,
 			}
@@ -227,8 +202,8 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 		It("When invoked with same version module, but different content without '--module-archive-version-overwrite' flag", func() {
 			cmd = createCmd{
 				path:             moduleRepoPath,
-				registry:         localRegistry,
-				moduleConfigFile: configFilePath,
+				registry:         ociRegistry,
+				moduleConfigFile: moduleConfigFilePath,
 				version:          moduleTemplateVersion,
 				secScanConfig:    changedSecScanConfigFile,
 			}
@@ -239,3 +214,70 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 		})
 	})
 })
+
+// Test helper functions
+
+func readModuleTemplate(filepath string) (*v1beta2.ModuleTemplate, error) {
+	moduleTemplate := &v1beta2.ModuleTemplate{}
+	moduleFile, err := os.ReadFile(filepath)
+	if err != nil && len(moduleFile) > 0 {
+		return nil, err
+	}
+	err = yaml.Unmarshal(moduleFile, moduleTemplate)
+	if err != nil {
+		return nil, err
+	}
+	return moduleTemplate, err
+}
+
+func getDescriptor(template *v1beta2.ModuleTemplate) *v1beta2.Descriptor {
+	if template.Spec.Descriptor.Object != nil {
+		desc, ok := template.Spec.Descriptor.Object.(*v1beta2.Descriptor)
+		if !ok || desc == nil {
+			return nil
+		}
+		return desc
+	}
+	ocmDesc, err := compdesc.Decode(
+		template.Spec.Descriptor.Raw,
+		[]compdesc.DecodeOption{compdesc.DisableValidation(true)}...)
+	if err != nil {
+		return nil
+	}
+	template.Spec.Descriptor.Object = &v1beta2.Descriptor{ComponentDescriptor: ocmDesc}
+	desc, ok := template.Spec.Descriptor.Object.(*v1beta2.Descriptor)
+	if !ok {
+		return nil
+	}
+
+	return desc
+}
+
+func flatten(labels ocmmetav1.Labels) map[string]string {
+	labelsMap := make(map[string]string)
+	for _, l := range labels {
+		var value string
+		_ = yaml.Unmarshal(l.Value, &value)
+		labelsMap[l.Name] = value
+	}
+	return labelsMap
+}
+
+func filesIn(dir string) []string {
+	fi, err := os.Stat(dir)
+	Expect(err).ToNot(HaveOccurred())
+	Expect(fi.IsDir()).To(BeTrueBecause("The provided path should be a directory: %s", dir))
+
+	dirFs := os.DirFS(dir)
+	entries, err := fs.ReadDir(dirFs, ".")
+	Expect(err).ToNot(HaveOccurred())
+
+	var res []string
+	for _, ent := range entries {
+		if ent.Type().IsRegular() {
+			res = append(res, ent.Name())
+		}
+	}
+
+	return res
+}
