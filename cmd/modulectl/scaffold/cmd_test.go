@@ -17,7 +17,7 @@ func Test_NewCmd_ReturnsError_WhenScaffoldServiceIsNil(t *testing.T) {
 	_, err := scaffoldcmd.NewCmd(nil)
 
 	require.Error(t, err)
-	assert.Contains(t, err.Error(), "scaffold Service")
+	assert.Contains(t, err.Error(), "service must not be nil")
 }
 
 func Test_NewCmd_Succceeds(t *testing.T) {

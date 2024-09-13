@@ -30,7 +30,7 @@ type Service interface {
 
 func NewCmd(service Service) (*cobra.Command, error) {
 	if service == nil {
-		return nil, fmt.Errorf("%w: create Service must not be nil", commonerrors.ErrInvalidArg)
+		return nil, fmt.Errorf("%w: service must not be nil", commonerrors.ErrInvalidArg)
 	}
 
 	opts := create.Options{}

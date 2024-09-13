@@ -196,7 +196,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 				secScanConfig:    securityScanConfigFile,
 			}
 		})
-		It("Then the command should succeed", func() {
+		It("Then the command should succeed, because content has not change and overwrite flag not needed", func() {
 			Expect(cmd.execute()).To(Succeed())
 		})
 	})
@@ -212,7 +212,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 				secScanConfig:    changedSecScanConfigFile,
 			}
 		})
-		It("Then the command should fail with same version exists message", func() {
+		It("Then the command should fail with same version exists message, because overwrite flag is required", func() {
 			err := cmd.execute()
 			Expect(err).To(Equal(errCreateModuleFailedWithSameVersion))
 		})

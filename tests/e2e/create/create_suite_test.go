@@ -34,7 +34,6 @@ type createCmd struct {
 func (cmd *createCmd) execute() error {
 	var command *exec.Cmd
 
-	//args := []string{"alpha", "create", "module"}
 	args := []string{"create"}
 
 	if cmd.moduleConfigFile != "" {
@@ -74,8 +73,6 @@ func (cmd *createCmd) execute() error {
 	}
 
 	println(" >>> Executing command: modulectl", strings.Join(args, " "))
-	//args = append(args, "--non-interactive")
-	//command = exec.Command("kyma", args...)
 
 	command = exec.Command("modulectl", args...)
 	cmdOut, err := command.CombinedOutput()
