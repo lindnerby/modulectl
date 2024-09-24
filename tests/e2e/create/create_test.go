@@ -24,6 +24,22 @@ import (
 	. "github.com/onsi/gomega"
 )
 
+const (
+	testdataDir = "./testdata/moduleconfig/"
+
+	validConfigs          = testdataDir + "valid/"
+	minimalConfig         = validConfigs + "minimal.yaml"
+	withAnnotationsConfig = validConfigs + "with-annotations.yaml"
+	withDefaultCrConfig   = validConfigs + "with-defaultcr.yaml"
+	withSecurityConfig    = validConfigs + "with-security.yaml"
+
+	invalidConfigs        = testdataDir + "invalid/"
+	missingNameConfig     = invalidConfigs + "missing-name.yaml"
+	missingChannelConfig  = invalidConfigs + "missing-channel.yaml"
+	missingVersionConfig  = invalidConfigs + "missing-version.yaml"
+	missingManifestConfig = invalidConfigs + "missing-manifest.yaml"
+)
+
 var _ = Describe("Test 'create' command", Ordered, func() {
 	// _ = os.Setenv("OCI_REPOSITORY_URL", "http://k3d-oci.localhost:5001")
 	// _ = os.Setenv("MODULE_TEMPLATE_PATH", "/tmp/module-config-template.yaml")
@@ -36,11 +52,6 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 
 	ociRegistry := "http://k3d-oci.localhost:5001"
 	moduleTemplateVersion := "1.0.0"
-
-	// TODO build module-config file in tests?
-	validModuleConfigFile := "./testdata/module-config-valid.yaml"
-	invalidModuleConfigFile := "./testdata/module-config-missing-required.yaml"
-
 	templateOutputPath := "/tmp/template.yaml"
 	gitRemote := "https://github.com/kyma-project/template-operator"
 
@@ -62,7 +73,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 		var cmd createCmd
 		It("When invoked with '--module-config-file' using valid file", func() {
 			cmd = createCmd{
-				moduleConfigFile: validModuleConfigFile,
+				moduleConfigFile: minimalConfig,
 			}
 		})
 		It("Then the command should succeed", func() {
@@ -77,9 +88,9 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 
 	Context("Given 'modulectl create' command", func() {
 		var cmd createCmd
-		It("When invoked with '--module-config-file' using file with missing required fields", func() {
+		It("When invoked with '--module-config-file' using file with missing name", func() {
 			cmd = createCmd{
-				moduleConfigFile: invalidModuleConfigFile,
+				moduleConfigFile: missingNameConfig,
 			}
 		})
 		It("Then the command should fail", func() {
@@ -91,9 +102,51 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 
 	Context("Given 'modulectl create' command", func() {
 		var cmd createCmd
+		It("When invoked with '--module-config-file' using file with missing channel", func() {
+			cmd = createCmd{
+				moduleConfigFile: missingChannelConfig,
+			}
+		})
+		It("Then the command should fail", func() {
+			err := cmd.execute()
+			Expect(err).Should(HaveOccurred())
+			Expect(err.Error()).Should(ContainSubstring("invalid Option: opts.ModuleChannel must not be empty"))
+		})
+	})
+
+	Context("Given 'modulectl create' command", func() {
+		var cmd createCmd
+		It("When invoked with '--module-config-file' using file with missing version", func() {
+			cmd = createCmd{
+				moduleConfigFile: missingVersionConfig,
+			}
+		})
+		It("Then the command should fail", func() {
+			err := cmd.execute()
+			Expect(err).Should(HaveOccurred())
+			Expect(err.Error()).Should(ContainSubstring("invalid Option: opts.ModuleVersion must not be empty"))
+		})
+	})
+
+	Context("Given 'modulectl create' command", func() {
+		var cmd createCmd
+		It("When invoked with '--module-config-file' using file with missing manifest", func() {
+			cmd = createCmd{
+				moduleConfigFile: missingManifestConfig,
+			}
+		})
+		It("Then the command should fail", func() {
+			err := cmd.execute()
+			Expect(err).Should(HaveOccurred())
+			Expect(err.Error()).Should(ContainSubstring("invalid Option: opts.ModuleManifest must not be empty"))
+		})
+	})
+
+	Context("Given 'modulectl create' command", func() {
+		var cmd createCmd
 		It("When invoked with existing '--registry' and missing '--insecure' flag", func() {
 			cmd = createCmd{
-				moduleConfigFile: validModuleConfigFile,
+				moduleConfigFile: minimalConfig,
 				registry:         ociRegistry,
 			}
 		})
@@ -108,7 +161,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 		var cmd createCmd
 		It("When invoked with existing '--registry' and '--insecure' flag", func() {
 			cmd = createCmd{
-				moduleConfigFile: validModuleConfigFile,
+				moduleConfigFile: minimalConfig,
 				registry:         ociRegistry,
 				insecure:         true,
 				output:           templateOutputPath,
@@ -215,7 +268,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 		var cmd createCmd
 		It("When invoked with same version that already exists in the registry", func() {
 			cmd = createCmd{
-				moduleConfigFile: validModuleConfigFile,
+				moduleConfigFile: minimalConfig,
 				registry:         ociRegistry,
 				insecure:         true,
 			}
