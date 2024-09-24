@@ -42,19 +42,22 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 	invalidModuleConfigFile := "./testdata/module-config-missing-required.yaml"
 
 	templateOutputPath := "/tmp/template.yaml"
+	gitRemote := "https://github.com/kyma-project/template-operator"
 
-	Context("Given 'modulectl create' command", func() {
-		var cmd createCmd
-		It("When invoked without any args", func() {
-			cmd = createCmd{}
-		})
-
-		It("Then the command should fail", func() {
-			err := cmd.execute()
-			Expect(err).Should(HaveOccurred())
-			Expect(err.Error()).Should(ContainSubstring("Error: \"--module-config-file\" flag is required"))
-		})
-	})
+	// TODO: Add a test with empty security
+	// test should be removed: module-config-file has the default value of module-config.yaml
+	// Context("Given 'modulectl create' command", func() {
+	// 	var cmd createCmd
+	// 	It("When invoked without any args", func() {
+	// 		cmd = createCmd{}
+	// 	})
+	//
+	// 	It("Then the command should fail", func() {
+	// 		err := cmd.execute()
+	// 		Expect(err).Should(HaveOccurred())
+	// 		Expect(err.Error()).Should(ContainSubstring("Error: \"--module-config-file\" flag is required"))
+	// 	})
+	// })
 
 	Context("Given 'modulectl create' command", func() {
 		var cmd createCmd
@@ -81,7 +84,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 		It("Then the command should fail", func() {
 			err := cmd.execute()
 			Expect(err).Should(HaveOccurred())
-			Expect(err.Error()).Should(ContainSubstring("Error: field is required"))
+			Expect(err.Error()).Should(ContainSubstring("invalid Option: opts.ModuleName must not be empty"))
 		})
 	})
 
@@ -108,6 +111,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 				registry:         ociRegistry,
 				insecure:         true,
 				output:           templateOutputPath,
+				gitRemote:        gitRemote,
 			}
 		})
 		It("Then the command should succeed", func() {
@@ -136,7 +140,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			Expect(repo.Object["type"]).To(Equal(ocireg.Type))
 
 			By("And descriptor.component.resources should be correct")
-			Expect(descriptor.Resources).To(HaveLen(2))
+			Expect(descriptor.Resources).To(HaveLen(3))
 			resource := descriptor.Resources[0]
 			Expect(resource.Name).To(Equal("template-operator"))
 			Expect(resource.Relation).To(Equal(ocmmetav1.ExternalRelation))
@@ -201,7 +205,8 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			Expect(secScanLabels).To(HaveKeyWithValue("scan.security.kyma-project.io/language", "golang-mod"))
 			Expect(secScanLabels).To(HaveKeyWithValue("scan.security.kyma-project.io/dev-branch", "main"))
 			Expect(secScanLabels).To(HaveKeyWithValue("scan.security.kyma-project.io/subprojects", "false"))
-			Expect(secScanLabels).To(HaveKeyWithValue("scan.security.kyma-project.io/exclude", "**/test/**,**/*_test.go"))
+			Expect(secScanLabels).To(HaveKeyWithValue("scan.security.kyma-project.io/exclude",
+				"**/test/**,**/*_test.go"))
 		})
 	})
 
