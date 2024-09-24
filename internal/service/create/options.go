@@ -45,7 +45,7 @@ func (opts Options) Validate() error {
 		return fmt.Errorf("%w:  opts.TemplateOutput must not be empty", commonerrors.ErrInvalidOption)
 	}
 
-	if opts.RegistryURL != "" && !strings.HasPrefix(opts.RegistryURL, "http") {
+	if !strings.HasPrefix(opts.RegistryURL, "http") {
 		return fmt.Errorf("%w:  opts.RegistryURL does not start with http(s)", commonerrors.ErrInvalidOption)
 	}
 
