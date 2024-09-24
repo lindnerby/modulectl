@@ -45,19 +45,18 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 	gitRemote := "https://github.com/kyma-project/template-operator"
 
 	// TODO: Add a test with empty security
-	// test should be removed: module-config-file has the default value of module-config.yaml
-	// Context("Given 'modulectl create' command", func() {
-	// 	var cmd createCmd
-	// 	It("When invoked without any args", func() {
-	// 		cmd = createCmd{}
-	// 	})
-	//
-	// 	It("Then the command should fail", func() {
-	// 		err := cmd.execute()
-	// 		Expect(err).Should(HaveOccurred())
-	// 		Expect(err.Error()).Should(ContainSubstring("Error: \"--module-config-file\" flag is required"))
-	// 	})
-	// })
+	Context("Given 'modulectl create' command", func() {
+		var cmd createCmd
+		It("When invoked without any args", func() {
+			cmd = createCmd{}
+		})
+
+		It("Then the command should fail", func() {
+			err := cmd.execute()
+			Expect(err).Should(HaveOccurred())
+			Expect(err.Error()).Should(ContainSubstring("failed to read file module-config.yaml: open module-config.yaml: no such file or directory"))
+		})
+	})
 
 	Context("Given 'modulectl create' command", func() {
 		var cmd createCmd
@@ -70,7 +69,9 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			Expect(cmd.execute()).To(Succeed())
 
 			By("And no module template file should be generated")
-			Expect(filesIn("./testdata/template-operator/")).Should(Not(ContainElement("template.yaml")))
+			currentDir, err := os.Getwd()
+			Expect(err).ToNot(HaveOccurred())
+			Expect(filesIn(currentDir)).Should(Not(ContainElement("template.yaml")))
 		})
 	})
 
@@ -222,6 +223,113 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 		It("Then the command should fail with same version exists message", func() {
 			err := cmd.execute()
 			Expect(err.Error()).Should(ContainSubstring("could not push component version: component version already exists"))
+		})
+	})
+
+	Context("Given 'modulectl create' command with no security option", func() {
+		var cmd createCmd
+		It("When invoked with existing '--registry' and '--insecure' flag", func() {
+			cmd = createCmd{
+				moduleConfigFile: validModuleConfigFile,
+				registry:         ociRegistry,
+				insecure:         true,
+				output:           templateOutputPath,
+				gitRemote:        gitRemote,
+			}
+		})
+		It("Then the command should succeed", func() {
+			Expect(cmd.execute()).To(Succeed())
+
+			By("And module template file should be generated")
+			Expect(filesIn("/tmp/")).Should(ContainElement("template.yaml"))
+		})
+		It("Then module template should contain the expected content", func() {
+			template, err := readModuleTemplate(templateOutputPath)
+			Expect(err).ToNot(HaveOccurred())
+			descriptor := getDescriptor(template)
+			Expect(descriptor).ToNot(BeNil())
+			Expect(descriptor.SchemaVersion()).To(Equal(compdescv2.SchemaVersion))
+
+			By("And annotations should be correct")
+			annotations := template.Annotations
+			Expect(annotations[shared.ModuleVersionAnnotation]).To(Equal(moduleTemplateVersion))
+			Expect(annotations[shared.IsClusterScopedAnnotation]).To(Equal("false"))
+
+			By("And descriptor.component.repositoryContexts should be correct")
+			Expect(descriptor.RepositoryContexts).To(HaveLen(1))
+			repo := descriptor.GetEffectiveRepositoryContext()
+			Expect(repo.Object["baseUrl"]).To(Equal(ociRegistry))
+			Expect(repo.Object["componentNameMapping"]).To(Equal(string(ocmocireg.OCIRegistryURLPathMapping)))
+			Expect(repo.Object["type"]).To(Equal(ocireg.Type))
+
+			By("And descriptor.component.resources should be correct")
+			Expect(descriptor.Resources).To(HaveLen(3))
+			resource := descriptor.Resources[0]
+			Expect(resource.Name).To(Equal("template-operator"))
+			Expect(resource.Relation).To(Equal(ocmmetav1.ExternalRelation))
+			Expect(resource.Type).To(Equal("ociArtifact"))
+			Expect(resource.Version).To(Equal(moduleTemplateVersion))
+
+			resource = descriptor.Resources[1]
+			Expect(resource.Name).To(Equal("raw-manifest"))
+			Expect(resource.Relation).To(Equal(ocmmetav1.LocalRelation))
+			Expect(resource.Type).To(Equal("directory"))
+			Expect(resource.Version).To(Equal(moduleTemplateVersion))
+
+			resource = descriptor.Resources[2]
+			Expect(resource.Name).To(Equal("default-cr"))
+			Expect(resource.Relation).To(Equal(ocmmetav1.LocalRelation))
+			Expect(resource.Type).To(Equal("directory"))
+			Expect(resource.Version).To(Equal(moduleTemplateVersion))
+
+			By("And descriptor.component.resources[0].access should be correct")
+			resourceAccessSpec0, err := ocm.DefaultContext().AccessSpecForSpec(descriptor.Resources[0].Access)
+			Expect(err).ToNot(HaveOccurred())
+			ociArtifactAccessSpec, ok := resourceAccessSpec0.(*ociartifact.AccessSpec)
+			Expect(ok).To(BeTrue())
+			Expect(ociArtifactAccessSpec.GetType()).To(Equal(ociartifact.Type))
+			Expect(ociArtifactAccessSpec.ImageReference).To(Equal("europe-docker.pkg.dev/kyma-project/prod/template-operator:1.0.0"))
+
+			By("And descriptor.component.resources[1].access should be correct")
+			resourceAccessSpec1, err := ocm.DefaultContext().AccessSpecForSpec(descriptor.Resources[1].Access)
+			Expect(err).ToNot(HaveOccurred())
+			localBlobAccessSpec, ok := resourceAccessSpec1.(*localblob.AccessSpec)
+			Expect(ok).To(BeTrue())
+			Expect(localBlobAccessSpec.GetType()).To(Equal(localblob.Type))
+			Expect(localBlobAccessSpec.LocalReference).To(ContainSubstring("sha256:"))
+			Expect(localBlobAccessSpec.MediaType).To(Equal("application/x-tar"))
+
+			By("And descriptor.component.resources[2].access should be correct")
+			defaultCRResourceAccessSpec, err := ocm.DefaultContext().AccessSpecForSpec(descriptor.Resources[2].Access)
+			Expect(err).ToNot(HaveOccurred())
+			defaultCRAccessSpec, ok := defaultCRResourceAccessSpec.(*localblob.AccessSpec)
+			Expect(ok).To(BeTrue())
+			Expect(defaultCRAccessSpec.GetType()).To(Equal(localblob.Type))
+			Expect(defaultCRAccessSpec.LocalReference).To(ContainSubstring("sha256:"))
+			Expect(defaultCRAccessSpec.MediaType).To(Equal("application/x-tar"))
+
+			By("And descriptor.component.sources should be correct")
+			Expect(len(descriptor.Sources)).To(Equal(1))
+			source := descriptor.Sources[0]
+			sourceAccessSpec, err := ocm.DefaultContext().AccessSpecForSpec(source.Access)
+			Expect(err).ToNot(HaveOccurred())
+			githubAccessSpec, ok := sourceAccessSpec.(*github.AccessSpec)
+			Expect(ok).To(BeTrue())
+			Expect(github.Type).To(Equal(githubAccessSpec.Type))
+			Expect(githubAccessSpec.RepoURL).To(Equal("https://github.com/kyma-project/template-operator"))
+
+			By("And spec.mandatory should be false")
+			Expect(template.Spec.Mandatory).To(BeFalse())
+
+			By("And security scan labels should be correct")
+			secScanLabels := flatten(descriptor.Sources[0].Labels)
+			Expect(secScanLabels).To(HaveKeyWithValue("git.kyma-project.io/ref", "HEAD"))
+			Expect(secScanLabels).To(HaveKeyWithValue("scan.security.kyma-project.io/rc-tag", "1.0.0"))
+			Expect(secScanLabels).To(HaveKeyWithValue("scan.security.kyma-project.io/language", "golang-mod"))
+			Expect(secScanLabels).To(HaveKeyWithValue("scan.security.kyma-project.io/dev-branch", "main"))
+			Expect(secScanLabels).To(HaveKeyWithValue("scan.security.kyma-project.io/subprojects", "false"))
+			Expect(secScanLabels).To(HaveKeyWithValue("scan.security.kyma-project.io/exclude",
+				"**/test/**,**/*_test.go"))
 		})
 	})
 })
