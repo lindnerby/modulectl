@@ -24,27 +24,6 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-const (
-	testdataDir = "./testdata/moduleconfig/"
-
-	invalidConfigs        = testdataDir + "invalid/"
-	missingNameConfig     = invalidConfigs + "missing-name.yaml"
-	missingChannelConfig  = invalidConfigs + "missing-channel.yaml"
-	missingVersionConfig  = invalidConfigs + "missing-version.yaml"
-	missingManifestConfig = invalidConfigs + "missing-manifest.yaml"
-
-	validConfigs          = testdataDir + "valid/"
-	minimalConfig         = validConfigs + "minimal.yaml"
-	withAnnotationsConfig = validConfigs + "with-annotations.yaml"
-	withDefaultCrConfig   = validConfigs + "with-defaultcr.yaml"
-	withSecurityConfig    = validConfigs + "with-security.yaml"
-	withMandatoryConfig   = validConfigs + "with-mandatory.yaml"
-
-	ociRegistry        = "http://k3d-oci.localhost:5001"
-	templateOutputPath = "/tmp/template.yaml"
-	gitRemote          = "https://github.com/kyma-project/template-operator"
-)
-
 var _ = Describe("Test 'create' command", Ordered, func() {
 	Context("Given 'modulectl create' command", func() {
 		var cmd createCmd
