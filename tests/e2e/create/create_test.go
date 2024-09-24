@@ -90,7 +90,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 		It("Then the command should fail", func() {
 			err := cmd.execute()
 			Expect(err).Should(HaveOccurred())
-			Expect(err.Error()).Should(ContainSubstring("invalid Option: opts.ModuleManifest must not be empty"))
+			Expect(err.Error()).Should(ContainSubstring("failed to parse module config: invalid Option: manifest path must not be empty: failed to value module config"))
 		})
 	})
 
@@ -225,9 +225,13 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 
 			By("And new annotation should be correctly added")
 			annotations := template.Annotations
-			Expect(annotations[shared.ModuleVersionAnnotation]).To(Equal("1.0.0"))
+			Expect(annotations[shared.ModuleVersionAnnotation]).To(Equal("1.0.1"))
 			Expect(annotations[shared.IsClusterScopedAnnotation]).To(Equal("false"))
 			Expect(annotations["operator.kyma-project.io/doc-url"]).To(Equal("https://kyma-project.io"))
+
+			By("And descriptor.component.resources should be correct")
+			resource := descriptor.Resources[0]
+			Expect(resource.Version).To(Equal("1.0.1"))
 		})
 	})
 
@@ -253,13 +257,17 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			descriptor := getDescriptor(template)
 			Expect(descriptor).ToNot(BeNil())
 
+			By("And annotation should have correct version")
+			annotations := template.Annotations
+			Expect(annotations[shared.ModuleVersionAnnotation]).To(Equal("1.0.2"))
+
 			By("And descriptor.component.resources should be correct")
 			Expect(descriptor.Resources).To(HaveLen(2))
 			resource := descriptor.Resources[1]
 			Expect(resource.Name).To(Equal("default-cr"))
 			Expect(resource.Relation).To(Equal(ocmmetav1.LocalRelation))
 			Expect(resource.Type).To(Equal("directory"))
-			Expect(resource.Version).To(Equal("1.0.0"))
+			Expect(resource.Version).To(Equal("1.0.2"))
 
 			By("And descriptor.component.resources[1].access should be correct")
 			defaultCRResourceAccessSpec, err := ocm.DefaultContext().AccessSpecForSpec(descriptor.Resources[1].Access)
