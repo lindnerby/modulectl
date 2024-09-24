@@ -27,35 +27,24 @@ import (
 const (
 	testdataDir = "./testdata/moduleconfig/"
 
+	invalidConfigs        = testdataDir + "invalid/"
+	missingNameConfig     = invalidConfigs + "missing-name.yaml"
+	missingChannelConfig  = invalidConfigs + "missing-channel.yaml"
+	missingVersionConfig  = invalidConfigs + "missing-version.yaml"
+	missingManifestConfig = invalidConfigs + "missing-manifest.yaml"
+
 	validConfigs          = testdataDir + "valid/"
 	minimalConfig         = validConfigs + "minimal.yaml"
 	withAnnotationsConfig = validConfigs + "with-annotations.yaml"
 	withDefaultCrConfig   = validConfigs + "with-defaultcr.yaml"
 	withSecurityConfig    = validConfigs + "with-security.yaml"
 
-	invalidConfigs        = testdataDir + "invalid/"
-	missingNameConfig     = invalidConfigs + "missing-name.yaml"
-	missingChannelConfig  = invalidConfigs + "missing-channel.yaml"
-	missingVersionConfig  = invalidConfigs + "missing-version.yaml"
-	missingManifestConfig = invalidConfigs + "missing-manifest.yaml"
+	ociRegistry        = "http://k3d-oci.localhost:5001"
+	templateOutputPath = "/tmp/template.yaml"
+	gitRemote          = "https://github.com/kyma-project/template-operator"
 )
 
 var _ = Describe("Test 'create' command", Ordered, func() {
-	// _ = os.Setenv("OCI_REPOSITORY_URL", "http://k3d-oci.localhost:5001")
-	// _ = os.Setenv("MODULE_TEMPLATE_PATH", "/tmp/module-config-template.yaml")
-	// _ = os.Setenv("MODULE_TEMPLATE_VERSION", "1.0.0")
-
-	// ociRegistry := os.Getenv("OCI_REPOSITORY_URL")
-	// testRepoURL := os.Getenv("TEST_REPOSITORY_URL")
-	// templateOutputPath := os.Getenv("MODULE_TEMPLATE_PATH")
-	// moduleTemplateVersion := os.Getenv("MODULE_TEMPLATE_VERSION")
-
-	ociRegistry := "http://k3d-oci.localhost:5001"
-	moduleTemplateVersion := "1.0.0"
-	templateOutputPath := "/tmp/template.yaml"
-	gitRemote := "https://github.com/kyma-project/template-operator"
-
-	// TODO: Add a test with empty security
 	Context("Given 'modulectl create' command", func() {
 		var cmd createCmd
 		It("When invoked without any args", func() {
@@ -66,23 +55,6 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			err := cmd.execute()
 			Expect(err).Should(HaveOccurred())
 			Expect(err.Error()).Should(ContainSubstring("failed to read file module-config.yaml: open module-config.yaml: no such file or directory"))
-		})
-	})
-
-	Context("Given 'modulectl create' command", func() {
-		var cmd createCmd
-		It("When invoked with '--module-config-file' using valid file", func() {
-			cmd = createCmd{
-				moduleConfigFile: minimalConfig,
-			}
-		})
-		It("Then the command should succeed", func() {
-			Expect(cmd.execute()).To(Succeed())
-
-			By("And no module template file should be generated")
-			currentDir, err := os.Getwd()
-			Expect(err).ToNot(HaveOccurred())
-			Expect(filesIn(currentDir)).Should(Not(ContainElement("template.yaml")))
 		})
 	})
 
@@ -144,6 +116,23 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 
 	Context("Given 'modulectl create' command", func() {
 		var cmd createCmd
+		It("When invoked with '--module-config-file' using valid file", func() {
+			cmd = createCmd{
+				moduleConfigFile: minimalConfig,
+			}
+		})
+		It("Then the command should succeed", func() {
+			Expect(cmd.execute()).To(Succeed())
+
+			By("And no module template file should be generated")
+			currentDir, err := os.Getwd()
+			Expect(err).ToNot(HaveOccurred())
+			Expect(filesIn(currentDir)).Should(Not(ContainElement("template.yaml")))
+		})
+	})
+
+	Context("Given 'modulectl create' command", func() {
+		var cmd createCmd
 		It("When invoked with existing '--registry' and missing '--insecure' flag", func() {
 			cmd = createCmd{
 				moduleConfigFile: minimalConfig,
@@ -183,7 +172,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 
 			By("And annotations should be correct")
 			annotations := template.Annotations
-			Expect(annotations[shared.ModuleVersionAnnotation]).To(Equal(moduleTemplateVersion))
+			Expect(annotations[shared.ModuleVersionAnnotation]).To(Equal("1.0.0"))
 			Expect(annotations[shared.IsClusterScopedAnnotation]).To(Equal("false"))
 
 			By("And descriptor.component.repositoryContexts should be correct")
@@ -199,19 +188,19 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			Expect(resource.Name).To(Equal("template-operator"))
 			Expect(resource.Relation).To(Equal(ocmmetav1.ExternalRelation))
 			Expect(resource.Type).To(Equal("ociArtifact"))
-			Expect(resource.Version).To(Equal(moduleTemplateVersion))
+			Expect(resource.Version).To(Equal("1.0.0"))
 
 			resource = descriptor.Resources[1]
 			Expect(resource.Name).To(Equal("raw-manifest"))
 			Expect(resource.Relation).To(Equal(ocmmetav1.LocalRelation))
 			Expect(resource.Type).To(Equal("directory"))
-			Expect(resource.Version).To(Equal(moduleTemplateVersion))
+			Expect(resource.Version).To(Equal("1.0.0"))
 
 			resource = descriptor.Resources[2]
 			Expect(resource.Name).To(Equal("default-cr"))
 			Expect(resource.Relation).To(Equal(ocmmetav1.LocalRelation))
 			Expect(resource.Type).To(Equal("directory"))
-			Expect(resource.Version).To(Equal(moduleTemplateVersion))
+			Expect(resource.Version).To(Equal("1.0.0"))
 
 			By("And descriptor.component.resources[0].access should be correct")
 			resourceAccessSpec0, err := ocm.DefaultContext().AccessSpecForSpec(descriptor.Resources[0].Access)
