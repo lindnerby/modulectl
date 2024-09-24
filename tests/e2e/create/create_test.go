@@ -309,9 +309,10 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			Expect(resource.Name).To(Equal("template-operator"))
 			Expect(resource.Relation).To(Equal(ocmmetav1.ExternalRelation))
 			Expect(resource.Type).To(Equal("ociArtifact"))
-			Expect(resource.Version).To(Equal("1.0.3"))
+			Expect(resource.Version).To(Equal("1.0.0"))
 			resource = descriptor.Resources[1]
 			Expect(resource.Name).To(Equal("raw-manifest"))
+			Expect(resource.Version).To(Equal("1.0.3"))
 
 			By("And descriptor.component.resources[0].access should be correct")
 			resourceAccessSpec0, err := ocm.DefaultContext().AccessSpecForSpec(descriptor.Resources[0].Access)
