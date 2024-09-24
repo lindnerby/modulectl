@@ -309,7 +309,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			Expect(resource.Name).To(Equal("template-operator"))
 			Expect(resource.Relation).To(Equal(ocmmetav1.ExternalRelation))
 			Expect(resource.Type).To(Equal("ociArtifact"))
-			Expect(resource.Version).To(Equal("1.0.0"))
+			Expect(resource.Version).To(Equal("1.0.3"))
 			resource = descriptor.Resources[1]
 			Expect(resource.Name).To(Equal("raw-manifest"))
 
@@ -376,6 +376,10 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			Expect(err).ToNot(HaveOccurred())
 			descriptor := getDescriptor(template)
 			Expect(descriptor).ToNot(BeNil())
+
+			By("And annotation should have correct version")
+			annotations := template.Annotations
+			Expect(annotations[shared.ModuleVersionAnnotation]).To(Equal("1.0.4"))
 
 			By("And spec.mandatory should be true")
 			Expect(template.Spec.Mandatory).To(BeTrue())
