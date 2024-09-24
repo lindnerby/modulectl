@@ -3,7 +3,6 @@
 package create_test
 
 import (
-	"errors"
 	"io/fs"
 	"os"
 
@@ -25,9 +24,6 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var errCreateModuleFailedWithSameVersion = errors.New(
-	"version 1.0.0 already exists with different content, please use --module-archive-version-overwrite flag to overwrite it")
-
 var _ = Describe("Test 'create' command", Ordered, func() {
 	// _ = os.Setenv("OCI_REPOSITORY_URL", "http://k3d-oci.localhost:5001")
 	// _ = os.Setenv("MODULE_TEMPLATE_PATH", "/tmp/module-config-template.yaml")
@@ -41,15 +37,11 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 	ociRegistry := "http://k3d-oci.localhost:5001"
 	moduleTemplateVersion := "1.0.0"
 
-	// TODO build module-config file in test
+	// TODO build module-config file in tests?
 	validModuleConfigFile := "./testdata/module-config-valid.yaml"
 	invalidModuleConfigFile := "./testdata/module-config-missing-required.yaml"
 
 	templateOutputPath := "/tmp/template.yaml"
-
-	// TODO build module-config file in test
-	//securityScanConfigFile := moduleRepoPath + "sec-scanners-config.yaml"
-	//changedSecScanConfigFile := moduleRepoPath + "sec-scanners-config-changed.yaml"
 
 	Context("Given 'modulectl create' command", func() {
 		var cmd createCmd
