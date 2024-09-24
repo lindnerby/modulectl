@@ -39,12 +39,17 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 	// moduleTemplateVersion := os.Getenv("MODULE_TEMPLATE_VERSION")
 
 	ociRegistry := "http://k3d-oci.localhost:5001"
-	moduleRepoPath := "./testdata/template-operator/"
 	moduleTemplateVersion := "1.0.0"
-	moduleConfigFilePath := moduleRepoPath + "module-config.yaml"
-	templateOutputPath := moduleRepoPath + "template.yaml"
-	securityScanConfigFile := moduleRepoPath + "sec-scanners-config.yaml"
-	changedSecScanConfigFile := moduleRepoPath + "sec-scanners-config-changed.yaml"
+
+	// TODO build module-config file in test
+	validModuleConfigFile := "./testdata/module-config-valid.yaml"
+	invalidModuleConfigFile := "./testdata/module-config-missing-required.yaml"
+
+	templateOutputPath := "/tmp/template.yaml"
+
+	// TODO build module-config file in test
+	//securityScanConfigFile := moduleRepoPath + "sec-scanners-config.yaml"
+	//changedSecScanConfigFile := moduleRepoPath + "sec-scanners-config-changed.yaml"
 
 	Context("Given 'modulectl create' command", func() {
 		var cmd createCmd
@@ -56,18 +61,14 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			err := cmd.execute()
 			Expect(err).Should(HaveOccurred())
 			Expect(err.Error()).Should(ContainSubstring("Error: \"--module-config-file\" flag is required"))
-
-			By("And no module template.yaml is generated")
-			Expect(filesIn(moduleRepoPath)).Should(Not(ContainElement("template.yaml")))
 		})
 	})
 
 	Context("Given 'modulectl create' command", func() {
 		var cmd createCmd
-		It("When invoked with '--module-config-file' and '--path'", func() {
+		It("When invoked with '--module-config-file' using valid file", func() {
 			cmd = createCmd{
-				moduleConfigFile: moduleConfigFilePath,
-				path:             moduleRepoPath,
+				moduleConfigFile: validModuleConfigFile,
 			}
 		})
 		It("Then the command should succeed", func() {
@@ -80,10 +81,38 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 
 	Context("Given 'modulectl create' command", func() {
 		var cmd createCmd
+		It("When invoked with '--module-config-file' using file with missing required fields", func() {
+			cmd = createCmd{
+				moduleConfigFile: invalidModuleConfigFile,
+			}
+		})
+		It("Then the command should fail", func() {
+			err := cmd.execute()
+			Expect(err).Should(HaveOccurred())
+			Expect(err.Error()).Should(ContainSubstring("Error: field is required"))
+		})
+	})
+
+	Context("Given 'modulectl create' command", func() {
+		var cmd createCmd
+		It("When invoked with existing '--registry' and missing '--insecure' flag", func() {
+			cmd = createCmd{
+				moduleConfigFile: validModuleConfigFile,
+				registry:         ociRegistry,
+			}
+		})
+		It("Then the command should fail", func() {
+			err := cmd.execute()
+			Expect(err).Should(HaveOccurred())
+			Expect(err.Error()).Should(ContainSubstring("Error: could not push"))
+		})
+	})
+
+	Context("Given 'modulectl create' command", func() {
+		var cmd createCmd
 		It("When invoked with existing '--registry' and '--insecure' flag", func() {
 			cmd = createCmd{
-				moduleConfigFile: moduleConfigFilePath,
-				path:             moduleRepoPath,
+				moduleConfigFile: validModuleConfigFile,
 				registry:         ociRegistry,
 				insecure:         true,
 				output:           templateOutputPath,
@@ -93,7 +122,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			Expect(cmd.execute()).To(Succeed())
 
 			By("And module template file should be generated")
-			Expect(filesIn("./testdata/template-operator/")).Should(ContainElement("template.yaml"))
+			Expect(filesIn("/tmp/")).Should(ContainElement("template.yaml"))
 		})
 		It("Then module template should contain the expected content", func() {
 			template, err := readModuleTemplate(templateOutputPath)
@@ -119,13 +148,19 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			resource := descriptor.Resources[0]
 			Expect(resource.Name).To(Equal("template-operator"))
 			Expect(resource.Relation).To(Equal(ocmmetav1.ExternalRelation))
-			Expect(resource.Type).To(Equal("ociImage"))
+			Expect(resource.Type).To(Equal("ociArtifact"))
 			Expect(resource.Version).To(Equal(moduleTemplateVersion))
 
 			resource = descriptor.Resources[1]
 			Expect(resource.Name).To(Equal("raw-manifest"))
 			Expect(resource.Relation).To(Equal(ocmmetav1.LocalRelation))
-			Expect(resource.Type).To(Equal("yaml"))
+			Expect(resource.Type).To(Equal("directory"))
+			Expect(resource.Version).To(Equal(moduleTemplateVersion))
+
+			resource = descriptor.Resources[2]
+			Expect(resource.Name).To(Equal("default-cr"))
+			Expect(resource.Relation).To(Equal(ocmmetav1.LocalRelation))
+			Expect(resource.Type).To(Equal("directory"))
 			Expect(resource.Version).To(Equal(moduleTemplateVersion))
 
 			By("And descriptor.component.resources[0].access should be correct")
@@ -143,6 +178,16 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			Expect(ok).To(BeTrue())
 			Expect(localBlobAccessSpec.GetType()).To(Equal(localblob.Type))
 			Expect(localBlobAccessSpec.LocalReference).To(ContainSubstring("sha256:"))
+			Expect(localBlobAccessSpec.MediaType).To(Equal("application/x-tar"))
+
+			By("And descriptor.component.resources[2].access should be correct")
+			defaultCRResourceAccessSpec, err := ocm.DefaultContext().AccessSpecForSpec(descriptor.Resources[2].Access)
+			Expect(err).ToNot(HaveOccurred())
+			defaultCRAccessSpec, ok := defaultCRResourceAccessSpec.(*localblob.AccessSpec)
+			Expect(ok).To(BeTrue())
+			Expect(defaultCRAccessSpec.GetType()).To(Equal(localblob.Type))
+			Expect(defaultCRAccessSpec.LocalReference).To(ContainSubstring("sha256:"))
+			Expect(defaultCRAccessSpec.MediaType).To(Equal("application/x-tar"))
 
 			By("And descriptor.component.sources should be correct")
 			Expect(len(descriptor.Sources)).To(Equal(1))
@@ -152,14 +197,14 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			githubAccessSpec, ok := sourceAccessSpec.(*github.AccessSpec)
 			Expect(ok).To(BeTrue())
 			Expect(github.Type).To(Equal(githubAccessSpec.Type))
-			Expect(githubAccessSpec.RepoURL).To(ContainSubstring("template-operator.git"))
+			Expect(githubAccessSpec.RepoURL).To(Equal("https://github.com/kyma-project/template-operator"))
 
 			By("And spec.mandatory should be false")
 			Expect(template.Spec.Mandatory).To(BeFalse())
 
 			By("And security scan labels should be correct")
 			secScanLabels := flatten(descriptor.Sources[0].Labels)
-			Expect(secScanLabels).To(HaveKeyWithValue("git.kyma-project.io/ref", "refs/heads/main"))
+			Expect(secScanLabels).To(HaveKeyWithValue("git.kyma-project.io/ref", "HEAD"))
 			Expect(secScanLabels).To(HaveKeyWithValue("scan.security.kyma-project.io/rc-tag", "1.0.0"))
 			Expect(secScanLabels).To(HaveKeyWithValue("scan.security.kyma-project.io/language", "golang-mod"))
 			Expect(secScanLabels).To(HaveKeyWithValue("scan.security.kyma-project.io/dev-branch", "main"))
@@ -170,51 +215,16 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 
 	Context("Given 'modulectl create' command", func() {
 		var cmd createCmd
-		It("When invoked with '--module-archive-version-overwrite' flag", func() {
+		It("When invoked with same version that already exists in the registry", func() {
 			cmd = createCmd{
-				path:                          moduleRepoPath,
-				registry:                      ociRegistry,
-				moduleConfigFile:              moduleConfigFilePath,
-				version:                       moduleTemplateVersion,
-				moduleArchiveVersionOverwrite: true,
-				secScanConfig:                 securityScanConfigFile,
-			}
-		})
-		It("Then the command should succeed", func() {
-			Expect(cmd.execute()).To(Succeed())
-		})
-	})
-
-	Context("Given 'modulectl create' command", func() {
-		var cmd createCmd
-		It("When invoked with same version module and same content without '--module-archive-version-overwrite' flag", func() {
-			cmd = createCmd{
-				path:             moduleRepoPath,
+				moduleConfigFile: validModuleConfigFile,
 				registry:         ociRegistry,
-				moduleConfigFile: moduleConfigFilePath,
-				version:          moduleTemplateVersion,
-				secScanConfig:    securityScanConfigFile,
+				insecure:         true,
 			}
 		})
-		It("Then the command should succeed, because content has not change and overwrite flag not needed", func() {
-			Expect(cmd.execute()).To(Succeed())
-		})
-	})
-
-	Context("Given 'modulectl create' command", func() {
-		var cmd createCmd
-		It("When invoked with same version module, but different content without '--module-archive-version-overwrite' flag", func() {
-			cmd = createCmd{
-				path:             moduleRepoPath,
-				registry:         ociRegistry,
-				moduleConfigFile: moduleConfigFilePath,
-				version:          moduleTemplateVersion,
-				secScanConfig:    changedSecScanConfigFile,
-			}
-		})
-		It("Then the command should fail with same version exists message, because overwrite flag is required", func() {
+		It("Then the command should fail with same version exists message", func() {
 			err := cmd.execute()
-			Expect(err).To(Equal(errCreateModuleFailedWithSameVersion))
+			Expect(err.Error()).Should(ContainSubstring("could not push component version: component version already exists"))
 		})
 	})
 })

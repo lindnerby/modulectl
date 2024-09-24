@@ -30,27 +30,14 @@ jobs:
           ls -la ./bin
           mv ./bin/modulectl-linux /usr/local/bin/modulectl
         timeout-minutes: 5
-      - name: Checkout template-operator
-        uses: actions/checkout@v4
-        with:
-          repository: kyma-project/template-operator
-          path: ./template-operator/
-      - name: Copy template-operator to e2e testdata folder
-        run: |
-          mkdir -p ./tests/e2e/create/testdata/template-operator/
-          cp -r ./../template-operator/ ./tests/e2e/create/testdata/template-operator/
-      - name: Set template-operator github URL
-        run: |
-          cd ./template-operator
-          echo "TEST_REPOSITORY_URL=$(git remote get-url origin)" >> "$GITHUB_ENV"
+#      - name: Set template-operator github URL
+#        run: |
+#          cd ./template-operator
+#          echo "TEST_REPOSITORY_URL=$(git remote get-url origin)" >> "$GITHUB_ENV"
       - name: Install k3d and create registry
         run: |
           wget -qO - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=$K3D_VERSION bash
           k3d registry create oci.localhost --port 5001
-      - name: Make manifests template-operator
-        run: |
-          cd ./template-operator
-          make build-manifests
       - name: Run tests
         run: |
           make -C tests/e2e test-create-cmd

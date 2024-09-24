@@ -20,15 +20,11 @@ func Test_Create(t *testing.T) {
 // Command wrapper for `modulectl create`
 
 type createCmd struct {
-	name                          string
-	registry                      string
-	path                          string
-	output                        string
-	version                       string
-	moduleConfigFile              string
-	secScanConfig                 string
-	moduleArchiveVersionOverwrite bool
-	insecure                      bool
+	registry         string
+	output           string
+	moduleConfigFile string
+	gitRemote        string
+	insecure         bool
 }
 
 func (cmd *createCmd) execute() error {
@@ -40,32 +36,16 @@ func (cmd *createCmd) execute() error {
 		args = append(args, "--module-config-file="+cmd.moduleConfigFile)
 	}
 
-	if cmd.path != "" {
-		args = append(args, "--path="+cmd.path)
-	}
-
-	if cmd.name != "" {
-		args = append(args, "--name="+cmd.name)
-	}
-
 	if cmd.registry != "" {
 		args = append(args, "--registry="+cmd.registry)
-	}
-
-	if cmd.secScanConfig != "" {
-		args = append(args, "--sec-scanners-config="+cmd.secScanConfig)
 	}
 
 	if cmd.output != "" {
 		args = append(args, "--output="+cmd.output)
 	}
 
-	if cmd.version != "" {
-		args = append(args, "--version="+cmd.version)
-	}
-
-	if cmd.moduleArchiveVersionOverwrite {
-		args = append(args, "--module-archive-version-overwrite")
+	if cmd.gitRemote != "" {
+		args = append(args, "--git-remote="+cmd.gitRemote)
 	}
 
 	if cmd.insecure {
