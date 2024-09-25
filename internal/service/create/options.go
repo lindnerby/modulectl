@@ -18,7 +18,6 @@ type Options struct {
 	TemplateOutput       string
 	RegistryURL          string
 	RegistryCredSelector string
-	SecScannerConfig     string
 }
 
 func (opts Options) Validate() error {
@@ -30,27 +29,21 @@ func (opts Options) Validate() error {
 		return fmt.Errorf("%w:  opts.ModuleConfigFile must not be empty", commonerrors.ErrInvalidOption)
 	}
 
-	matched, err := regexp.MatchString("(.+):(.+)", opts.Credentials)
-	if err != nil {
-		return fmt.Errorf("%w: opts.Credentials could not be parsed: %w", commonerrors.ErrInvalidOption, err)
-	} else if !matched {
-		return fmt.Errorf("%w: opts.Credentials is in invalid format", commonerrors.ErrInvalidOption)
-	}
-
-	if opts.GitRemote == "" {
-		return fmt.Errorf("%w:  opts.GitRemote must not be empty", commonerrors.ErrInvalidOption)
+	if opts.Credentials != "" {
+		matched, err := regexp.MatchString("(.+):(.+)", opts.Credentials)
+		if err != nil {
+			return fmt.Errorf("%w: opts.Credentials could not be parsed: %w", commonerrors.ErrInvalidOption, err)
+		} else if !matched {
+			return fmt.Errorf("%w: opts.Credentials is in invalid format", commonerrors.ErrInvalidOption)
+		}
 	}
 
 	if opts.TemplateOutput == "" {
 		return fmt.Errorf("%w:  opts.TemplateOutput must not be empty", commonerrors.ErrInvalidOption)
 	}
 
-	if !strings.HasPrefix(opts.RegistryURL, "http") {
+	if opts.RegistryURL != "" && !strings.HasPrefix(opts.RegistryURL, "http") {
 		return fmt.Errorf("%w:  opts.RegistryURL does not start with http(s)", commonerrors.ErrInvalidOption)
-	}
-
-	if opts.SecScannerConfig == "" {
-		return fmt.Errorf("%w:  opts.SecurityScanConfig must not be empty", commonerrors.ErrInvalidOption)
 	}
 
 	return nil

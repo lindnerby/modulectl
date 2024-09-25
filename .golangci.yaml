@@ -30,7 +30,9 @@ linters-settings:
         disabled: true
         arguments: [ 120 ]
   funlen:
+    statements: 50
     lines: 80
+    ignore-comments: true
   cyclop:
     max-complexity: 20
   nestif:
@@ -58,12 +60,27 @@ linters-settings:
         alias: scaffoldcmd
       - pkg: github.com/kyma-project/modulectl/cmd/modulectl/create
         alias: createcmd
+      - pkg: github.com/kyma-project/modulectl/internal/service/moduleconfig/generator
+        alias: moduleconfiggenerator
+      - pkg: github.com/kyma-project/modulectl/internal/service/moduleconfig/reader
+        alias: moduleconfigreader
+      - pkg: ocm.software/ocm/api/ocm/compdesc/meta/v1
+        alias: ocmv1
+      - pkg: ocm.software/ocm/cmds/ocm/commands/ocmcmds/common/inputs/types/ociartifact
+        alias: ociartifacttypes
+      - pkg: k8s.io/apimachinery/pkg/apis/meta/v1
+        alias: metav1
   ireturn:
     allow:
       - anon
       - error
       - empty
       - stdlib
+      - vfs.FileSystem
+      - internal.BlobAccess
+      - internal.ComponentVersionAccess
+      - internal.Credentials
+      - internal.Repository
   varnamelen:
     ignore-names:
       - ok
@@ -75,6 +92,9 @@ issues:
   exclude-rules:
     - path: "_test\\.go"
       linters:
+        - dupl # Table driven unit and integration tests are expected to have duplicate code
+        - goconst # To be descriptive in tests we sometimes don't extract constants
+        - varnamelen # Table driven unit and integration tests are expected to have short variable names
         - wrapcheck # Errors do not need to be wrapped in unit and integration tests
         - err113 # Dynamic error creation in unit and integration tests is ok
         - gochecknoglobals # Does not apply to unit and integration tests

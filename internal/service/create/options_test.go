@@ -18,8 +18,10 @@ func Test_Validate_Options(t *testing.T) {
 		errMsg  string
 	}{
 		{
-			name:    "Out is nil",
-			options: create.Options{Out: nil},
+			name: "Out is nil",
+			options: create.Options{
+				Out: nil,
+			},
 			wantErr: true,
 			errMsg:  "opts.Out must not be nil",
 		},
@@ -43,27 +45,28 @@ func Test_Validate_Options(t *testing.T) {
 			errMsg:  "opts.Credentials is in invalid format",
 		},
 		{
-			name: "GitRemote is empty",
-			options: create.Options{
-				Out:              iotools.NewDefaultOut(io.Discard),
-				ModuleConfigFile: "config.yaml",
-				Credentials:      "username:password",
-				GitRemote:        "",
-			},
-			wantErr: true,
-			errMsg:  "opts.GitRemote must not be empty",
-		},
-		{
 			name: "TemplateOutput is empty",
 			options: create.Options{
 				Out:              iotools.NewDefaultOut(io.Discard),
 				ModuleConfigFile: "config.yaml",
 				Credentials:      "username:password",
-				GitRemote:        "origin",
+				GitRemote:        "github.com/kyma-project/modulectl",
 				TemplateOutput:   "",
 			},
 			wantErr: true,
 			errMsg:  "opts.TemplateOutput must not be empty",
+		},
+		{
+			name: "All fields valid",
+			options: create.Options{
+				Out:              iotools.NewDefaultOut(io.Discard),
+				ModuleConfigFile: "config.yaml",
+				Credentials:      "username:password",
+				GitRemote:        "github.com/kyma-project/modulectl",
+				TemplateOutput:   "output",
+				RegistryURL:      "http://registry.example.com",
+			},
+			wantErr: false,
 		},
 		{
 			name: "RegistryURL does not start with http",
@@ -77,33 +80,6 @@ func Test_Validate_Options(t *testing.T) {
 			},
 			wantErr: true,
 			errMsg:  "opts.RegistryURL does not start with http(s)",
-		},
-		{
-			name: "SecScannerConfig is empty",
-			options: create.Options{
-				Out:              iotools.NewDefaultOut(io.Discard),
-				ModuleConfigFile: "config.yaml",
-				Credentials:      "username:password",
-				GitRemote:        "origin",
-				TemplateOutput:   "output",
-				RegistryURL:      "http://registry.example.com",
-				SecScannerConfig: "",
-			},
-			wantErr: true,
-			errMsg:  "opts.SecurityScanConfig must not be empty",
-		},
-		{
-			name: "All fields valid",
-			options: create.Options{
-				Out:              iotools.NewDefaultOut(io.Discard),
-				ModuleConfigFile: "config.yaml",
-				Credentials:      "username:password",
-				GitRemote:        "origin",
-				TemplateOutput:   "output",
-				RegistryURL:      "http://registry.example.com",
-				SecScannerConfig: "scanner.yaml",
-			},
-			wantErr: false,
 		},
 	}
 
