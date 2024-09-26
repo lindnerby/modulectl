@@ -9,16 +9,16 @@ import (
 const (
 	ModuleConfigFileFlagName    = "module-config-file"
 	ModuleConfigFileFlagDefault = "module-config.yaml"
-	moduleConfigFileFlagUsage   = "Specifies the module configuration file."
+	moduleConfigFileFlagUsage   = "Specifies the path to the module configuration file."
 
-	CredentialsFlagName    = "credentials"
+	CredentialsFlagName    = "registry-credentials" //nolint:gosec // Not hardcoded credentials, rather just flag name
 	credentialsFlagShort   = "c"
 	CredentialsFlagDefault = ""
 	credentialsFlagUsage   = "Basic authentication credentials for the given repository in the <user:password> format."
 
 	GitRemoteFlagName    = "git-remote"
-	GitRemoteFlagDefault = "origin"
-	gitRemoteFlagUsage   = `Specifies the remote name of the wanted GitHub repository. For example "origin" or "upstream" (default "origin").`
+	GitRemoteFlagDefault = ""
+	gitRemoteFlagUsage   = "Specifies the URL of the module's GitHub repository. "
 
 	InsecureFlagName    = "insecure"
 	InsecureFlagDefault = false
@@ -27,9 +27,10 @@ const (
 	TemplateOutputFlagName    = "output"
 	templateOutputFlagShort   = "o"
 	TemplateOutputFlagDefault = "template.yaml"
-	templateOutputFlagUsage   = `File to write the module template if the module is uploaded to a registry (default "template.yaml").`
+	templateOutputFlagUsage   = `Path to write the ModuleTemplate file to, if the module is uploaded to a registry (default "template.yaml").`
 
 	RegistryURLFlagName    = "registry"
+	registryFlagShort      = "r"
 	RegistryURLFlagDefault = ""
 	registryURLFlagUsage   = "Context URL of the repository. The repository URL will be automatically added to the repository contexts in the module descriptor."
 
@@ -38,19 +39,18 @@ const (
 	RegistryCredSelectorFlagDefault = ""
 	//nolint:gosec // Not hardcoded credentials, rather just flag name
 	registryCredSelectorFlagUsage = `Label selector to identify an externally created Secret of type "kubernetes.io/dockerconfigjson". It allows the image to be accessed in private image registries. It can be used when you push your module to a registry with authenticated access. For example, "label1=value1,label2=value2".`
-
-	SecScannersConfigFlagName    = "sec-scanners-config"
-	SecScannersConfigFlagDefault = "sec-scanners-config.yaml"
-	secScannersConfigFlagUsage   = `Path to the file holding the security scan configuration (default "sec-scanners-config.yaml").`
 )
 
 func parseFlags(flags *pflag.FlagSet, opts *create.Options) {
-	flags.StringVar(&opts.ModuleConfigFile, ModuleConfigFileFlagName, ModuleConfigFileFlagDefault, moduleConfigFileFlagUsage)
-	flags.StringVarP(&opts.Credentials, CredentialsFlagName, credentialsFlagShort, CredentialsFlagDefault, credentialsFlagUsage)
+	flags.StringVar(&opts.ModuleConfigFile, ModuleConfigFileFlagName, ModuleConfigFileFlagDefault,
+		moduleConfigFileFlagUsage)
+	flags.StringVarP(&opts.Credentials, CredentialsFlagName, credentialsFlagShort, CredentialsFlagDefault,
+		credentialsFlagUsage)
 	flags.StringVar(&opts.GitRemote, GitRemoteFlagName, GitRemoteFlagDefault, gitRemoteFlagUsage)
 	flags.BoolVar(&opts.Insecure, InsecureFlagName, InsecureFlagDefault, insecureFlagUsage)
-	flags.StringVarP(&opts.TemplateOutput, TemplateOutputFlagName, templateOutputFlagShort, TemplateOutputFlagDefault, templateOutputFlagUsage)
-	flags.StringVar(&opts.RegistryURL, RegistryURLFlagName, RegistryURLFlagDefault, registryURLFlagUsage)
-	flags.StringVar(&opts.RegistryCredSelector, RegistryCredSelectorFlagName, RegistryCredSelectorFlagDefault, registryCredSelectorFlagUsage)
-	flags.StringVar(&opts.SecScannerConfig, SecScannersConfigFlagName, SecScannersConfigFlagDefault, secScannersConfigFlagUsage)
+	flags.StringVarP(&opts.TemplateOutput, TemplateOutputFlagName, templateOutputFlagShort, TemplateOutputFlagDefault,
+		templateOutputFlagUsage)
+	flags.StringVarP(&opts.RegistryURL, RegistryURLFlagName, registryFlagShort, RegistryURLFlagDefault, registryURLFlagUsage)
+	flags.StringVar(&opts.RegistryCredSelector, RegistryCredSelectorFlagName, RegistryCredSelectorFlagDefault,
+		registryCredSelectorFlagUsage)
 }
