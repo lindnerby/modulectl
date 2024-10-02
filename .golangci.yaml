@@ -17,6 +17,9 @@ linters:
     - paralleltest  # should be enabled consciously for long running tests
     - wsl           # too strict and mostly code is not more readable
 linters-settings:
+  wrapcheck:
+    ignorePackageGlobs:
+      - github.com/kyma-project/modulectl/internal/common/guard
   revive:
     severity: error
     rules:

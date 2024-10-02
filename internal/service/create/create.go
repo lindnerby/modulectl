@@ -121,15 +121,11 @@ func (s *Service) Run(opts Options) error {
 		return fmt.Errorf("failed to parse module config: %w", err)
 	}
 
+	compdescBuilder := compdescbuilder.New()
+
 	descriptor, err := componentdescriptor.InitializeComponentDescriptor(moduleConfig.Name, moduleConfig.Version)
 	if err != nil {
 		return fmt.Errorf("failed to populate component descriptor metadata: %w", err)
-	}
-
-	moduleResources, err := componentdescriptor.GenerateModuleResources(moduleConfig.Version, moduleConfig.ManifestPath,
-		moduleConfig.DefaultCRPath, opts.RegistryCredSelector)
-	if err != nil {
-		return fmt.Errorf("failed to generate module resources: %w", err)
 	}
 
 	if opts.GitRemote != "" {
@@ -146,19 +142,31 @@ func (s *Service) Run(opts Options) error {
 	}
 
 	opts.Out.Write("- Creating component archive\n")
-	archive, err := s.componentArchiveService.CreateComponentArchive(descriptor)
-	if err != nil {
-		return fmt.Errorf("failed to create component archive: %w", err)
-	}
-	if err = s.componentArchiveService.AddModuleResourcesToArchive(archive,
-		moduleResources); err != nil {
-		return fmt.Errorf("failed to add module resources to component archive: %w", err)
+	archive, err2 := s.createArchive(opts, descriptor, moduleConfig)
+	if err2 != nil {
+		return err2
 	}
 
 	if opts.RegistryURL != "" {
 		return s.pushImgAndCreateTemplate(archive, moduleConfig, opts)
 	}
 	return nil
+}
+
+func (s *Service) createArchive(opts Options, descriptor *compdesc.ComponentDescriptor, moduleConfig *contentprovider.ModuleConfig) (*comparch.ComponentArchive, error) {
+	archive, err := s.componentArchiveService.CreateComponentArchive(descriptor)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create component archive: %w", err)
+	}
+	moduleResources, err := componentdescriptor.GenerateModuleResources(moduleConfig.Version, moduleConfig.ManifestPath,
+		moduleConfig.DefaultCRPath, opts.RegistryCredSelector)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate module resources: %w", err)
+	}
+	if err = s.componentArchiveService.AddModuleResourcesToArchive(archive, moduleResources); err != nil {
+		return nil, fmt.Errorf("failed to add module resources to component archive: %w", err)
+	}
+	return archive, nil
 }
 
 func (s *Service) pushImgAndCreateTemplate(archive *comparch.ComponentArchive, moduleConfig *contentprovider.ModuleConfig, opts Options) error {

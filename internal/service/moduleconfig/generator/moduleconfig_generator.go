@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"path"
 
-	commonerrors "github.com/kyma-project/modulectl/internal/common/errors"
+	"github.com/kyma-project/modulectl/internal/common/guard"
 	"github.com/kyma-project/modulectl/internal/common/types"
 	"github.com/kyma-project/modulectl/internal/service/moduleconfig"
 	iotools "github.com/kyma-project/modulectl/tools/io"
@@ -23,13 +23,13 @@ type Service struct {
 	fileGenerator FileGenerator
 }
 
+// NewService is the constructor function for creating a new instance of Service.
 func NewService(fileSystem FileSystem, fileGenerator FileGenerator) (*Service, error) {
-	if fileSystem == nil {
-		return nil, fmt.Errorf("%w: fileSystem must not be nil", commonerrors.ErrInvalidArg)
+	if err := guard.NotNil(fileSystem, "fileSystem"); err != nil {
+		return nil, err
 	}
-
-	if fileGenerator == nil {
-		return nil, fmt.Errorf("%w: fileGenerator must not be nil", commonerrors.ErrInvalidArg)
+	if err := guard.NotNil(fileGenerator, "fileGenerator"); err != nil {
+		return nil, err
 	}
 
 	return &Service{

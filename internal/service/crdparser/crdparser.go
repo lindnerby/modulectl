@@ -3,12 +3,11 @@ package crdparser
 import (
 	"bytes"
 	"fmt"
+	"github.com/kyma-project/modulectl/internal/common/guard"
 	"strings"
 
 	"gopkg.in/yaml.v3"
 	"k8s.io/apiextensions-apiserver/pkg/apis/apiextensions"
-
-	commonerrors "github.com/kyma-project/modulectl/internal/common/errors"
 )
 
 type FileSystem interface {
@@ -19,9 +18,10 @@ type Service struct {
 	fileSystem FileSystem
 }
 
+// NewService is the constructor function for creating a new instance of Service.
 func NewService(fileSystem FileSystem) (*Service, error) {
-	if fileSystem == nil {
-		return nil, fmt.Errorf("%w: fileSystem must not be nil", commonerrors.ErrInvalidArg)
+	if err := guard.NotNil(fileSystem, "fileSystem"); err != nil {
+		return nil, err
 	}
 
 	return &Service{

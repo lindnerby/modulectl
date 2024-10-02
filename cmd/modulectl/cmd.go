@@ -78,55 +78,6 @@ func NewCmd() (*cobra.Command, error) {
 	return rootCmd, nil
 }
 
-func buildModuleService() (*create.Service, error) {
-	fileSystemUtil := &filesystem.Util{}
-	tmpFileSystem := filesystem.NewTempFileSystem()
-
-	moduleConfigService, err := moduleconfigreader.NewService(fileSystemUtil, tmpFileSystem)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create module config service: %w", err)
-	}
-	gitService := git.NewService()
-	gitSourcesService, err := componentdescriptor.NewGitSourcesService(gitService)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create git sources service: %w", err)
-	}
-	securityConfigService, err := componentdescriptor.NewSecurityConfigService(gitService)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create security config service: %w", err)
-	}
-	memoryFileSystem := memoryfs.New()
-	osFileSystem := osfs.New()
-	archiveFileSystemService, err := filesystem.NewArchiveFileSystem(memoryFileSystem, osFileSystem)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create archive file system service: %w", err)
-	}
-	componentArchiveService, err := componentarchive.NewService(archiveFileSystemService)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create component archive service: %w", err)
-	}
-
-	ociRepo := &ocirepo.OCIRepo{}
-	registryService, err := registry.NewService(ociRepo, nil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create registry service: %w", err)
-	}
-	moduleTemplateService, err := templategenerator.NewService(fileSystemUtil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create module template service: %w", err)
-	}
-	crdParserService, err := crdparser.NewService(fileSystemUtil)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create crd parser service: %w", err)
-	}
-	moduleService, err := create.NewService(moduleConfigService, gitSourcesService,
-		securityConfigService, componentArchiveService, registryService, moduleTemplateService, crdParserService)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create module service: %w", err)
-	}
-	return moduleService, nil
-}
-
 func buildScaffoldService() (*scaffold.Service, error) {
 	fileSystemUtil := &filesystem.Util{}
 	yamlConverter := &yaml.ObjectToYAMLConverter{}
@@ -198,4 +149,53 @@ func buildScaffoldService() (*scaffold.Service, error) {
 	}
 
 	return scaffoldService, nil
+}
+
+func buildModuleService() (*create.Service, error) {
+	fileSystemUtil := &filesystem.Util{}
+	tmpFileSystem := filesystem.NewTempFileSystem()
+
+	moduleConfigService, err := moduleconfigreader.NewService(fileSystemUtil, tmpFileSystem)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create module config service: %w", err)
+	}
+	gitService := git.NewService()
+	gitSourcesService, err := componentdescriptor.NewGitSourcesService(gitService)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create git sources service: %w", err)
+	}
+	securityConfigService, err := componentdescriptor.NewSecurityConfigService(gitService)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create security config service: %w", err)
+	}
+	memoryFileSystem := memoryfs.New()
+	osFileSystem := osfs.New()
+	archiveFileSystemService, err := filesystem.NewArchiveFileSystem(memoryFileSystem, osFileSystem)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create archive file system service: %w", err)
+	}
+	componentArchiveService, err := componentarchive.NewService(archiveFileSystemService)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create component archive service: %w", err)
+	}
+
+	ociRepo := &ocirepo.OCIRepo{}
+	registryService, err := registry.NewService(ociRepo, nil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create registry service: %w", err)
+	}
+	moduleTemplateService, err := templategenerator.NewService(fileSystemUtil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create module template service: %w", err)
+	}
+	crdParserService, err := crdparser.NewService(fileSystemUtil)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create crd parser service: %w", err)
+	}
+	moduleService, err := create.NewService(moduleConfigService, gitSourcesService,
+		securityConfigService, componentArchiveService, registryService, moduleTemplateService, crdParserService)
+	if err != nil {
+		return nil, fmt.Errorf("failed to create module service: %w", err)
+	}
+	return moduleService, nil
 }
