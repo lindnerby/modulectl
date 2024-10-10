@@ -3,10 +3,11 @@
 package create_test
 
 import (
-	"github.com/open-component-model/ocm/pkg/contexts/ocm/accessmethods/github"
-	"github.com/open-component-model/ocm/pkg/contexts/ocm/accessmethods/ociartifact"
 	"io/fs"
 	"os"
+
+	"github.com/open-component-model/ocm/pkg/contexts/ocm/accessmethods/github"
+	"github.com/open-component-model/ocm/pkg/contexts/ocm/accessmethods/ociartifact"
 
 	"github.com/open-component-model/ocm/pkg/contexts/oci/repositories/ocireg"
 	"github.com/open-component-model/ocm/pkg/contexts/ocm"
