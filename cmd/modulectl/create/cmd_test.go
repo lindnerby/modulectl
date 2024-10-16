@@ -56,7 +56,7 @@ func Test_Execute_ParsesAllModuleOptions(t *testing.T) {
 
 	os.Args = []string{
 		"create",
-		"--module-config-file", moduleConfigFile,
+		"--config-file", moduleConfigFile,
 		"--git-remote", gitRemote,
 		"--insecure", insecure,
 		"--output", templateOutput,
@@ -86,11 +86,13 @@ func Test_Execute_ParsesAllModuleOptions(t *testing.T) {
 func Test_Execute_ParsesModuleShortOptions(t *testing.T) {
 	credentials := testutils.RandomName(10)
 	templateOutput := testutils.RandomName(10)
+	registry := testutils.RandomName(10)
 
 	os.Args = []string{
 		"create",
 		"-c", credentials,
 		"-o", templateOutput,
+		"-r", registry,
 	}
 
 	svc := &moduleServiceStub{}
