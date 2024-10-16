@@ -84,13 +84,13 @@ func Test_Execute_ParsesAllModuleOptions(t *testing.T) {
 }
 
 func Test_Execute_ParsesModuleShortOptions(t *testing.T) {
-	credentials := testutils.RandomName(10)
+	configFile := testutils.RandomName(10)
 	templateOutput := testutils.RandomName(10)
 	registry := testutils.RandomName(10)
 
 	os.Args = []string{
 		"create",
-		"-c", credentials,
+		"-c", configFile,
 		"-o", templateOutput,
 		"-r", registry,
 	}
@@ -101,8 +101,9 @@ func Test_Execute_ParsesModuleShortOptions(t *testing.T) {
 	err := cmd.Execute()
 	require.NoError(t, err)
 
-	assert.Equal(t, credentials, svc.opts.Credentials)
+	assert.Equal(t, configFile, svc.opts.ConfigFile)
 	assert.Equal(t, templateOutput, svc.opts.TemplateOutput)
+	assert.Equal(t, registry, svc.opts.RegistryURL)
 }
 
 func Test_Execute_ModuleParsesDefaults(t *testing.T) {
