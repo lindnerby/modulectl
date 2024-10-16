@@ -50,7 +50,7 @@ then
 fi
 
 echo "Adding assets to Github release"
-UPLOAD_URL="https://uploads.github.com/repos/kyma-project/modulectl/releases/${RELEASE_ID}/assets"
+UPLOAD_URL="https://uploads.github.com/repos/lindnerby/modulectl/releases/${RELEASE_ID}/assets"
 
 echo "$UPLOAD_URL"
 pwd
