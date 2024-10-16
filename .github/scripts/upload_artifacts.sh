@@ -25,13 +25,13 @@ uploadFile() {
   fi
 }
 
-echo "PULL_BASE_REF= ${PULL_BASE_REF}"
+RELEASE_TAG=$1
 
 echo "Fetching releases"
 CURL_RESPONSE=$(curl -w "%{http_code}" -sL \
                 -H "Accept: application/vnd.github+json" \
                 -H "Authorization: Bearer $GITHUB_TOKEN"\
-                https://api.github.com/repos/kyma-project/modulectl/releases)
+                "$GITHUB_URL"/releases)
 JSON_RESPONSE=$(sed '$ d' <<< "${CURL_RESPONSE}")
 HTTP_CODE=$(tail -n1 <<< "${CURL_RESPONSE}")
 if [[ "${HTTP_CODE}" != "200" ]]; then
@@ -39,13 +39,13 @@ if [[ "${HTTP_CODE}" != "200" ]]; then
   exit 1
 fi
 
-echo "Finding release id for: ${PULL_BASE_REF}"
-RELEASE_ID=$(jq <<< "${JSON_RESPONSE}" --arg tag "${PULL_BASE_REF}" '.[] | select(.tag_name == $ARGS.named.tag) | .id')
+echo "Finding release id for: ${RELEASE_TAG}"
+RELEASE_ID=$(jq <<< "${JSON_RESPONSE}" --arg tag "${RELEASE_TAG}" '.[] | select(.tag_name == $ARGS.named.tag) | .id')
 
 echo "Got '${RELEASE_ID}' release id"
 if [ -z "${RELEASE_ID}" ]
 then
-  echo "No release with tag = ${PULL_BASE_REF}"
+  echo "No release with tag = ${RELEASE_TAG}"
   exit 1
 fi
 
@@ -55,4 +55,5 @@ UPLOAD_URL="https://uploads.github.com/repos/kyma-project/modulectl/releases/${R
 echo "$UPLOAD_URL"
 pwd
 ls -la
-uploadFile "modulectl-linux" "${UPLOAD_URL}?name=modulectl-linux"
+echo "modulectl-linux" "${UPLOAD_URL}?name=modulectl-linux"
+#uploadFile "modulectl-linux" "${UPLOAD_URL}?name=modulectl-linux"
