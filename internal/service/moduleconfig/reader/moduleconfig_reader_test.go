@@ -31,7 +31,6 @@ func Test_ParseModuleConfig_Returns_CorrectModuleConfig(t *testing.T) {
 	require.NoError(t, err)
 	require.Equal(t, "github.com/module-name", result.Name)
 	require.Equal(t, "0.0.1", result.Version)
-	require.Equal(t, "regular", result.Channel)
 	require.Equal(t, "https://example.com/path/to/manifests", result.Manifest)
 	require.Equal(t, "https://example.com/path/to/defaultCR", result.DefaultCR)
 	require.False(t, result.Mandatory)
@@ -75,7 +74,6 @@ func Test_ValidateModuleConfig(t *testing.T) {
 			moduleConfig: &contentprovider.ModuleConfig{
 				Name:      "invalid name",
 				Version:   "0.0.1",
-				Channel:   "regular",
 				Namespace: "kcp-system",
 				Manifest:  "test",
 			},
@@ -86,29 +84,16 @@ func Test_ValidateModuleConfig(t *testing.T) {
 			moduleConfig: &contentprovider.ModuleConfig{
 				Name:      "github.com/module-name",
 				Version:   "invalid version",
-				Channel:   "regular",
 				Namespace: "kcp-system",
 				Manifest:  "test",
 			},
 			expectedError: fmt.Errorf("failed to validate module version: %w", commonerrors.ErrInvalidOption),
 		},
 		{
-			name: "invalid module channel",
-			moduleConfig: &contentprovider.ModuleConfig{
-				Name:      "github.com/module-name",
-				Version:   "0.0.1",
-				Channel:   "invalid channel",
-				Namespace: "kcp-system",
-				Manifest:  "test",
-			},
-			expectedError: fmt.Errorf("failed to validate module channel: %w", commonerrors.ErrInvalidOption),
-		},
-		{
 			name: "invalid module namespace",
 			moduleConfig: &contentprovider.ModuleConfig{
 				Name:      "github.com/module-name",
 				Version:   "0.0.1",
-				Channel:   "regular",
 				Namespace: "invalid namespace",
 				Manifest:  "test",
 			},
@@ -119,7 +104,6 @@ func Test_ValidateModuleConfig(t *testing.T) {
 			moduleConfig: &contentprovider.ModuleConfig{
 				Name:      "github.com/module-name",
 				Version:   "0.0.1",
-				Channel:   "regular",
 				Namespace: "kcp-system",
 				Manifest:  "",
 			},
@@ -131,7 +115,6 @@ func Test_ValidateModuleConfig(t *testing.T) {
 			moduleConfig: &contentprovider.ModuleConfig{
 				Name:      "github.com/module-name",
 				Version:   "0.0.1",
-				Channel:   "regular",
 				Namespace: "kcp-system",
 				Manifest:  "test",
 				Resources: contentprovider.ResourcesMap{
@@ -146,7 +129,6 @@ func Test_ValidateModuleConfig(t *testing.T) {
 			moduleConfig: &contentprovider.ModuleConfig{
 				Name:      "github.com/module-name",
 				Version:   "0.0.1",
-				Channel:   "regular",
 				Namespace: "kcp-system",
 				Manifest:  "test",
 				Resources: contentprovider.ResourcesMap{
@@ -161,7 +143,6 @@ func Test_ValidateModuleConfig(t *testing.T) {
 			moduleConfig: &contentprovider.ModuleConfig{
 				Name:      "github.com/module-name",
 				Version:   "0.0.1",
-				Channel:   "regular",
 				Namespace: "kcp-system",
 				Manifest:  "test",
 				Resources: contentprovider.ResourcesMap{
@@ -176,7 +157,6 @@ func Test_ValidateModuleConfig(t *testing.T) {
 			moduleConfig: &contentprovider.ModuleConfig{
 				Name:      "github.com/module-name",
 				Version:   "0.0.1",
-				Channel:   "regular",
 				Namespace: "kcp-system",
 				Manifest:  "./test",
 			},
@@ -188,7 +168,6 @@ func Test_ValidateModuleConfig(t *testing.T) {
 			moduleConfig: &contentprovider.ModuleConfig{
 				Name:      "github.com/module-name",
 				Version:   "0.0.1",
-				Channel:   "regular",
 				Namespace: "kcp-system",
 				Manifest:  "https://example.com/test",
 				DefaultCR: "/test",
@@ -370,7 +349,6 @@ func (*fileExistsStub) FileExists(_ string) (bool, error) {
 var expectedReturnedModuleConfig = contentprovider.ModuleConfig{
 	Name:        "github.com/module-name",
 	Version:     "0.0.1",
-	Channel:     "regular",
 	Manifest:    "https://example.com/path/to/manifests",
 	Mandatory:   false,
 	DefaultCR:   "https://example.com/path/to/defaultCR",

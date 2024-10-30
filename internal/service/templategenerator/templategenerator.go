@@ -59,7 +59,6 @@ metadata:
     {{- end}}
 {{- end}} 
 spec:
-  channel: {{.Channel}}
   mandatory: {{.Mandatory}}
 {{- with .AssociatedResources}}
   associatedResources:
@@ -99,7 +98,6 @@ type moduleTemplateData struct {
 	ResourceName        string
 	Namespace           string
 	Descriptor          compdesc.ComponentDescriptorVersion
-	Channel             string
 	Labels              map[string]string
 	Annotations         map[string]string
 	Mandatory           bool
@@ -151,7 +149,6 @@ func (s *Service) GenerateModuleTemplate(
 		ResourceName:        moduleTemplateName,
 		Namespace:           moduleConfig.Namespace,
 		Descriptor:          cva,
-		Channel:             moduleConfig.Channel,
 		Labels:              labels,
 		Annotations:         annotations,
 		Mandatory:           moduleConfig.Mandatory,
