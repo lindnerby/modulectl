@@ -39,7 +39,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 
 	Context("Given 'modulectl create' command", func() {
 		var cmd createCmd
-		It("When invoked with '--config-file' using file with missing name", func() {
+		It("When invoked with missing name", func() {
 			cmd = createCmd{
 				moduleConfigFile: missingNameConfig,
 			}
@@ -53,7 +53,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 
 	Context("Given 'modulectl create' command", func() {
 		var cmd createCmd
-		It("When invoked with '--config-file' using file with missing version", func() {
+		It("When invoked with missing version", func() {
 			cmd = createCmd{
 				moduleConfigFile: missingVersionConfig,
 			}
@@ -67,7 +67,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 
 	Context("Given 'modulectl create' command", func() {
 		var cmd createCmd
-		It("When invoked with '--config-file' using file with missing manifest", func() {
+		It("When invoked with missing manifest", func() {
 			cmd = createCmd{
 				moduleConfigFile: missingManifestConfig,
 			}
@@ -81,6 +81,118 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 
 	Context("Given 'modulectl create' command", func() {
 		var cmd createCmd
+		It("When invoked with missing repository", func() {
+			cmd = createCmd{
+				moduleConfigFile: missingRepositoryConfig,
+			}
+		})
+		It("Then the command should fail", func() {
+			err := cmd.execute()
+			Expect(err).Should(HaveOccurred())
+			Expect(err.Error()).Should(ContainSubstring("failed to parse module config: failed to validate module config: failed to validate repository: invalid Option: must not be empty"))
+		})
+	})
+
+	Context("Given 'modulectl create' command", func() {
+		var cmd createCmd
+		It("When invoked with missing documentation", func() {
+			cmd = createCmd{
+				moduleConfigFile: missingDocumentationConfig,
+			}
+		})
+		It("Then the command should fail", func() {
+			err := cmd.execute()
+			Expect(err).Should(HaveOccurred())
+			Expect(err.Error()).Should(ContainSubstring("failed to parse module config: failed to validate module config: failed to validate documentation: invalid Option: must not be empty"))
+		})
+	})
+
+	Context("Given 'modulectl create' command", func() {
+		var cmd createCmd
+		It("When invoked with non https repository", func() {
+			cmd = createCmd{
+				moduleConfigFile: nonHttpsRepository,
+			}
+		})
+		It("Then the command should fail", func() {
+			err := cmd.execute()
+			Expect(err).Should(HaveOccurred())
+			Expect(err.Error()).Should(ContainSubstring("failed to parse module config: failed to validate module config: failed to validate repository: invalid Option: 'http://github.com/kyma-project/template-operator' is not using https scheme"))
+		})
+	})
+
+	Context("Given 'modulectl create' command", func() {
+		var cmd createCmd
+		It("When invoked with non https documentation", func() {
+			cmd = createCmd{
+				moduleConfigFile: nonHttpsDocumentation,
+			}
+		})
+		It("Then the command should fail", func() {
+			err := cmd.execute()
+			Expect(err).Should(HaveOccurred())
+			Expect(err.Error()).Should(ContainSubstring("failed to parse module config: failed to validate module config: failed to validate documentation: invalid Option: 'http://github.com/kyma-project/template-operator/blob/main/README.md' is not using https scheme"))
+		})
+	})
+
+	Context("Given 'modulectl create' command", func() {
+		var cmd createCmd
+		It("When invoked with missing icons", func() {
+			cmd = createCmd{
+				moduleConfigFile: missingIconsConfig,
+			}
+		})
+		It("Then the command should fail", func() {
+			err := cmd.execute()
+			Expect(err).Should(HaveOccurred())
+			Expect(err.Error()).Should(ContainSubstring("failed to parse module config: failed to validate module config: failed to validate module icons: invalid Option: must contain at least one icon"))
+		})
+	})
+
+	Context("Given 'modulectl create' command", func() {
+		var cmd createCmd
+		It("When invoked with duplicate entry in icons", func() {
+			cmd = createCmd{
+				moduleConfigFile: duplicateIcons,
+			}
+		})
+		It("Then the command should fail", func() {
+			err := cmd.execute()
+			Expect(err).Should(HaveOccurred())
+			Expect(err.Error()).Should(ContainSubstring("failed to parse module config file: failed to unmarshal Icons: map contains duplicate entries"))
+		})
+	})
+
+	Context("Given 'modulectl create' command", func() {
+		var cmd createCmd
+		It("When invoked with invalid icon - link missing", func() {
+			cmd = createCmd{
+				moduleConfigFile: iconsWithoutLink,
+			}
+		})
+		It("Then the command should fail", func() {
+			err := cmd.execute()
+			Expect(err).Should(HaveOccurred())
+			Expect(err.Error()).Should(ContainSubstring("failed to parse module config: failed to validate module config: failed to validate module icons: invalid Option: link must not be empty"))
+		})
+	})
+
+	Context("Given 'modulectl create' command", func() {
+		var cmd createCmd
+		It("When invoked with invalid icon - name missing", func() {
+			cmd = createCmd{
+				moduleConfigFile: iconsWithoutName,
+			}
+		})
+		It("Then the command should fail", func() {
+			err := cmd.execute()
+			Expect(err).Should(HaveOccurred())
+			Expect(err.Error()).Should(ContainSubstring("failed to parse module config: failed to validate module config: failed to validate module icons: invalid Option: name must not be empty"))
+		})
+	})
+
+	Context("Given 'modulectl create' command", func() {
+		var cmd createCmd
 		It("When invoked with duplicate entry in resources", func() {
 			cmd = createCmd{
 				moduleConfigFile: duplicateResources,
@@ -89,7 +201,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 		It("Then the command should fail", func() {
 			err := cmd.execute()
 			Expect(err).Should(HaveOccurred())
-			Expect(err.Error()).Should(ContainSubstring("failed to parse module config file: resources contain duplicate entries"))
+			Expect(err.Error()).Should(ContainSubstring("failed to parse module config file: failed to unmarshal Resources: map contains duplicate entries"))
 		})
 	})
 
@@ -189,8 +301,14 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			descriptor := getDescriptor(template)
 			Expect(descriptor).ToNot(BeNil())
 			Expect(descriptor.SchemaVersion()).To(Equal(v2.SchemaVersion))
-
 			Expect(template.Name).To(Equal("template-operator-1.0.0"))
+
+			By("And spec.info should be correct")
+			Expect(template.Spec.Info.Repository).To(Equal("https://github.com/kyma-project/template-operator"))
+			Expect(template.Spec.Info.Documentation).To(Equal("https://github.com/kyma-project/template-operator/blob/main/README.md"))
+			Expect(template.Spec.Info.Icons).To(HaveLen(1))
+			Expect(template.Spec.Info.Icons[0].Name).To(Equal("module-icon"))
+			Expect(template.Spec.Info.Icons[0].Link).To(Equal("https://github.com/kyma-project/template-operator/blob/main/docs/assets/logo.png"))
 
 			By("And annotations should be correct")
 			annotations := template.Annotations
@@ -276,7 +394,6 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			Expect(err).ToNot(HaveOccurred())
 			descriptor := getDescriptor(template)
 			Expect(descriptor).ToNot(BeNil())
-
 			Expect(template.Name).To(Equal("template-operator-1.0.1"))
 
 			By("And new annotation should be correctly added")
@@ -312,7 +429,6 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			Expect(err).ToNot(HaveOccurred())
 			descriptor := getDescriptor(template)
 			Expect(descriptor).ToNot(BeNil())
-
 			Expect(template.Name).To(Equal("template-operator-1.0.2"))
 
 			By("And annotation should have correct version")
@@ -361,7 +477,6 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			Expect(err).ToNot(HaveOccurred())
 			descriptor := getDescriptor(template)
 			Expect(descriptor).ToNot(BeNil())
-
 			Expect(template.Name).To(Equal("template-operator-1.0.3"))
 
 			By("And descriptor.component.resources should be correct")
@@ -438,7 +553,6 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			Expect(err).ToNot(HaveOccurred())
 			descriptor := getDescriptor(template)
 			Expect(descriptor).ToNot(BeNil())
-
 			Expect(template.Name).To(Equal("template-operator-1.0.4"))
 
 			By("And annotation should have correct version")
@@ -471,7 +585,6 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			Expect(err).ToNot(HaveOccurred())
 			descriptor := getDescriptor(template)
 			Expect(descriptor).ToNot(BeNil())
-
 			Expect(template.Name).To(Equal("template-operator-1.0.5"))
 
 			By("And annotation should have correct version")
@@ -511,7 +624,6 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			Expect(err).ToNot(HaveOccurred())
 			descriptor := getDescriptor(template)
 			Expect(descriptor).ToNot(BeNil())
-
 			Expect(template.Name).To(Equal("template-operator-1.0.6"))
 
 			By("And annotation should have correct version")

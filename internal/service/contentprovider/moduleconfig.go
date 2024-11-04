@@ -10,7 +10,7 @@ import (
 	"github.com/kyma-project/modulectl/internal/common/types"
 )
 
-var ErrDuplicateResourceNames = errors.New("resources contain duplicate entries")
+var ErrDuplicateMapEntries = errors.New("map contains duplicate entries")
 
 type ModuleConfigProvider struct {
 	yamlConverter ObjectToYAMLConverter
@@ -66,16 +66,13 @@ func (s *ModuleConfigProvider) validateArgs(args types.KeyValueArgs) error {
 	return nil
 }
 
-type Manager struct {
-	Name                    string `yaml:"name" comment:"required, the name of the manager"`
-	Namespace               string `yaml:"namespace" comment:"optional, the path to the manager"`
-	metav1.GroupVersionKind `yaml:",inline" comment:"required, the GVK of the manager"`
-}
-
 type ModuleConfig struct {
 	Name                string                     `yaml:"name" comment:"required, the name of the Module"`
 	Version             string                     `yaml:"version" comment:"required, the version of the Module"`
 	Manifest            string                     `yaml:"manifest" comment:"required, relative path or remote URL to the manifests"`
+	Repository          string                     `yaml:"repository" comment:"required, link to the repository"`
+	Documentation       string                     `yaml:"documentation" comment:"required, link to documentation"`
+	Icons               Icons                      `yaml:"icons,omitempty" comment:"required, list of icons to represent the module in the UI"`
 	Mandatory           bool                       `yaml:"mandatory" comment:"optional, default=false, indicates whether the module is mandatory to be installed on all clusters"`
 	DefaultCR           string                     `yaml:"defaultCR" comment:"optional, relative path or remote URL to a YAML file containing the default CR for the module"`
 	Namespace           string                     `yaml:"namespace" comment:"optional, default=kcp-system, the namespace where the ModuleTemplate will be deployed"`
@@ -86,38 +83,81 @@ type ModuleConfig struct {
 	Annotations         map[string]string          `yaml:"annotations" comment:"optional, additional annotations for the ModuleTemplate"`
 	AssociatedResources []*metav1.GroupVersionKind `yaml:"associatedResources" comment:"optional, GVK of the resources which are associated with the module and have to be deleted with module deletion"`
 	Manager             *Manager                   `yaml:"manager" comment:"optional, the module resource that can be used to indicate the installation readiness of the module. This is typically the manager deployment of the module"`
-	Resources           ResourcesMap               `yaml:"resources,omitempty" comment:"optional, additional resources of the ModuleTemplate that may be fetched"`
+	Resources           Resources                  `yaml:"resources,omitempty" comment:"optional, additional resources of the ModuleTemplate that may be fetched"`
 }
 
-type resource struct {
-	Name string `yaml:"name"`
-	Link string `yaml:"link"`
+type Manager struct {
+	Name                    string `yaml:"name" comment:"required, the name of the manager"`
+	Namespace               string `yaml:"namespace" comment:"optional, the path to the manager"`
+	metav1.GroupVersionKind `yaml:",inline" comment:"required, the GVK of the manager"`
 }
 
-type ResourcesMap map[string]string
+// Icons represents a map of icon names to links.
+type Icons map[string]string
 
-func (rm *ResourcesMap) UnmarshalYAML(unmarshal func(interface{}) error) error {
-	resources := []resource{}
-	if err := unmarshal(&resources); err != nil {
-		return err
+// UnmarshalYAML unmarshals Icons from YAML format.
+func (i *Icons) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	dataMap, err := unmarshalToMap(unmarshal)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal Icons: %w", err)
 	}
-
-	*rm = make(map[string]string)
-	for _, resource := range resources {
-		(*rm)[resource.Name] = resource.Link
-	}
-
-	if len(resources) > len(*rm) {
-		return ErrDuplicateResourceNames
-	}
-
+	*i = dataMap
 	return nil
 }
 
-func (rm ResourcesMap) MarshalYAML() (interface{}, error) {
-	resources := []resource{}
-	for name, link := range rm {
-		resources = append(resources, resource{Name: name, Link: link})
+// MarshalYAML marshals Icons to YAML format.
+func (i *Icons) MarshalYAML() (interface{}, error) {
+	return marshalFromMap(*i)
+}
+
+// Resources represents a map of resource names to links.
+type Resources map[string]string
+
+// UnmarshalYAML unmarshals Resources from YAML format.
+func (rm *Resources) UnmarshalYAML(unmarshal func(interface{}) error) error {
+	dataMap, err := unmarshalToMap(unmarshal)
+	if err != nil {
+		return fmt.Errorf("failed to unmarshal Resources: %w", err)
 	}
-	return resources, nil
+	*rm = dataMap
+	return nil
+}
+
+// MarshalYAML marshals Resources to YAML format.
+func (rm *Resources) MarshalYAML() (interface{}, error) {
+	return marshalFromMap(*rm)
+}
+
+func unmarshalToMap(unmarshal func(interface{}) error) (map[string]string, error) {
+	var items []nameLinkItem
+	if err := unmarshal(&items); err == nil {
+		resultMap := make(map[string]string)
+		for _, item := range items {
+			if _, exists := resultMap[item.Name]; exists {
+				return nil, ErrDuplicateMapEntries
+			}
+			resultMap[item.Name] = item.Link
+		}
+		return resultMap, nil
+	}
+
+	resultMap := make(map[string]string)
+	if err := unmarshal(&resultMap); err != nil {
+		return nil, err
+	}
+
+	return resultMap, nil
+}
+
+func marshalFromMap(dataMap map[string]string) (interface{}, error) {
+	items := make([]nameLinkItem, 0, len(dataMap))
+	for name, link := range dataMap {
+		items = append(items, nameLinkItem{Name: name, Link: link})
+	}
+	return items, nil
+}
+
+type nameLinkItem struct {
+	Name string `yaml:"name"`
+	Link string `yaml:"link"`
 }

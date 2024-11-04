@@ -60,6 +60,16 @@ metadata:
 {{- end}} 
 spec:
   mandatory: {{.Mandatory}}
+  info:
+    repository: {{.Repository}}
+    documentation: {{.Documentation}}
+    {{- with .Icons}}
+    icons:
+      {{- range $key, $value := . }}
+    - name: {{ $key }}
+      link: {{ $value }}
+      {{- end}}
+    {{- end}}
 {{- with .AssociatedResources}}
   associatedResources:
   {{- range .}}
@@ -98,12 +108,15 @@ type moduleTemplateData struct {
 	ResourceName        string
 	Namespace           string
 	Descriptor          compdesc.ComponentDescriptorVersion
+	Repository          string
+	Documentation       string
+	Icons               contentprovider.Icons
 	Labels              map[string]string
 	Annotations         map[string]string
 	Mandatory           bool
 	Data                string
 	AssociatedResources []*metav1.GroupVersionKind
-	Resources           contentprovider.ResourcesMap
+	Resources           contentprovider.Resources
 	Manager             *contentprovider.Manager
 }
 
@@ -149,11 +162,14 @@ func (s *Service) GenerateModuleTemplate(
 		ResourceName:        moduleTemplateName,
 		Namespace:           moduleConfig.Namespace,
 		Descriptor:          cva,
+		Repository:          moduleConfig.Repository,
+		Documentation:       moduleConfig.Documentation,
+		Icons:               moduleConfig.Icons,
 		Labels:              labels,
 		Annotations:         annotations,
 		Mandatory:           moduleConfig.Mandatory,
 		AssociatedResources: moduleConfig.AssociatedResources,
-		Resources: contentprovider.ResourcesMap{
+		Resources: contentprovider.Resources{
 			"rawManifest": moduleConfig.Manifest, // defaults rawManifest to Manifest; may be overwritten by explicitly provided entries
 		},
 		Manager: moduleConfig.Manager,

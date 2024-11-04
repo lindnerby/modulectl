@@ -56,12 +56,29 @@ func ValidateModuleConfig(moduleConfig *contentprovider.ModuleConfig) error {
 		return fmt.Errorf("failed to validate module namespace: %w", err)
 	}
 
-	if err := validation.ValidateResources(moduleConfig.Resources); err != nil {
-		return fmt.Errorf("failed to validate resources: %w", err)
-	}
-
 	if err := validation.ValidateIsValidHTTPSURL(moduleConfig.Manifest); err != nil {
 		return fmt.Errorf("failed to validate manifest: %w", err)
+	}
+
+	if err := validation.ValidateIsValidHTTPSURL(moduleConfig.Repository); err != nil {
+		return fmt.Errorf("failed to validate repository: %w", err)
+	}
+
+	if err := validation.ValidateIsValidHTTPSURL(moduleConfig.Documentation); err != nil {
+		return fmt.Errorf("failed to validate documentation: %w", err)
+	}
+
+	if len(moduleConfig.Icons) == 0 {
+		return fmt.Errorf("failed to validate module icons: %w: must contain at least one icon",
+			commonerrors.ErrInvalidOption)
+	}
+
+	if err := validation.ValidateMapEntries(moduleConfig.Icons); err != nil {
+		return fmt.Errorf("failed to validate module icons: %w", err)
+	}
+
+	if err := validation.ValidateMapEntries(moduleConfig.Resources); err != nil {
+		return fmt.Errorf("failed to validate resources: %w", err)
 	}
 
 	if moduleConfig.DefaultCR != "" {
