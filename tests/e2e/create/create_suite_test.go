@@ -53,7 +53,6 @@ const (
 
 	ociRegistry        = "http://k3d-oci.localhost:5001"
 	templateOutputPath = "/tmp/template.yaml"
-	gitRemote          = "https://github.com/kyma-project/template-operator"
 )
 
 // Command wrapper for `modulectl create`
@@ -62,7 +61,6 @@ type createCmd struct {
 	registry         string
 	output           string
 	moduleConfigFile string
-	gitRemote        string
 	insecure         bool
 }
 
@@ -81,10 +79,6 @@ func (cmd *createCmd) execute() error {
 
 	if cmd.output != "" {
 		args = append(args, "--output="+cmd.output)
-	}
-
-	if cmd.gitRemote != "" {
-		args = append(args, "--git-remote="+cmd.gitRemote)
 	}
 
 	if cmd.insecure {
