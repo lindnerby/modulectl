@@ -25,15 +25,15 @@ type Service struct {
 
 func NewService(kind string, fileSystem FileWriter, defaultContentProvider DefaultContentProvider) (*Service, error) {
 	if kind == "" {
-		return nil, fmt.Errorf("%w: kind must not be empty", commonerrors.ErrInvalidArg)
+		return nil, fmt.Errorf("kind must not be empty: %w", commonerrors.ErrInvalidArg)
 	}
 
 	if fileSystem == nil {
-		return nil, fmt.Errorf("%w: fileSystem must not be nil", commonerrors.ErrInvalidArg)
+		return nil, fmt.Errorf("fileSystem must not be nil: %w", commonerrors.ErrInvalidArg)
 	}
 
 	if defaultContentProvider == nil {
-		return nil, fmt.Errorf("%w: defaultContentProvider must not be nil", commonerrors.ErrInvalidArg)
+		return nil, fmt.Errorf("defaultContentProvider must not be nil: %w", commonerrors.ErrInvalidArg)
 	}
 
 	return &Service{
@@ -60,7 +60,7 @@ func (s *Service) GenerateFile(out iotools.Out, path string, args types.KeyValue
 
 func (s *Service) writeFile(content, path string) error {
 	if err := s.fileWriter.WriteFile(path, content); err != nil {
-		return fmt.Errorf("%w %s: %w", ErrWritingFile, path, err)
+		return fmt.Errorf("file path: %s, %w: %w", path, err, ErrWritingFile)
 	}
 
 	return nil

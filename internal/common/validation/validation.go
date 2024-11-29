@@ -21,18 +21,17 @@ const (
 
 func ValidateModuleName(name string) error {
 	if name == "" {
-		return fmt.Errorf("%w: opts.ModuleName must not be empty", commonerrors.ErrInvalidOption)
+		return fmt.Errorf("opts.ModuleName must not be empty: %w", commonerrors.ErrInvalidOption)
 	}
 
 	if len(name) > moduleNameMaxLength {
-		return fmt.Errorf("%w: opts.ModuleName length must not exceed %q characters", commonerrors.ErrInvalidOption,
-			moduleNameMaxLength)
+		return fmt.Errorf("opts.ModuleName length must not exceed %q characters: %w", moduleNameMaxLength, commonerrors.ErrInvalidOption)
 	}
 
 	if matched, err := regexp.MatchString(moduleNamePattern, name); err != nil {
-		return fmt.Errorf("%w: failed to evaluate regex pattern for opts.ModuleName", commonerrors.ErrInvalidOption)
+		return fmt.Errorf("failed to evaluate regex pattern for opts.ModuleName: %w", commonerrors.ErrInvalidOption)
 	} else if !matched {
-		return fmt.Errorf("%w: opts.ModuleName must match the required pattern, e.g: 'github.com/path-to/your-repo'",
+		return fmt.Errorf("opts.ModuleName must match the required pattern, e.g: 'github.com/path-to/your-repo': %w",
 			commonerrors.ErrInvalidOption)
 	}
 
@@ -41,7 +40,7 @@ func ValidateModuleName(name string) error {
 
 func ValidateModuleVersion(version string) error {
 	if version == "" {
-		return fmt.Errorf("%w: opts.ModuleVersion must not be empty", commonerrors.ErrInvalidOption)
+		return fmt.Errorf("opts.ModuleVersion must not be empty: %w", commonerrors.ErrInvalidOption)
 	}
 
 	if err := validateSemanticVersion(version); err != nil {
@@ -53,7 +52,7 @@ func ValidateModuleVersion(version string) error {
 
 func ValidateModuleNamespace(namespace string) error {
 	if namespace == "" {
-		return fmt.Errorf("%w: opts.ModuleNamespace must not be empty", commonerrors.ErrInvalidOption)
+		return fmt.Errorf("opts.ModuleNamespace must not be empty: %w", commonerrors.ErrInvalidOption)
 	}
 
 	if err := ValidateNamespace(namespace); err != nil {
@@ -65,15 +64,15 @@ func ValidateModuleNamespace(namespace string) error {
 
 func ValidateNamespace(namespace string) error {
 	if len(namespace) > namespaceMaxLength {
-		return fmt.Errorf("%w: opts.ModuleNamespace length must not exceed %q characters",
-			commonerrors.ErrInvalidOption,
-			namespaceMaxLength)
+		return fmt.Errorf("opts.ModuleNamespace length must not exceed %q characters: %w",
+			namespaceMaxLength,
+			commonerrors.ErrInvalidOption)
 	}
 
 	if matched, err := regexp.MatchString(namespacePattern, namespace); err != nil {
 		return fmt.Errorf("failed to evaluate regex pattern for module namespace: %w", err)
 	} else if !matched {
-		return fmt.Errorf("%w: namespace must match the required pattern, only small alphanumeric characters and hyphens",
+		return fmt.Errorf("namespace must match the required pattern, only small alphanumeric characters and hyphens: %w",
 			commonerrors.ErrInvalidOption)
 	}
 
@@ -83,11 +82,11 @@ func ValidateNamespace(namespace string) error {
 func ValidateMapEntries(nameLinkMap map[string]string) error {
 	for name, link := range nameLinkMap {
 		if name == "" {
-			return fmt.Errorf("%w: name must not be empty", commonerrors.ErrInvalidOption)
+			return fmt.Errorf("name must not be empty: %w", commonerrors.ErrInvalidOption)
 		}
 
 		if link == "" {
-			return fmt.Errorf("%w: link must not be empty", commonerrors.ErrInvalidOption)
+			return fmt.Errorf("link must not be empty: %w", commonerrors.ErrInvalidOption)
 		}
 
 		if err := ValidateIsValidHTTPSURL(link); err != nil {
@@ -100,16 +99,16 @@ func ValidateMapEntries(nameLinkMap map[string]string) error {
 
 func ValidateIsValidHTTPSURL(input string) error {
 	if input == "" {
-		return fmt.Errorf("%w: must not be empty", commonerrors.ErrInvalidOption)
+		return fmt.Errorf("must not be empty: %w", commonerrors.ErrInvalidOption)
 	}
 
 	_url, err := url.Parse(input)
 	if err != nil {
-		return fmt.Errorf("%w: '%s' is not a valid URL", commonerrors.ErrInvalidOption, input)
+		return fmt.Errorf("'%s' is not a valid URL: %w", input, commonerrors.ErrInvalidOption)
 	}
 
 	if _url.Scheme != "https" {
-		return fmt.Errorf("%w: '%s' is not using https scheme", commonerrors.ErrInvalidOption, input)
+		return fmt.Errorf("'%s' is not using https scheme: %w", input, commonerrors.ErrInvalidOption)
 	}
 
 	return nil
@@ -118,8 +117,8 @@ func ValidateIsValidHTTPSURL(input string) error {
 func validateSemanticVersion(version string) error {
 	_, err := semver.StrictNewVersion(strings.TrimSpace(version))
 	if err != nil {
-		return fmt.Errorf("%w: opts.ModuleVersion failed to parse as semantic version: %w",
-			commonerrors.ErrInvalidOption, err)
+		return fmt.Errorf("opts.ModuleVersion failed to be parsed as semantic version: %w",
+			commonerrors.ErrInvalidOption)
 	}
 
 	return nil
