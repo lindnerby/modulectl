@@ -140,6 +140,7 @@ func NewService(moduleConfigService ModuleConfigService,
 	}, nil
 }
 
+//nolint:funlen // this is a straight down aggregation of the individual steps
 func (s *Service) Run(opts Options) error {
 	if err := opts.Validate(); err != nil {
 		return err
@@ -205,31 +206,56 @@ func (s *Service) Run(opts Options) error {
 		return fmt.Errorf("failed to add module resources to component archive: %w", err)
 	}
 
-	if opts.RegistryURL != "" {
-		return s.pushImgAndCreateTemplate(archive, moduleConfig, manifestFilePath, defaultCRFilePath, opts)
+	opts.Out.Write("- Pushing component version\n")
+	if !opts.DryRun {
+		descriptor, err = s.pushComponentVersion(archive, opts)
+		if err != nil {
+			return fmt.Errorf("failed to push component version: %w", err)
+		}
+	} else {
+		opts.Out.Write("\t\tSkipping due to dry-run mode\n")
 	}
+
+	opts.Out.Write("- Generating ModuleTemplate\n")
+	if err = s.generateModuleTemplate(moduleConfig,
+		descriptor,
+		manifestFilePath,
+		defaultCRFilePath,
+		opts.TemplateOutput); err != nil {
+		return fmt.Errorf("failed to generate module template: %w", err)
+	}
+
 	return nil
 }
 
-func (s *Service) pushImgAndCreateTemplate(archive *comparch.ComponentArchive,
-	moduleConfig *contentprovider.ModuleConfig, manifestFilePath, defaultCRFilePath string, opts Options,
-) error {
-	opts.Out.Write("- Pushing component version\n")
-	isCRDClusterScoped, err := s.crdParserService.IsCRDClusterScoped(defaultCRFilePath, manifestFilePath)
-	if err != nil {
-		return fmt.Errorf("failed to determine if CRD is cluster scoped: %w", err)
-	}
-
-	if err := s.registryService.PushComponentVersion(archive, opts.Insecure, opts.OverwriteComponentVersion,
+func (s *Service) pushComponentVersion(archive *comparch.ComponentArchive, opts Options) (*compdesc.ComponentDescriptor, error) {
+	if err := s.registryService.PushComponentVersion(archive,
+		opts.Insecure,
+		opts.OverwriteComponentVersion,
 		opts.Credentials,
 		opts.RegistryURL); err != nil {
-		return fmt.Errorf("failed to push component archive: %w", err)
+		return nil, fmt.Errorf("failed to push component archive: %w", err)
 	}
 
 	componentVersionAccess, err := s.registryService.GetComponentVersion(archive, opts.Insecure, opts.Credentials,
 		opts.RegistryURL)
 	if err != nil {
-		return fmt.Errorf("failed to get component version: %w", err)
+		return nil, fmt.Errorf("failed to get component version: %w", err)
+	}
+
+	return componentVersionAccess.GetDescriptor(), nil
+}
+
+func (s *Service) generateModuleTemplate(
+	moduleConfig *contentprovider.ModuleConfig,
+	descriptor *compdesc.ComponentDescriptor,
+	manifestFilePath string,
+	defaultCRFilePath string,
+	templateOutput string,
+) error {
+	isCRDClusterScoped, err := s.crdParserService.IsCRDClusterScoped(defaultCRFilePath, manifestFilePath)
+	if err != nil {
+		return fmt.Errorf("failed to determine if CRD is cluster scoped: %w", err)
 	}
 
 	var crData []byte
@@ -240,12 +266,14 @@ func (s *Service) pushImgAndCreateTemplate(archive *comparch.ComponentArchive,
 		}
 	}
 
-	opts.Out.Write("- Generating ModuleTemplate\n")
-	descriptor := componentVersionAccess.GetDescriptor()
-	if err = s.moduleTemplateService.GenerateModuleTemplate(moduleConfig, descriptor,
-		crData, isCRDClusterScoped, opts.TemplateOutput); err != nil {
+	if err := s.moduleTemplateService.GenerateModuleTemplate(moduleConfig,
+		descriptor,
+		crData,
+		isCRDClusterScoped,
+		templateOutput); err != nil {
 		return fmt.Errorf("failed to generate module template: %w", err)
 	}
+
 	return nil
 }
 
