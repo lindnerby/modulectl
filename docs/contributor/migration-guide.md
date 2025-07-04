@@ -63,7 +63,7 @@ This section illustrates how the `scaffold` and `create` command flags from Kyma
 | `--module-archive-version-overwrite` | **Renamed** `--overwrite`              | Overwrite existing module OCI archive (**for testing only**)  |
 | `--descriptor-version string`        | **Removed**                            | Schema version for generated descriptor                       |
 | `--git-remote string`                | **Removed**                            | Git remote name for module sources                            |
-| `--insecure`                         | `--insecure`                           | Allow insecure registry connections                           |
+| `--insecure`                         | `--unsecure`                           | Allow unsecure registry connections                           |
 | `--key string`                       | **Removed**                            | Private key path for signing                                  |
 | `--kubebuilder-project`              | **Removed**                            | Indicate Kubebuilder project                                  |
 | `-n, --name string`                  | `--name`                               | Override module name                                          |
