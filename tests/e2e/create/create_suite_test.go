@@ -65,7 +65,7 @@ type createCmd struct {
 	registry         string
 	output           string
 	moduleConfigFile string
-	insecure         bool
+	unsecure         bool
 	overwrite        bool
 	dryRun           bool
 }
@@ -87,8 +87,8 @@ func (cmd *createCmd) execute() error {
 		args = append(args, "--output="+cmd.output)
 	}
 
-	if cmd.insecure {
-		args = append(args, "--insecure")
+	if cmd.unsecure {
+		args = append(args, "--unsecure")
 	}
 
 	if cmd.overwrite {

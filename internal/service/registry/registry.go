@@ -44,11 +44,11 @@ func NewService(ociRepository OCIRepository, repo cpi.Repository, credResolverFu
 }
 
 func (s *Service) ExistsComponentVersion(archive *comparch.ComponentArchive,
-	insecure bool,
+	unsecure bool,
 	credentials string,
 	registryURL string,
 ) (bool, error) {
-	repo, err := s.getRepository(insecure, credentials, registryURL)
+	repo, err := s.getRepository(unsecure, credentials, registryURL)
 	if err != nil {
 		return false, fmt.Errorf("could not get repository: %w", err)
 	}
@@ -61,10 +61,10 @@ func (s *Service) ExistsComponentVersion(archive *comparch.ComponentArchive,
 	return exists, nil
 }
 
-func (s *Service) PushComponentVersion(archive *comparch.ComponentArchive, insecure, overwrite bool,
+func (s *Service) PushComponentVersion(archive *comparch.ComponentArchive, unsecure, overwrite bool,
 	credentials, registryURL string,
 ) error {
-	repo, err := s.getRepository(insecure, credentials, registryURL)
+	repo, err := s.getRepository(unsecure, credentials, registryURL)
 	if err != nil {
 		return fmt.Errorf("could not get repository: %w", err)
 	}
@@ -76,10 +76,10 @@ func (s *Service) PushComponentVersion(archive *comparch.ComponentArchive, insec
 	return nil
 }
 
-func (s *Service) GetComponentVersion(archive *comparch.ComponentArchive, insecure bool,
+func (s *Service) GetComponentVersion(archive *comparch.ComponentArchive, unsecure bool,
 	userPasswordCreds, registryURL string,
 ) (cpi.ComponentVersionAccess, error) {
-	repo, err := s.getRepository(insecure, userPasswordCreds, registryURL)
+	repo, err := s.getRepository(unsecure, userPasswordCreds, registryURL)
 	if err != nil {
 		return nil, fmt.Errorf("could not get repository: %w", err)
 	}
@@ -92,7 +92,7 @@ func (s *Service) GetComponentVersion(archive *comparch.ComponentArchive, insecu
 	return componentVersion, nil
 }
 
-func (s *Service) getRepository(insecure bool, userPasswordCreds, registryURL string) (cpi.Repository, error) {
+func (s *Service) getRepository(unsecure bool, userPasswordCreds, registryURL string) (cpi.Repository, error) {
 	if s.repo != nil {
 		return s.repo, nil
 	}
@@ -100,7 +100,7 @@ func (s *Service) getRepository(insecure bool, userPasswordCreds, registryURL st
 	ctx := cpi.DefaultContext()
 	repoType := ocireg.Type
 	registryURL = NoSchemeURL(registryURL)
-	if insecure {
+	if unsecure {
 		registryURL = "http://" + registryURL
 	}
 	creds, err := s.credResolver(ctx, userPasswordCreds, registryURL)

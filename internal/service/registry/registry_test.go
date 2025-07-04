@@ -26,6 +26,36 @@ func TestServiceNew_WhenCalledWithNilDependency_ReturnsErr(t *testing.T) {
 	require.NoError(t, err)
 }
 
+func TestServiceExistsComponentVersion_WhenCredResolverReturnsError_ReturnsErr(t *testing.T) {
+	repo, _ := ocireg.NewRepository(cpi.DefaultContext(), "URL")
+	svc, _ := registry.NewService(nil, repo, errResolverFunc)
+
+	_, err := svc.ExistsComponentVersion(&comparch.ComponentArchive{}, true, "", "ghcr.io/template-operator")
+
+	require.ErrorContains(t, err, "failed to resolve credentials")
+	require.ErrorContains(t, err, "could not get repository")
+}
+
+func TestServicePushComponentVersion_WhenCredResolverReturnsError_ReturnsErr(t *testing.T) {
+	repo, _ := ocireg.NewRepository(cpi.DefaultContext(), "URL")
+	svc, _ := registry.NewService(nil, repo, errResolverFunc)
+
+	err := svc.PushComponentVersion(&comparch.ComponentArchive{}, true, true, "creds", "ghcr.io/template-operator")
+
+	require.ErrorContains(t, err, "failed to resolve credentials")
+	require.ErrorContains(t, err, "could not get repository")
+}
+
+func TestServiceGetComponentVersion_WhenCredResolverReturnsError_ReturnsErr(t *testing.T) {
+	repo, _ := ocireg.NewRepository(cpi.DefaultContext(), "URL")
+	svc, _ := registry.NewService(nil, repo, errResolverFunc)
+
+	_, err := svc.GetComponentVersion(&comparch.ComponentArchive{}, true, "creds", "ghcr.io/template-operator")
+
+	require.ErrorContains(t, err, "failed to resolve credentials")
+	require.ErrorContains(t, err, "could not get repository")
+}
+
 func TestService_PushComponentVersion_ReturnErrorWhenSameComponentVersionExists(t *testing.T) {
 	repo, err := ocireg.NewRepository(cpi.DefaultContext(), "URL")
 	require.NoError(t, err)

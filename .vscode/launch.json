@@ -13,7 +13,7 @@
       "args": ["create",
                "--config-file", "${workspaceFolder}/tests/e2e/create/testdata/moduleconfig/valid/minimal.yaml",
                "--registry", "http://localhost:5001/unsigned",
-               "--insecure"],
+               "--unsecure"],
     }
   ]
 }

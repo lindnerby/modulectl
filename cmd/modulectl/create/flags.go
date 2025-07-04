@@ -16,9 +16,9 @@ const (
 	CredentialsFlagDefault = ""
 	credentialsFlagUsage   = "Basic authentication credentials for the given repository in the <user:password> format."
 
-	InsecureFlagName    = "insecure"
-	InsecureFlagDefault = false
-	insecureFlagUsage   = "Uses an insecure connection to access the registry."
+	UnsecureFlagName    = "unsecure"
+	UnsecureFlagDefault = false
+	unsecureFlagUsage   = "Uses an unsecure (non-tls) connection to access the registry. Should only be used in dev scenarios."
 
 	TemplateOutputFlagName    = "output"
 	templateOutputFlagShort   = "o"
@@ -49,10 +49,10 @@ func parseFlags(flags *pflag.FlagSet, opts *create.Options) {
 		CredentialsFlagName,
 		CredentialsFlagDefault,
 		credentialsFlagUsage)
-	flags.BoolVar(&opts.Insecure,
-		InsecureFlagName,
-		InsecureFlagDefault,
-		insecureFlagUsage)
+	flags.BoolVar(&opts.Unsecure,
+		UnsecureFlagName,
+		UnsecureFlagDefault,
+		unsecureFlagUsage)
 	flags.StringVarP(&opts.TemplateOutput,
 		TemplateOutputFlagName,
 		templateOutputFlagShort,

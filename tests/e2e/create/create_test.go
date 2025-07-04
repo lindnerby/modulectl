@@ -290,7 +290,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 
 	Context("Given 'modulectl create' command", func() {
 		var cmd createCmd
-		It("When invoked with existing '--registry' and missing '--insecure' flag", func() {
+		It("When invoked with existing '--registry' and missing '--unsecure' flag", func() {
 			cmd = createCmd{
 				moduleConfigFile: minimalConfig,
 				registry:         ociRegistry,
@@ -309,7 +309,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			cmd = createCmd{
 				moduleConfigFile: minimalConfig,
 				registry:         ociRegistry,
-				insecure:         true,
+				unsecure:         true,
 				output:           templateOutputPath,
 				dryRun:           true,
 			}
@@ -342,7 +342,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			cmd = createCmd{
 				moduleConfigFile: minimalConfig,
 				registry:         ociRegistry,
-				insecure:         true,
+				unsecure:         true,
 				output:           templateOutputPath,
 			}
 		})
@@ -406,7 +406,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			cmd = createCmd{
 				moduleConfigFile: minimalConfig,
 				registry:         ociRegistry,
-				insecure:         true,
+				unsecure:         true,
 			}
 		})
 		It("Then the command should fail with same version exists message", func() {
@@ -421,7 +421,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			cmd = createCmd{
 				moduleConfigFile: minimalConfig,
 				registry:         ociRegistry,
-				insecure:         true,
+				unsecure:         true,
 				output:           templateOutputPath,
 				dryRun:           true,
 			}
@@ -442,7 +442,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 				cmd = createCmd{
 					moduleConfigFile: minimalConfig,
 					registry:         ociRegistry,
-					insecure:         true,
+					unsecure:         true,
 					output:           templateOutputPath,
 					overwrite:        true,
 					dryRun:           true,
@@ -476,7 +476,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			cmd = createCmd{
 				moduleConfigFile: minimalConfig,
 				registry:         ociRegistry,
-				insecure:         true,
+				unsecure:         true,
 				overwrite:        true,
 				output:           templateOutputPath,
 			}
@@ -493,7 +493,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			cmd = createCmd{
 				moduleConfigFile: withAnnotationsConfig,
 				registry:         ociRegistry,
-				insecure:         true,
+				unsecure:         true,
 				output:           templateOutputPath,
 			}
 		})
@@ -530,7 +530,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			cmd = createCmd{
 				moduleConfigFile: withDefaultCrConfig,
 				registry:         ociRegistry,
-				insecure:         true,
+				unsecure:         true,
 				output:           templateOutputPath,
 			}
 		})
@@ -576,7 +576,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 				cmd = createCmd{
 					moduleConfigFile: withSecurityConfig,
 					registry:         ociRegistry,
-					insecure:         true,
+					unsecure:         true,
 					output:           templateOutputPath,
 				}
 			})
@@ -687,7 +687,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 				cmd = createCmd{
 					moduleConfigFile: invalidSecurityConfig,
 					registry:         ociRegistry,
-					insecure:         true,
+					unsecure:         true,
 					output:           templateOutputPath,
 				}
 			})
@@ -705,7 +705,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			cmd = createCmd{
 				moduleConfigFile: withMandatoryConfig,
 				registry:         ociRegistry,
-				insecure:         true,
+				unsecure:         true,
 				output:           templateOutputPath,
 			}
 		})
@@ -737,7 +737,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			cmd = createCmd{
 				moduleConfigFile: withManagerConfig,
 				registry:         ociRegistry,
-				insecure:         true,
+				unsecure:         true,
 				output:           templateOutputPath,
 			}
 		})
@@ -775,7 +775,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 				cmd = createCmd{
 					moduleConfigFile: withNoNamespaceManagerConfig,
 					registry:         ociRegistry,
-					insecure:         true,
+					unsecure:         true,
 					output:           templateOutputPath,
 				}
 			})
@@ -812,7 +812,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			cmd = createCmd{
 				moduleConfigFile: withAssociatedResourcesConfig,
 				registry:         ociRegistry,
-				insecure:         true,
+				unsecure:         true,
 				output:           templateOutputPath,
 			}
 		})
@@ -849,7 +849,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			cmd = createCmd{
 				moduleConfigFile: withResources,
 				registry:         ociRegistry,
-				insecure:         true,
+				unsecure:         true,
 				output:           templateOutputPath,
 			}
 		})
@@ -878,7 +878,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			cmd = createCmd{
 				moduleConfigFile: withResourcesOverwrite,
 				registry:         ociRegistry,
-				insecure:         true,
+				unsecure:         true,
 				output:           templateOutputPath,
 			}
 		})
@@ -905,7 +905,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			cmd = createCmd{
 				moduleConfigFile: manifestFileref,
 				registry:         ociRegistry,
-				insecure:         true,
+				unsecure:         true,
 				output:           templateOutputPath,
 			}
 		})
@@ -933,7 +933,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			cmd = createCmd{
 				moduleConfigFile: defaultCRFileref,
 				registry:         ociRegistry,
-				insecure:         true,
+				unsecure:         true,
 				output:           templateOutputPath,
 			}
 		})
@@ -963,7 +963,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			cmd = createCmd{
 				moduleConfigFile: withRequiresDowntimeConfig,
 				registry:         ociRegistry,
-				insecure:         true,
+				unsecure:         true,
 				output:           templateOutputPath,
 			}
 		})
@@ -994,7 +994,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			cmd = createCmd{
 				moduleConfigFile: withInternalConfig,
 				registry:         ociRegistry,
-				insecure:         true,
+				unsecure:         true,
 				output:           templateOutputPath,
 			}
 		})
@@ -1027,7 +1027,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			cmd = createCmd{
 				moduleConfigFile: withBetaConfig,
 				registry:         ociRegistry,
-				insecure:         true,
+				unsecure:         true,
 				output:           templateOutputPath,
 			}
 		})
