@@ -16,10 +16,10 @@ import (
 
 func TestServiceNew_WhenCalledWithNilDependency_ReturnsErr(t *testing.T) {
 	repo, _ := ocireg.NewRepository(cpi.DefaultContext(), "URL")
-	_, err := registry.NewService(nil, repo)
+	_, err := registry.NewService(nil, repo, nilResolverFunc)
 	require.Error(t, err)
 
-	_, err = registry.NewService(&ociRepositoryVersionExistsStub{}, nil)
+	_, err = registry.NewService(&ociRepositoryVersionExistsStub{}, nil, nilResolverFunc)
 	require.NoError(t, err)
 }
 
@@ -224,4 +224,12 @@ func (*ociRepositoryNotExistStub) ExistsComponentVersion(_ ocirepo.ComponentArch
 	_ cpi.Repository,
 ) (bool, error) {
 	return false, nil
+}
+
+func errResolverFunc(_ cpi.Context, _ string, _ string) (credentials.Credentials, error) {
+	return nil, errors.New("nil resolver function called")
+}
+
+func nilResolverFunc(_ cpi.Context, _ string, _ string) (credentials.Credentials, error) {
+	return nil, nil
 }
