@@ -16,19 +16,18 @@ import (
 
 func TestServiceNew_WhenCalledWithNilDependency_ReturnsErr(t *testing.T) {
 	repo, _ := ocireg.NewRepository(cpi.DefaultContext(), "URL")
-	_, err := registry.NewService(nil, repo, nilResolverFunc)
+	_, err := registry.NewService(nil, repo, nil)
 	require.Error(t, err)
 
 	_, err = registry.NewService(&ociRepositoryVersionExistsStub{}, repo, nil)
 	require.Error(t, err)
 
-	_, err = registry.NewService(&ociRepositoryVersionExistsStub{}, nil, nilResolverFunc)
-	require.NoError(t, err)
+	_, err = registry.NewService(&ociRepositoryVersionExistsStub{}, nil, nil)
+	require.Error(t, err)
 }
 
 func TestServiceExistsComponentVersion_WhenCredResolverReturnsError_ReturnsErr(t *testing.T) {
-	repo, _ := ocireg.NewRepository(cpi.DefaultContext(), "URL")
-	svc, _ := registry.NewService(nil, repo, errResolverFunc)
+	svc, _ := registry.NewService(&ociRepositoryVersionExistsStub{}, nil, errResolverFunc)
 
 	_, err := svc.ExistsComponentVersion(&comparch.ComponentArchive{}, true, "", "ghcr.io/template-operator")
 
@@ -37,8 +36,7 @@ func TestServiceExistsComponentVersion_WhenCredResolverReturnsError_ReturnsErr(t
 }
 
 func TestServicePushComponentVersion_WhenCredResolverReturnsError_ReturnsErr(t *testing.T) {
-	repo, _ := ocireg.NewRepository(cpi.DefaultContext(), "URL")
-	svc, _ := registry.NewService(nil, repo, errResolverFunc)
+	svc, _ := registry.NewService(&ociRepositoryVersionExistsStub{}, nil, errResolverFunc)
 
 	err := svc.PushComponentVersion(&comparch.ComponentArchive{}, true, true, "creds", "ghcr.io/template-operator")
 
@@ -47,8 +45,7 @@ func TestServicePushComponentVersion_WhenCredResolverReturnsError_ReturnsErr(t *
 }
 
 func TestServiceGetComponentVersion_WhenCredResolverReturnsError_ReturnsErr(t *testing.T) {
-	repo, _ := ocireg.NewRepository(cpi.DefaultContext(), "URL")
-	svc, _ := registry.NewService(nil, repo, errResolverFunc)
+	svc, _ := registry.NewService(&ociRepositoryVersionExistsStub{}, nil, errResolverFunc)
 
 	_, err := svc.GetComponentVersion(&comparch.ComponentArchive{}, true, "creds", "ghcr.io/template-operator")
 
@@ -229,10 +226,6 @@ func (*ociRepositoryNotExistStub) ExistsComponentVersion(_ ocirepo.ComponentArch
 
 func errResolverFunc(_ cpi.Context, _ string, _ string) (credentials.Credentials, error) {
 	return nil, errors.New("nil resolver function called")
-}
-
-func nilResolverFunc(_ cpi.Context, _ string, _ string) (credentials.Credentials, error) {
-	return nil, nil
 }
 
 func defaultCredsResolverFunc(_ cpi.Context, _ string, _ string) (credentials.Credentials, error) {
