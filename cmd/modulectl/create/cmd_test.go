@@ -48,14 +48,14 @@ func Test_Execute_ReturnsError_WhenModuleServiceReturnsError(t *testing.T) {
 func Test_Execute_ParsesAllModuleOptions(t *testing.T) {
 	moduleConfigFile := testutils.RandomName(10)
 	credentials := testutils.RandomName(10)
-	unsecure := "true"
+	insecure := "true"
 	templateOutput := testutils.RandomName(10)
 	registryURL := testutils.RandomName(10)
 
 	os.Args = []string{
 		"create",
 		"--config-file", moduleConfigFile,
-		"--unsecure", unsecure,
+		"--insecure", insecure,
 		"--output", templateOutput,
 		"--registry", registryURL,
 		"--registry-credentials", credentials,
@@ -67,12 +67,12 @@ func Test_Execute_ParsesAllModuleOptions(t *testing.T) {
 	err := cmd.Execute()
 	require.NoError(t, err)
 
-	unsecureFlagSet, err := strconv.ParseBool(unsecure)
+	insecureFlagSet, err := strconv.ParseBool(insecure)
 	require.NoError(t, err)
 
 	assert.Equal(t, moduleConfigFile, svc.opts.ConfigFile)
 	assert.Equal(t, credentials, svc.opts.Credentials)
-	assert.Equal(t, unsecureFlagSet, svc.opts.Unsecure)
+	assert.Equal(t, insecureFlagSet, svc.opts.Insecure)
 	assert.Equal(t, templateOutput, svc.opts.TemplateOutput)
 	assert.Equal(t, registryURL, svc.opts.RegistryURL)
 }
@@ -113,7 +113,7 @@ func Test_Execute_ModuleParsesDefaults(t *testing.T) {
 
 	assert.Equal(t, createcmd.ConfigFileFlagDefault, svc.opts.ConfigFile)
 	assert.Equal(t, createcmd.CredentialsFlagDefault, svc.opts.Credentials)
-	assert.Equal(t, createcmd.UnsecureFlagDefault, svc.opts.Unsecure)
+	assert.Equal(t, createcmd.InsecureFlagDefault, svc.opts.Insecure)
 	assert.Equal(t, createcmd.TemplateOutputFlagDefault, svc.opts.TemplateOutput)
 	assert.Equal(t, createcmd.RegistryURLFlagDefault, svc.opts.RegistryURL)
 }

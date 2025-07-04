@@ -13,7 +13,7 @@ type Options struct {
 	Out                       iotools.Out
 	ConfigFile                string
 	Credentials               string
-	Unsecure                  bool
+	Insecure                  bool
 	TemplateOutput            string
 	RegistryURL               string
 	OverwriteComponentVersion bool

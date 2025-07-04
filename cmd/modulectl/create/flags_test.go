@@ -19,7 +19,7 @@ func Test_CreateFlagsDefaults(t *testing.T) {
 			expected: "module-config.yaml",
 		},
 		{name: createcmd.CredentialsFlagName, value: createcmd.CredentialsFlagDefault, expected: ""},
-		{name: createcmd.UnsecureFlagName, value: strconv.FormatBool(createcmd.UnsecureFlagDefault), expected: "false"},
+		{name: createcmd.InsecureFlagName, value: strconv.FormatBool(createcmd.InsecureFlagDefault), expected: "false"},
 		{name: createcmd.TemplateOutputFlagName, value: createcmd.TemplateOutputFlagDefault, expected: "template.yaml"},
 		{name: createcmd.RegistryURLFlagName, value: createcmd.RegistryURLFlagDefault, expected: ""},
 		{name: createcmd.OverwriteComponentVersionFlagName, value: strconv.FormatBool(createcmd.OverwriteComponentVersionFlagDefault), expected: "false"},

@@ -52,18 +52,18 @@ type ComponentArchiveService interface {
 
 type RegistryService interface {
 	PushComponentVersion(archive *comparch.ComponentArchive,
-		unsecure bool,
+		insecure bool,
 		overwrite bool,
 		credentials string,
 		registryURL string,
 	) error
 	GetComponentVersion(archive *comparch.ComponentArchive,
-		unsecure bool,
+		insecure bool,
 		userPasswordCreds string,
 		registryURL string,
 	) (cpi.ComponentVersionAccess, error)
 	ExistsComponentVersion(archive *comparch.ComponentArchive,
-		unsecure bool,
+		insecure bool,
 		credentials string,
 		registryURL string,
 	) (bool, error)
@@ -266,7 +266,7 @@ func (s *Service) Run(opts Options) error {
 
 func (s *Service) ensureComponentVersionDoesNotExist(archive *comparch.ComponentArchive, opts Options) error {
 	exists, err := s.registryService.ExistsComponentVersion(archive,
-		opts.Unsecure,
+		opts.Insecure,
 		opts.Credentials,
 		opts.RegistryURL)
 	if err != nil {
@@ -292,14 +292,14 @@ func (s *Service) ensureComponentVersionDoesNotExist(archive *comparch.Component
 
 func (s *Service) pushComponentVersion(archive *comparch.ComponentArchive, opts Options) (*compdesc.ComponentDescriptor, error) {
 	if err := s.registryService.PushComponentVersion(archive,
-		opts.Unsecure,
+		opts.Insecure,
 		opts.OverwriteComponentVersion,
 		opts.Credentials,
 		opts.RegistryURL); err != nil {
 		return nil, fmt.Errorf("failed to push component archive: %w", err)
 	}
 
-	componentVersionAccess, err := s.registryService.GetComponentVersion(archive, opts.Unsecure, opts.Credentials,
+	componentVersionAccess, err := s.registryService.GetComponentVersion(archive, opts.Insecure, opts.Credentials,
 		opts.RegistryURL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to get component version: %w", err)
