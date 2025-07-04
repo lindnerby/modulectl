@@ -32,6 +32,9 @@ func NewService(ociRepository OCIRepository, repo cpi.Repository, credResolverFu
 	if ociRepository == nil {
 		return nil, fmt.Errorf("ociRepository must not be nil: %w", commonerrors.ErrInvalidArg)
 	}
+	if credResolverFunc == nil {
+		return nil, fmt.Errorf("credResolverFunc must not be nil: %w", commonerrors.ErrInvalidArg)
+	}
 
 	return &Service{
 		ociRepository: ociRepository,
