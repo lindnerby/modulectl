@@ -2,12 +2,13 @@ package registry
 
 import (
 	"fmt"
+	"regexp"
+
 	"ocm.software/ocm/api/credentials"
 	"ocm.software/ocm/api/oci/extensions/repositories/ocireg"
 	"ocm.software/ocm/api/ocm/cpi"
 	"ocm.software/ocm/api/ocm/extensions/repositories/comparch"
 	"ocm.software/ocm/api/utils/runtime"
-	"regexp"
 
 	commonerrors "github.com/kyma-project/modulectl/internal/common/errors"
 	"github.com/kyma-project/modulectl/tools/ocirepo"
