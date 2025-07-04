@@ -2,6 +2,7 @@ package credential
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -61,7 +62,11 @@ func tryResolveFromDockerConfig(ctx cpi.Context, registryURL string) (credential
 		path := filepath.Join(home, ".docker", "config.json")
 		if repo, err := dockerconfig.NewRepository(ctx.CredentialsContext(), path, nil, true); err == nil {
 			hostNameInDockerConfig := strings.Split(registryURL, "/")[0]
-			return repo.LookupCredentials(hostNameInDockerConfig)
+			creds, err := repo.LookupCredentials(hostNameInDockerConfig)
+			if err != nil {
+				return nil, fmt.Errorf("failed to lookup credentials: %w", err)
+			}
+			return creds, nil
 		}
 	}
 
