@@ -40,8 +40,8 @@ jobs:
           k3d registry create oci.localhost --port 5001
       - name: Setup private OCI registry
         run: |
-          mkdir -p ~/registry-auth
-          docker run --rm httpd:2.4-alpine htpasswd -Bbn k3duser k3dpass > ~/registry-auth/htpasswd
+          mkdir -p ./auth
+          docker run --rm httpd:2.4-alpine htpasswd -Bbn k3duser k3dpass > ./auth/htpasswd
           cat <<EOF > registry.yaml
           version: 0.1
           log:
