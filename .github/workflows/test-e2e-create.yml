@@ -55,9 +55,6 @@ jobs:
           --port 5002 \
           --volume "$(pwd)/auth:/auth@server" \
           --volume "$(pwd)/registry.yaml:/etc/docker/registry/config.yml@server:ro"
-      - name: Test login to registry
-        run: |
-          docker login localhost:5001 -u k3duser -p k3dpass
       - name: Run tests
         run: |
           make -C tests/e2e test-create-cmd
