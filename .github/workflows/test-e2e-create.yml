@@ -38,6 +38,26 @@ jobs:
         run: |
           wget -qO - https://raw.githubusercontent.com/k3d-io/k3d/main/install.sh | TAG=$K3D_VERSION bash
           k3d registry create oci.localhost --port 5001
+      - name: Setup private OCI registry
+        run: |
+          mkdir -p ~/registry-auth
+          docker run --rm httpd:2.4-alpine htpasswd -Bbn k3duser k3dpass > ~/registry-auth/htpasswd
+          cat <<EOF > registry.yaml
+          version: 0.1
+          log:
+            level: debug
+          auth:
+            htpasswd:
+              realm: basic-realm
+              path: /auth/htpasswd
+          EOF
+          k3d registry create private-oci.localhost \
+          --port 5002 \
+          --volume "$(pwd)/auth:/auth@server" \
+          --volume "$(pwd)/registry.yaml:/etc/docker/registry/config.yml@server:ro"
+      - name: Test login to registry
+        run: |
+          docker login localhost:5001 -u k3duser -p k3dpass
       - name: Run tests
         run: |
           make -C tests/e2e test-create-cmd
