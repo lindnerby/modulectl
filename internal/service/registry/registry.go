@@ -98,19 +98,15 @@ func (s *Service) getRepository(insecure bool, userPasswordCreds, registryURL st
 	}
 
 	ctx := cpi.DefaultContext()
-	repoType := ocireg.Type
-	registryURL = NoSchemeURL(registryURL)
-	if insecure {
-		registryURL = "http://" + registryURL
-	}
+
 	creds, err := s.credResolver(ctx, userPasswordCreds, registryURL)
 	if err != nil {
 		return nil, fmt.Errorf("failed to resolve credentials: %w", err)
 	}
 
 	ociRepoSpec := &ocireg.RepositorySpec{
-		ObjectVersionedType: runtime.NewVersionedObjectType(repoType),
-		BaseURL:             registryURL,
+		ObjectVersionedType: runtime.NewVersionedObjectType(ocireg.Type),
+		BaseURL:             ConstructRegistryUrl(registryURL, insecure),
 	}
 
 	ociRepo, err := ctx.RepositoryTypes().Convert(ociRepoSpec)
@@ -128,7 +124,16 @@ func (s *Service) getRepository(insecure bool, userPasswordCreds, registryURL st
 	return repo, nil
 }
 
-func NoSchemeURL(url string) string {
+func ConstructRegistryUrl(url string, insecure bool) string {
+	registryURL := noSchemeURL(url)
+	if insecure {
+		registryURL = "http://" + registryURL
+	}
+
+	return registryURL
+}
+
+func noSchemeURL(url string) string {
 	regex := regexp.MustCompile(`^https?://`)
 	return regex.ReplaceAllString(url, "")
 }

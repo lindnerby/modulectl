@@ -108,22 +108,40 @@ func TestService_GetComponentVersion_ReturnErrorOnComponentVersionGetError(t *te
 	require.ErrorContains(t, err, "could not get component version")
 }
 
-func Test_NoSchemeURL_ReturnsCorrectWithHTTP(t *testing.T) {
-	scheme := registry.NoSchemeURL("http://ghcr.io")
+func Test_ConstructRegistryUrl_ReturnsCorrectWithHTTPAndNotInsecure(t *testing.T) {
+	scheme := registry.ConstructRegistryUrl("http://ghcr.io", false)
 
 	require.Equal(t, "ghcr.io", scheme)
 }
 
-func Test_NoSchemeURL_ReturnsCorrectWithHTTPS(t *testing.T) {
-	scheme := registry.NoSchemeURL("https://ghcr.io")
+func Test_ConstructRegistryUrl_ReturnsCorrectWithHTTPSAndNotInsecure(t *testing.T) {
+	scheme := registry.ConstructRegistryUrl("https://ghcr.io", false)
 
 	require.Equal(t, "ghcr.io", scheme)
 }
 
-func Test_NoSchemeURL_ReturnsCorrectWithNoScheme(t *testing.T) {
-	scheme := registry.NoSchemeURL("ghcr.io")
+func Test_NoSchemeURL_ReturnsCorrectWithNoSchemeAndNotInsecure(t *testing.T) {
+	scheme := registry.ConstructRegistryUrl("ghcr.io", false)
 
 	require.Equal(t, "ghcr.io", scheme)
+}
+
+func Test_ConstructRegistryUrl_ReturnsCorrectWithHTTPAndInsecure(t *testing.T) {
+	scheme := registry.ConstructRegistryUrl("http://ghcr.io", true)
+
+	require.Equal(t, "http://ghcr.io", scheme)
+}
+
+func Test_ConstructRegistryUrl_ReturnsCorrectWithHTTPSAndInsecure(t *testing.T) {
+	scheme := registry.ConstructRegistryUrl("https://ghcr.io", true)
+
+	require.Equal(t, "http://ghcr.io", scheme)
+}
+
+func Test_NoSchemeURL_ReturnsCorrectWithNoSchemeAndInsecure(t *testing.T) {
+	scheme := registry.ConstructRegistryUrl("ghcr.io", true)
+
+	require.Equal(t, "http://ghcr.io", scheme)
 }
 
 func Test_ExistsComponentVersion_Exists(t *testing.T) {
