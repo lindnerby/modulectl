@@ -1056,15 +1056,16 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 
 	Context("Given 'modulectl create' command", func() {
 		var cmd createCmd
-		It("When invoked with valid module-config with insecure private OCI registry", func() {
-			cmd = createCmd{
-				moduleConfigFile: minimalConfig,
-				registry:         privateOciRegistry,
-				insecure:         true,
-				output:           templateOutputPath,
-				registryCreds:    ociRegistryCreds,
-			}
-		})
+		It("When invoked with valid module-config with insecure private OCI registry and registry credentials",
+			func() {
+				cmd = createCmd{
+					moduleConfigFile: minimalConfig,
+					registry:         privateOciRegistry,
+					insecure:         true,
+					output:           templateOutputPath,
+					registryCreds:    ociRegistryCreds,
+				}
+			})
 		It("Then the command should succeed", func() {
 			Expect(cmd.execute()).To(Succeed())
 
