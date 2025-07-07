@@ -40,21 +40,24 @@ jobs:
           k3d registry create oci.localhost --port 5001
       - name: Setup private OCI registry
         run: |
-          mkdir -p ./auth
-          docker run --rm httpd:2.4-alpine htpasswd -Bbn k3duser k3dpass > ./auth/htpasswd
-          cat <<EOF > registry.yaml
-          version: 0.1
-          log:
-            level: debug
-          auth:
-            htpasswd:
-              realm: basic-realm
-              path: /auth/htpasswd
-          EOF
-          k3d registry create private-oci.localhost \
-          --port 5002 \
-          --volume "$(pwd)/auth:/auth@server" \
-          --volume "$(pwd)/registry.yaml:/etc/docker/registry/config.yml@server:ro"
+          mkdir -p ~/registry-auth
+          docker run --rm httpd:2.4-alpine htpasswd -Bbn k3duser k3dpass > ~/registry-auth/htpasswd
+          
+          docker run -d \
+          --restart=always \
+          -p [::]:5002:5000 \
+          --name private-oci.localhost \
+          -v ~/registry-auth:/auth \
+          -e "REGISTRY_AUTH=htpasswd" \
+          -e "REGISTRY_AUTH_HTPASSWD_REALM=Registry Realm" \
+          -e "REGISTRY_AUTH_HTPASSWD_PATH=/auth/htpasswd" \
+          registry:2
+          
+          k3d cluster create cluster
+
+          docker network ls
+          
+          docker network connect k3d-cluster private-oci.localhost
       - name: Run tests
         run: |
           make -C tests/e2e test-create-cmd
