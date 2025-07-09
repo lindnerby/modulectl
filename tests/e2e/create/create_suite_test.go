@@ -37,6 +37,7 @@ const (
 	iconsWithoutLink           = invalidConfigs + "icons-without-link.yaml"
 	iconsWithoutName           = invalidConfigs + "icons-without-name.yaml"
 	invalidSecurityConfig      = invalidConfigs + "not-existing-security.yaml"
+	invalidSecurityConfigImage = invalidConfigs + "with-security.yaml"
 
 	validConfigs                  = testdataDir + "valid/"
 	minimalConfig                 = validConfigs + "minimal.yaml"
