@@ -134,6 +134,37 @@ func Test_CreateModule_ReturnsError_WhenResolvingDefaultCRFilePathReturnsError(t
 	require.Contains(t, err.Error(), "failed to resolve file")
 }
 
+func Test_CreateModule_ReturnsError_WhenModuleSourcesGitDirectoryIsEmpty(t *testing.T) {
+	svc, err := create.NewService(&moduleConfigServiceStub{}, &gitSourcesServiceStub{}, &securityConfigServiceStub{},
+		&componentArchiveServiceStub{}, &registryServiceStub{}, &ModuleTemplateServiceStub{}, &CRDParserServiceStub{},
+		&ModuleResourceServiceStub{}, &imageVersionVerifierStub{}, &fileResolverStub{}, &fileResolverStub{},
+		&fileExistsStub{})
+	require.NoError(t, err)
+
+	opts := newCreateOptionsBuilder().withModuleSourcesGitDirectory("").build()
+
+	err = svc.Run(opts)
+
+	require.ErrorIs(t, err, commonerrors.ErrInvalidOption)
+	require.Contains(t, err.Error(), "opts.ModuleSourcesGitDirectory must not be empty")
+}
+
+func Test_CreateModule_ReturnsError_WhenModuleSourcesIsNotGitDirectory(t *testing.T) {
+	svc, err := create.NewService(&moduleConfigServiceStub{}, &gitSourcesServiceStub{}, &securityConfigServiceStub{},
+		&componentArchiveServiceStub{}, &registryServiceStub{}, &ModuleTemplateServiceStub{}, &CRDParserServiceStub{},
+		&ModuleResourceServiceStub{}, &imageVersionVerifierStub{}, &fileResolverStub{}, &fileResolverStub{},
+		&fileExistsStub{})
+	require.NoError(t, err)
+
+	opts := newCreateOptionsBuilder().withModuleSourcesGitDirectory(".").build()
+
+	err = svc.Run(opts)
+
+	require.ErrorIs(t, err, commonerrors.ErrInvalidOption)
+	require.Contains(t, err.Error(),
+		"currently configured module-sources-git-directory \".\" must point to a valid git repository")
+}
+
 type createOptionsBuilder struct {
 	options create.Options
 }
@@ -148,7 +179,8 @@ func newCreateOptionsBuilder() *createOptionsBuilder {
 		withModuleConfigFile("create-module-config.yaml").
 		withRegistryURL("https://registry.kyma.cx").
 		withTemplateOutput("test").
-		withCredentials("user:password")
+		withCredentials("user:password").
+		withModuleSourcesGitDirectory("../../../")
 }
 
 func (b *createOptionsBuilder) build() create.Options {
@@ -177,6 +209,11 @@ func (b *createOptionsBuilder) withTemplateOutput(templateOutput string) *create
 
 func (b *createOptionsBuilder) withCredentials(credentials string) *createOptionsBuilder {
 	b.options.Credentials = credentials
+	return b
+}
+
+func (b *createOptionsBuilder) withModuleSourcesGitDirectory(moduleSourcesGitDirectory string) *createOptionsBuilder {
+	b.options.ModuleSourcesGitDirectory = moduleSourcesGitDirectory
 	return b
 }
 
@@ -233,7 +270,7 @@ func (*moduleConfigServiceParseErrorStub) ParseAndValidateModuleConfig(_ string)
 type gitSourcesServiceStub struct{}
 
 func (*gitSourcesServiceStub) AddGitSources(_ *compdesc.ComponentDescriptor,
-	_, _ string,
+	_, _, _ string,
 ) error {
 	return nil
 }
