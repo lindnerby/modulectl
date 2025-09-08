@@ -8,8 +8,8 @@ import (
 	"os"
 	"os/exec"
 
-	"github.com/kyma-project/lifecycle-manager/api/shared"
-	"github.com/kyma-project/lifecycle-manager/api/v1beta2"
+	. "github.com/onsi/ginkgo/v2"
+	. "github.com/onsi/gomega"
 	"k8s.io/apimachinery/pkg/util/yaml"
 	"ocm.software/ocm/api/ocm"
 	"ocm.software/ocm/api/ocm/compdesc"
@@ -20,8 +20,8 @@ import (
 	"ocm.software/ocm/api/ocm/extensions/accessmethods/ociartifact"
 	"ocm.software/ocm/api/ocm/extensions/repositories/ocireg"
 
-	. "github.com/onsi/ginkgo/v2"
-	. "github.com/onsi/gomega"
+	"github.com/kyma-project/lifecycle-manager/api/shared"
+	"github.com/kyma-project/lifecycle-manager/api/v1beta2"
 )
 
 const (
@@ -737,7 +737,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			err := cmd.execute()
 
 			Expect(err).Should(HaveOccurred())
-			Expect(err.Error()).Should(ContainSubstring("failed to configure security scanners: failed to parse security config data: security config file does not exist"))
+			Expect(err.Error()).Should(ContainSubstring("failed to configure security scanners: failed to get security config: failed to parse security config data: security config file does not exist"))
 		})
 	})
 
@@ -1298,7 +1298,6 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 				err = verifyImageResource(imageResources, "webhook",
 					"europe-docker.pkg.dev/kyma-project/prod/webhook:v1.2.0", "v1.2.0")
 				Expect(err).ToNot(HaveOccurred())
-
 			})
 		})
 	})
@@ -1323,6 +1322,63 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 				ContainSubstring("latest"),
 				ContainSubstring("main"),
 			))
+		})
+	})
+
+	It("Given 'modulectl create' command", func() {
+		var cmd createCmd
+		constructorFilePath := "/tmp/component-constructor.yaml"
+		By("When invoked with --disable-ocm-registry-push flag", func() {
+			cmd = createCmd{
+				moduleConfigFile:          minimalConfig,
+				output:                    templateOutputPath,
+				outputConstructorFile:     constructorFilePath,
+				disableOCMRegistryPush:    true,
+				moduleSourcesGitDirectory: templateOperatorPath,
+			}
+		})
+		By("Then the command should succeed", func() {
+			Expect(cmd.execute()).To(Succeed())
+
+			By("And module template file should be generated")
+			Expect(filesIn("/tmp/")).Should(ContainElement("template.yaml"))
+
+			By("And component constructor file should be generated")
+			Expect(filesIn("/tmp/")).Should(ContainElement("component-constructor.yaml"))
+
+			By("And the module template should contain the expected content", func() {
+				template, err := readModuleTemplate(templateOutputPath)
+				Expect(err).ToNot(HaveOccurred())
+
+				By("And template should have no descriptor")
+				Expect(template.Spec.Descriptor.Raw).To(BeNil())
+
+				By("And template should have basic info")
+				Expect(template.Spec.ModuleName).To(Equal("template-operator"))
+				Expect(template.Spec.Version).To(Equal(moduleVersion))
+				Expect(template.Spec.Info.Repository).To(Equal("https://github.com/kyma-project/template-operator"))
+				Expect(template.Spec.Info.Documentation).To(Equal("https://github.com/kyma-project/template-operator/blob/main/README.md"))
+
+				By("And template should have rawManifest resource")
+				Expect(template.Spec.Resources).To(HaveLen(1))
+				Expect(template.Spec.Resources[0].Name).To(Equal("rawManifest"))
+				Expect(template.Spec.Resources[0].Link).To(Equal(fmt.Sprintf("https://github.com/kyma-project/template-operator/releases/download/%s/template-operator.yaml", moduleVersion)))
+			})
+
+			By("And the component constructor file should contain expected content", func() {
+				constructorData, err := os.ReadFile(constructorFilePath)
+				Expect(err).ToNot(HaveOccurred())
+				Expect(string(constructorData)).To(ContainSubstring("components:"))
+				Expect(string(constructorData)).To(ContainSubstring("name: kyma-project.io/module/template-operator"))
+				Expect(string(constructorData)).To(ContainSubstring("version: " + moduleVersion))
+				Expect(string(constructorData)).To(ContainSubstring("resources:"))
+			})
+
+			By("And cleanup temporary files", func() {
+				if _, err := os.Stat(constructorFilePath); err == nil {
+					os.Remove(constructorFilePath)
+				}
+			})
 		})
 	})
 })

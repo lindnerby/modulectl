@@ -22,6 +22,8 @@ type Options struct {
 	OverwriteComponentVersion bool
 	DryRun                    bool
 	SkipVersionValidation     bool
+	DisableOCMRegistryPush    bool
+	OutputConstructorFile     string
 }
 
 func (opts Options) Validate() error {
@@ -33,25 +35,21 @@ func (opts Options) Validate() error {
 		return fmt.Errorf("opts.ConfigFile must not be empty: %w", commonerrors.ErrInvalidOption)
 	}
 
-	if opts.Credentials != "" {
-		matched, err := regexp.MatchString("(.+):(.+)", opts.Credentials)
-		if err != nil {
-			return fmt.Errorf("opts.Credentials could not be parsed: %w: %w", commonerrors.ErrInvalidOption, err)
-		} else if !matched {
-			return fmt.Errorf("opts.Credentials is in invalid format: %w", commonerrors.ErrInvalidOption)
-		}
-	}
-
 	if opts.TemplateOutput == "" {
 		return fmt.Errorf("opts.TemplateOutput must not be empty: %w", commonerrors.ErrInvalidOption)
 	}
 
-	if opts.RegistryURL == "" {
-		return fmt.Errorf("opts.RegistryURL must not be empty: %w", commonerrors.ErrInvalidOption)
+	if opts.OutputConstructorFile == "" && opts.DisableOCMRegistryPush {
+		return fmt.Errorf("opts.OutputConstructorFile must not be empty when OCM registry push is disabled: %w",
+			commonerrors.ErrInvalidOption)
 	}
 
-	if !strings.HasPrefix(opts.RegistryURL, "http") {
-		return fmt.Errorf("opts.RegistryURL does not start with http(s): %w", commonerrors.ErrInvalidOption)
+	// Only validate registry related args if OCM registry push is not disabled
+	if !opts.DisableOCMRegistryPush {
+		err := opts.validateArgsForRegistryPush()
+		if err != nil {
+			return err
+		}
 	}
 
 	if opts.ModuleSourcesGitDirectory == "" {
@@ -71,6 +69,26 @@ func (opts Options) Validate() error {
 		opts.Out.Write("Warning: dry-run flag is set to true. The descriptor will NOT be pushed.\n")
 	}
 
+	return nil
+}
+
+func (opts Options) validateArgsForRegistryPush() error {
+	if opts.Credentials != "" {
+		matched, err := regexp.MatchString("(.+):(.+)", opts.Credentials)
+		if err != nil {
+			return fmt.Errorf("opts.Credentials could not be parsed: %w: %w", commonerrors.ErrInvalidOption, err)
+		} else if !matched {
+			return fmt.Errorf("opts.Credentials is in invalid format: %w", commonerrors.ErrInvalidOption)
+		}
+	}
+
+	if opts.RegistryURL == "" {
+		return fmt.Errorf("opts.RegistryURL must not be empty: %w", commonerrors.ErrInvalidOption)
+	}
+
+	if !strings.HasPrefix(opts.RegistryURL, "http") {
+		return fmt.Errorf("opts.RegistryURL does not start with http(s): %w", commonerrors.ErrInvalidOption)
+	}
 	return nil
 }
 
