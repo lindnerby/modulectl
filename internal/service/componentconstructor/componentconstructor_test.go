@@ -161,7 +161,8 @@ func TestService_AddImagesToConstructor_Success(t *testing.T) {
 	resources := constructor.Components[0].Resources
 	imageResourceCount := 0
 	for _, resource := range resources {
-		if resource.Type == component.OCIArtifactResourceType && resource.Relation == component.OCIArtifactResourceRelation {
+		if resource.Type == component.OCIArtifactResourceType &&
+			resource.Relation == component.OCIArtifactResourceRelation {
 			imageResourceCount++
 			require.NotEmpty(t, resource.Name)
 			require.NotEmpty(t, resource.Version)
@@ -188,7 +189,8 @@ func TestService_AddImagesToConstructor_EmptyImages(t *testing.T) {
 	resources := constructor.Components[0].Resources
 	imageResourceCount := 0
 	for _, resource := range resources {
-		if resource.Type == component.OCIArtifactResourceType && resource.Relation == component.OCIArtifactResourceRelation {
+		if resource.Type == component.OCIArtifactResourceType &&
+			resource.Relation == component.OCIArtifactResourceRelation {
 			imageResourceCount++
 		}
 	}
@@ -288,7 +290,8 @@ func TestService_AddImagesToConstructor_SingleImage(t *testing.T) {
 	resources := constructor.Components[0].Resources
 	var imageResources []component.Resource
 	for _, resource := range resources {
-		if resource.Type == component.OCIArtifactResourceType && resource.Relation == component.OCIArtifactResourceRelation {
+		if resource.Type == component.OCIArtifactResourceType &&
+			resource.Relation == component.OCIArtifactResourceRelation {
 			imageResources = append(imageResources, resource)
 		}
 	}
