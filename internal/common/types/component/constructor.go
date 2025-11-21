@@ -198,7 +198,7 @@ func (c *Constructor) addFileAsDirResource(resourceName, filePath string) error 
 		Input: &Input{
 			Type:         DirectoryInputType,
 			Path:         dir,
-			Compress:     true,
+			Compress:     false,
 			IncludeFiles: []string{filepath.Base(filePath)},
 		},
 	})
