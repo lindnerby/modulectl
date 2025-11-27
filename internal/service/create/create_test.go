@@ -5,6 +5,7 @@ import (
 	"io"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 	"ocm.software/ocm/api/ocm/compdesc"
 	"ocm.software/ocm/api/ocm/cpi"
@@ -185,6 +186,85 @@ func Test_CreateModule_ReturnsError_WhenModuleSourcesIsNotGitDirectory(t *testin
 		"currently configured module-sources-git-directory \".\" must point to a valid git repository")
 }
 
+func Test_CreateModule_CleansUpTempFiles_WhenRegistryPushIsEnabled(t *testing.T) {
+	// given
+	manifestResolverStub := &fileResolverStub{}
+	defaultCRResolverStub := &fileResolverStub{}
+	svc, err := create.NewService(&moduleConfigServiceStub{}, &gitSourcesServiceStub{}, &securityConfigServiceStub{},
+		&componentConstructorServiceStub{},
+		&componentArchiveServiceStub{}, &registryServiceStub{}, &ModuleTemplateServiceStub{}, &CRDParserServiceStub{},
+		&ModuleResourceServiceStub{}, &imageVersionVerifierStub{}, &manifestServiceStub{},
+		manifestResolverStub, defaultCRResolverStub,
+		&fileExistsStub{})
+	require.NoError(t, err)
+
+	opts := newCreateOptionsBuilder().withDisableOCMRegistryPush(false).build() // registry push enabled
+
+	// when
+	err = svc.Run(opts)
+	require.Contains(t, err.Error(), "failed to add images to component descriptor") // error is expected because\
+	// this legacy code path is not fully stubbed
+
+	// then
+	assert.Equal(t, 1, manifestResolverStub.cleanupTempFilesCallCount,
+		"expected manifest resolver to clean up temporary files")
+	assert.Equal(t, 1, defaultCRResolverStub.cleanupTempFilesCallCount,
+		"expected default CR resolver to clean up temporary files")
+}
+
+func Test_CreateModule_DoesNotCleanUpTempFiles_WhenConstructorMode_AndSuccess(t *testing.T) {
+	manifestResolverStub := &fileResolverStub{}
+	defaultCRResolverStub := &fileResolverStub{}
+	svc, err := create.NewService(&moduleConfigServiceStub{}, &gitSourcesServiceStub{}, &securityConfigServiceStub{},
+		&componentConstructorServiceStub{},
+		&componentArchiveServiceStub{}, &registryServiceStub{}, &ModuleTemplateServiceStub{}, &CRDParserServiceStub{},
+		&ModuleResourceServiceStub{}, &imageVersionVerifierStub{}, &manifestServiceStub{},
+		manifestResolverStub, defaultCRResolverStub,
+		&fileExistsStub{})
+	require.NoError(t, err)
+
+	opts := newCreateOptionsBuilder().
+		withOutputConstructorFile("constructor.yaml").
+		withDisableOCMRegistryPush(true). // component-constructor mode enabled
+		build()
+
+	// when
+	err = svc.Run(opts)
+
+	// then
+	require.NoError(t, err)
+	assert.Equal(t, 0, manifestResolverStub.cleanupTempFilesCallCount,
+		"expected manifest resolver not to clean up temporary files on success")
+	assert.Equal(t, 0, defaultCRResolverStub.cleanupTempFilesCallCount,
+		"expected default CR resolver not to clean up temporary files on success")
+}
+
+func Test_CreateModule_CleansUpTempFiles_WhenConstructorMode_AndError(t *testing.T) {
+	manifestResolverStub := &fileResolverStub{}
+	defaultCRResolverStub := &fileResolverStub{}
+	svc, err := create.NewService(&moduleConfigServiceStub{}, &gitSourcesServiceErrorStub{},
+		&securityConfigServiceStub{}, &componentConstructorServiceStub{}, &componentArchiveServiceStub{},
+		&registryServiceStub{}, &ModuleTemplateServiceStub{}, &CRDParserServiceStub{},
+		&ModuleResourceServiceStub{}, &imageVersionVerifierStub{}, &manifestServiceStub{},
+		manifestResolverStub, defaultCRResolverStub,
+		&fileExistsStub{})
+	require.NoError(t, err)
+
+	opts := newCreateOptionsBuilder().
+		withOutputConstructorFile("constructor.yaml").
+		withDisableOCMRegistryPush(true). // component-constructor mode enabled
+		build()
+	// when
+	err = svc.Run(opts)
+
+	// then
+	require.Contains(t, err.Error(), "failed to add git sources to constructor")
+	assert.Equal(t, 1, manifestResolverStub.cleanupTempFilesCallCount,
+		"expected manifest resolver to clean up temporary files on error")
+	assert.Equal(t, 1, defaultCRResolverStub.cleanupTempFilesCallCount,
+		"expected default CR resolver to clean up temporary files on error")
+}
+
 type createOptionsBuilder struct {
 	options create.Options
 }
@@ -237,6 +317,16 @@ func (b *createOptionsBuilder) withModuleSourcesGitDirectory(moduleSourcesGitDir
 	return b
 }
 
+func (b *createOptionsBuilder) withDisableOCMRegistryPush(disableRegistryPush bool) *createOptionsBuilder {
+	b.options.DisableOCMRegistryPush = disableRegistryPush
+	return b
+}
+
+func (b *createOptionsBuilder) withOutputConstructorFile(outputConstructorFile string) *createOptionsBuilder {
+	b.options.OutputConstructorFile = outputConstructorFile
+	return b
+}
+
 type fileExistsStub struct{}
 
 func (*fileExistsStub) FileExists(_ string) (bool, error) {
@@ -247,13 +337,16 @@ func (*fileExistsStub) ReadFile(_ string) ([]byte, error) {
 	return nil, nil
 }
 
-type fileResolverStub struct{}
+type fileResolverStub struct {
+	cleanupTempFilesCallCount int // to track how many times CleanupTempFiles is called
+}
 
 func (*fileResolverStub) Resolve(_ contentprovider.UrlOrLocalFile, _ string) (string, error) {
 	return "/tmp/some-file.yaml", nil
 }
 
-func (*fileResolverStub) CleanupTempFiles() []error {
+func (frs *fileResolverStub) CleanupTempFiles() []error {
+	frs.cleanupTempFilesCallCount++
 	return nil
 }
 
@@ -301,6 +394,20 @@ func (*gitSourcesServiceStub) AddGitSources(_ *compdesc.ComponentDescriptor,
 	_, _, _ string,
 ) error {
 	return nil
+}
+
+type gitSourcesServiceErrorStub struct{}
+
+func (s *gitSourcesServiceErrorStub) AddGitSourcesToConstructor(_ *component.Constructor,
+	_, _ string,
+) error {
+	return errors.New("unexpected error")
+}
+
+func (*gitSourcesServiceErrorStub) AddGitSources(_ *compdesc.ComponentDescriptor,
+	_, _, _ string,
+) error {
+	return errors.New("unexpected error")
 }
 
 type securityConfigServiceStub struct{}
