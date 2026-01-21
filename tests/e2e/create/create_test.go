@@ -760,7 +760,7 @@ var _ = Describe("Test 'create' command", Ordered, func() {
 			Expect(err).Should(HaveOccurred())
 			Expect(
 				err.Error(),
-			).Should(ContainSubstring("failed to configure security scanners: failed to get security config: failed to parse security config data: security config file does not exist"))
+			).Should(ContainSubstring("failed to get security scanners images: failed to get security config: failed to parse security config data: security config file does not exist"))
 		})
 	})
 
@@ -1474,6 +1474,7 @@ func validateMinimalModuleTemplate(template *v1beta2.ModuleTemplate, descriptor 
 	Expect(ok).To(BeTrue())
 	Expect(github.Type).To(Equal(githubAccessSpec.Type))
 	Expect(githubAccessSpec.RepoURL).To(Equal("https://github.com/kyma-project/template-operator"))
+	Expect(githubAccessSpec.Commit).To(Not(BeEmpty()))
 
 	By("And spec.associatedResources should be empty")
 	Expect(template.Spec.AssociatedResources).To(BeEmpty())
