@@ -53,6 +53,7 @@ func (s *ModuleConfigProvider) getModuleConfig(args types.KeyValueArgs) (*Module
 	return &ModuleConfig{
 		Name:      args[ArgModuleName],
 		Version:   args[ArgModuleVersion],
+		Team:      args[ArgTeam],
 		Manifest:  manifest,
 		Security:  args[ArgSecurityConfigFile],
 		DefaultCR: defaultCR,
