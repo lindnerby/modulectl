@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Check out reporting tools
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: kyma-project/qa-toolkit
           path: scripts
@@ -26,11 +26,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r $pip_requirements
       - name: Check out the sourcecode
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           path: codebase
       - name: Set up Go
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
         with:
           go-version-file: ${{ github.workspace }}/codebase/go.mod
       - name: Run the quality gate verification

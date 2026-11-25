@@ -21,9 +21,9 @@ jobs:
       OCI_REPOSITORY_URL: http://k3d-oci.localhost:5001
     steps:
       - name: Checkout
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Checkout template-operator
-        uses: actions/checkout@v6
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: kyma-project/template-operator
           path: template-operator
@@ -33,7 +33,7 @@ jobs:
         run: echo "TEMPLATE_OPERATOR_LATEST_COMMIT=$(git rev-parse HEAD)" >> $GITHUB_ENV
 
       - name: Go setup
-        uses: actions/setup-go@v6
+        uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
         with:
           go-version-file: 'go.mod'
           cache-dependency-path: 'go.sum'
